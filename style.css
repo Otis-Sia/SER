@@ -1,0 +1,104 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f4f8;
+}
+
+#logo {
+    width: 80px;
+    height: auto;
+}
+
+header,
+footer {
+    background: #026702;
+    color: white;
+    padding: 1.5em;
+    text-align: left;
+}
+
+nav {
+    background: #009900;
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1em;
+}
+
+#navb {
+    background: #51be51;
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    padding: 0.5em 1em;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #003366;
+    border-radius: 5px;
+}
+
+section {
+    padding: 2em;
+    background: white;
+    margin: 1em;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #003366;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.gallery img {
+    width: 150px;
+    margin: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-section input,
+.form-section textarea {
+    width: 10%;
+    margin-bottom: 1em;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-section button {
+    padding: 0.5em 1em;
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-section button:hover {
+    background: #002244;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+}
+
+#emblem-image {
+    width: 100px;
+    height: auto;
+    margin: 0 auto;
+}
