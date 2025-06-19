@@ -17,6 +17,7 @@ header{
     background: #026702;
     color: white;
     padding: 1em 2em;
+    height: fit-content;
 }
 header h1 {
     margin: 0;
