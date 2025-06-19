@@ -33,9 +33,7 @@ footer {
 nav {
     background: #009900;
     color: white;
-    display: flex;
     justify-content: center;
-    flex-wrap: wrap;
     padding: 1em;
 }
 
