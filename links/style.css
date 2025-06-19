@@ -72,7 +72,7 @@ img {
 
 .form-section input,
 .form-section textarea {
-    width: 10%;
+    width: 30%;
     margin-bottom: 1em;
     padding: 0.5em;
     border: 1px solid #ccc;
