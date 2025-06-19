@@ -12,7 +12,10 @@ body {
     height: auto;
     margin-right: 15px;
 }
-
+#smicons{
+    width: 15px;
+    height: auto;
+}
 header{
     background: #026702;
     color: white;
@@ -28,13 +31,19 @@ footer {
     color: white;
     padding: 1.5em;
     font-size: 0.9em;
+    transition: transform 0.3s ease;
+    vertical-align: middle;
+
 }
+
 
 nav {
     background: #009900;
     color: white;
     justify-content: center;
     padding: 1em;
+    text-align: center;
+    display: block;
 }
 
 #navb {
