@@ -1,51 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Robins Scout Rover Crew Juja</title>
-    <link rel="stylesheet" href="../links/style.css" type="text/css">
-
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SER Login</title>
+  <link rel="stylesheet" href="../links/style.css">
 </head>
-
 <body>
-    <header>
-        <a href="../index.html"><img src="../images/logo.png" id="logo" alt="SER Logo"></a>
-        <h1 style="float: inline-end;">Scouts Emergency Response</h1>
-        <button style="position: fixed;top: 10px; right: 20px;" ;>
-            <a href="#">Register</a>
-        </button>
-    </header>
+
+  <header>
     <nav>
-        <a href="../index.html">Home</a>
-        <a href="../About.html">About</a>
-        <a href="../projects/Projects.html">Projects</a>
-        <a href="../Events.html">Events</a>
-        <a href="../Gallery.html">Gallery</a>
-        <a href="../Contacts.html">Contacts</a>
-        <a href="../faq.html">FAQs</a>
-        <a href="../community.htm">community</a>
-        <h1>SIGN IN</h1>
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="SER Logo" style="height: 50px;">
+        </a>
+      </div>
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
     </nav>
-    <nav id="navb">
+  </header>
 
-    </nav>
+  <main>
+    <section class="form-container">
+      <h1>Login to Your SER Account</h1>
+      <form action="#" method="post">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
 
-    <section id="register" class="form-section">
-        <h2>SIGN IN To your Account</h2>
-        <h2><a href="register.html"><button>OR CREATE an ACCOUNT</button></a></h2>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
 
-        <form>
-            <input type="email" placeholder="Email Address" required>
-            <input type="password" placeholder="password" required><br/>
-            <button type="submit">Submit</button>
-        </form>
+        <button type="submit" class="btn">Login</button>
+        <p>Don't have an account? <a href="register.html">Register here</a></p>
+      </form>
     </section>
+  </main>
 
+  <footer>
+    <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+  </footer>
 
-    <script src="../links/script.js"></script>
 </body>
-
 </html>
