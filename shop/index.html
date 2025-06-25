@@ -1,35 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SER SHOP</title>
-    <link rel="stylesheet" href="../links/style.css" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Online Shop</title>
+    <link rel="stylesheet" href="../links/style.css">
 </head>
 
 <body>
     <header>
-        <a href="../index.html"><img src="../images/logo.png" id="logo" alt="SER Logo"></a>
-        <h1 style="float: inline-end;">Scouts Emergency Response</h1>
-        <button style="position: fixed;top: 10px; right: 20px;" ;>
-            <a href="login/register.html">Register</a>
-        </button>
+        <nav>
+            <div class="logo">
+                <a href="../index.html"><img src="../images/logo.png" alt="SER Logo" style="height: 50px; width: auto;">
+                    <span style="display: none;">SER</span> </a>
+                </a>
+            </div>
+            <ul>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Cart <span class="cart-count">(0)</span></a></li>
+            </ul>
+        </nav>
     </header>
-    <nav>
-        <a href="../index.html">Home</a>
-        <a href="About.html">About</a>
-        <a href="projects/Projects.html">Projects</a>
-        <a href="Events.html">Events</a>
-        <a href="Gallery.html">Gallery</a>
-        <a href="Contacts.html">Contacts</a>
-        <a href="faq.html">FAQs</a>
-    </nav>
-    <nav id="navb">
-<H2><a href="new.html">NEW</a></H2>
-<h2><a href="offers.html">OFFERS</a></h2>
 
-    </nav>
+    <main>
+        <section class="hero">
+            <h1>Welcome to Our Shop</h1>
+            <p>Discover our amazing products</p>
+            <a href="products.html" class="btn">Shop Now</a>
+        </section>
+
+        <section class="featured-products">
+            <h2>Featured Products</h2>
+            <div class="product-grid" id="featured-products-grid">
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Your Online Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="../links/script.js"></script>
 </body>
 
 </html>

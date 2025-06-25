@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -10,27 +10,53 @@
 
 <body>
     <header>
-        <a href="index.html"><img src="images/logo.png" id="logo" alt="SER Logo"></a>
-        <h1 style="float: inline-end;">Scouts Emergency Response</h1>
-        <button style="position: fixed;top: 10px; right: 20px;" ;>
-            <a href="login/register.html">Register</a>
-        </button>
-    </header>
-    <nav>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="SER Logo" style="height: 50px; width: auto;">
+                    <span style="display: none;">SER</span>
+                </a>
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="About.html">About</a></li>
+                <li><a href="projects/Projects.html">Projects</a></li>
+                <li><a href="Events.html">Events</a></li>
+                <li><a href="Gallery.html">Gallery</a></li>
+                <li><a href="Contacts.html">Contacts</a></li>
+                <li><a href="faq.html">FAQs</a></li>
+                <li><a href="community.htm" class="active">Community</a></li>
+            </ul>
 
-        <a href="index.html">Home</a>
-        <a href="About.html">About</a>
-        <a href="projects/Projects.html">Projects</a>
-        <a href="Events.html">Events</a>
-        <a href="Gallery.html">Gallery</a>
-        <a href="Contacts.html">Contacts</a>
-    </nav>
-    <nav id="navb">
-        <button>BLOGSPOT</button>
-    </nav>
+            <a href="login/register.html" class="btn btn-accent">Register</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h1>Join the SER Community</h1>
+            <p style="text-align: center; max-width: 700px; margin: 0 auto;">
+                Our community is where Scouts, volunteers, and emergency responders come together to share stories, resources, and support. Whether you're looking to contribute, learn, or simply connect — you're welcome here.
+            </p>
+        </section>
+
+        <section style="text-align: center;">
+            <h2>Community Blog</h2>
+            <a href="https://your-blog-link.blogspot.com" target="_blank" class="btn">Visit Blogspot</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://facebook.com" target="_blank" title="Facebook">
+                <!-- Facebook SVG -->
+                <svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Facebook</title><path d="M23.9981 11.9991C23.9981 5.37216 18.626 0 11.9991 0C5.37216 0 0 5.37216 0 11.9991C0 17.9882 4.38789 22.9522 10.1242 23.8524V15.4676H7.07758V11.9991H10.1242V9.35553C10.1242 6.34826 11.9156 4.68714 14.6564 4.68714C15.9692 4.68714 17.3424 4.92149 17.3424 4.92149V7.87439H15.8294C14.3388 7.87439 13.8739 8.79933 13.8739 9.74824V11.9991H17.2018L16.6698 15.4676H13.8739V23.8524C19.6103 22.9522 23.9981 17.9882 23.9981 11.9991Z"/></svg>
+            </a>
+        </div>
+        <p>&copy; 2025 Scouts Emergency Response</p>
+    </footer>
 
     <script src="links/script.js"></script>
-
 </body>
 
 </html>

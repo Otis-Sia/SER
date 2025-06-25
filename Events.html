@@ -4,44 +4,66 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SER Events</title>
-    <link rel="stylesheet" href="links/style.css" type="text/css">
-
-
+    <title>Events - Scouts Emergency Response</title>
+    <link rel="stylesheet" href="links/style.css" type="text/css" />
 </head>
 
 <body>
+    <!-- Header & Navigation -->
     <header>
-        <a href="index.html"><img src="images/logo.png" id="logo" alt="SER Logo"></a>
-        <h1 style="float: inline-end;">Scouts Emergency Response</h1>
-        <button style="position: fixed;top: 10px; right: 20px;" ;>
-            <a href="login/register.html">Register</a>
-        </button>
-    </header>
-    
         <nav>
-            <a href="index.html">Home</a>
-            <a href="About.html">About</a>
-            <a href="projects/Projects.html">Projects</a>
-            <a href="Events.html">Events</a>
-            <a href="Gallery.html">Gallery</a>
-            <a href="Contacts.html">Contacts</a>
-        </nav>
-        
-        <nav id="navb">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="SER Logo" style="height: 50px; width: auto;">
+                </a>
+            </div>
 
-        </nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="About.html">About</a></li>
+                <li><a href="projects/Projects.html">Projects</a></li>
+                <li><a href="Events.html" class="active">Events</a></li>
+                <li><a href="Gallery.html">Gallery</a></li>
+                <li><a href="Contacts.html">Contacts</a></li>
+                <li><a href="faq.html">FAQs</a></li>
+                <li><a href="community.htm">Community</a></li>
+            </ul>
 
-    
-    <section id="dates">
-        <h2>Important Dates in Scouting</h2>
-        <ul>
-            <li>1907: First Scout Camp</li>
-            <li>1908: First Scout Handbook Published</li>
-            <li>1920: First World Scout Jamboree</li>
-            <li>February 22: Founder's Day (Baden-Powell's Birthday)</li>
-        </ul>
-    </section>
+            <a href="login/register.html" class="btn btn-accent">Register</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section style="max-width: 800px; margin: 2rem auto; text-align: center;">
+            <h1>Scouting Milestones & Upcoming Events</h1>
+            <p>Scouts Emergency Response (SER) proudly honors key dates in Scouting and hosts community-centered events.</p>
+
+            <h2 style="margin-top: 2rem;">📅 Historic Milestones</h2>
+            <ul style="text-align: left; margin: 0 auto; max-width: 500px; padding-left: 1rem;">
+                <li><strong>1907:</strong> First Scout Camp (Brownsea Island)</li>
+                <li><strong>1908:</strong> First Scout Handbook Published</li>
+                <li><strong>1920:</strong> First World Scout Jamboree</li>
+                <li><strong>February 22:</strong> Founder's Day (Baden-Powell's Birthday)</li>
+            </ul>
+
+            <h2 style="margin-top: 3rem;">🚨 Upcoming SER Events</h2>
+            <ul style="text-align: left; margin: 0 auto; max-width: 500px; padding-left: 1rem;">
+                <li><strong>July 6, 2025:</strong> Fire Safety Awareness Workshop – Juja Scouts Hall</li>
+                <li><strong>August 10–12, 2025:</strong> Disaster Response Camp – Mount Kenya</li>
+                <li><strong>September 21, 2025:</strong> Community First Aid Day – JKUAT Grounds</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <!-- Add your social SVGs here as before -->
+        </div>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
     <script src="links/script.js"></script>
 </body>
 
