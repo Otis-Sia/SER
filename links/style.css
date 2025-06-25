@@ -704,3 +704,33 @@ nav ul li a.active {
   color: #0a6e3c;
   text-decoration: underline;
 }
+.project-section {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.project-section h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #0a6e3c;
+}
+
+.project-card {
+  background-color: #f0fdf6;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-left: 6px solid #0a6e3c;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.project-card h3 {
+  margin-top: 0;
+  color: #064d2c;
+}
+
+.project-card p {
+  color: #333;
+  line-height: 1.6;
+}
