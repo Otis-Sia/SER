@@ -13,14 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 });
 
-// Hamburger toggle
-document.addEventListener("DOMContentLoaded", function() {
-    const hamburger = document.getElementById("hamburger");
-    const navLinks = document.getElementById("nav-links");
+document.addEventListener('DOMContentLoaded', function() {
+    // Find the button and the navigation links container
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
 
-    hamburger.addEventListener("click", () => {
-        navLinks.classList.toggle("show");
-    });
+    // Check if the button exists on the page
+    if (menuToggle) {
+        // Add a 'click' event listener to the button
+        menuToggle.addEventListener('click', function() {
+            // When the button is clicked, add or remove the 'active' class
+            // from the navigation links container.
+            navLinks.classList.toggle('active');
+        });
+    }
 });
 
 //Cart.js

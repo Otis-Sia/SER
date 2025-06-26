@@ -114,18 +114,16 @@ header {
     box-shadow: var(--box-shadow);
     padding: 1rem 2rem;
     position: sticky;
-    width: fit-content;
     top: 0;
-    /*z-index: 1000;*/
+    z-index: 1000;
 }
 
 nav {
-    text-align: center;
-    display: block;
-    /*flex-wrap: wrap;*/
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    /*max-width: 1200px;*/
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -146,6 +144,79 @@ nav ul li a {
     font-weight: 500;
     position: relative;
     padding-bottom: 5px;
+}
+
+
+/* --- ADD THESE STYLES FOR RESPONSIVE NAVIGATION --- */
+
+
+/* Style for the hamburger menu button */
+
+.menu-toggle {
+    display: none;
+    /* Hide it by default on desktop */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 1rem;
+}
+
+.menu-toggle svg {
+    color: var(--primary-color);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+
+/* This is the media query where the magic happens */
+
+
+/* On screens 992px or less (tablets and phones) */
+
+@media (max-width: 992px) {
+    /* Hide the normal navigation links */
+    .nav-links ul {
+        display: none;
+        flex-direction: column;
+        /* Stack them vertically */
+        position: absolute;
+        top: 75px;
+        /* Position it just below the header */
+        right: 0;
+        background-color: var(--white-color);
+        width: 100%;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+        border-bottom-left-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+    /* When the menu is active, show the links */
+    .nav-links.active ul {
+        display: flex;
+    }
+    .nav-links ul li {
+        width: 100%;
+        text-align: center;
+    }
+    .nav-links ul li a {
+        padding: 1rem;
+        display: block;
+        /* Make the whole area clickable */
+        width: 100%;
+    }
+    /* Show the hamburger menu button */
+    .menu-toggle {
+        display: block;
+    }
+    /* Hide the register button from the main bar to avoid clutter */
+    /* Optional: you can move it inside the mobile menu if you like */
+    .header-actions .btn {
+        display: none;
+    }
 }
 
 
