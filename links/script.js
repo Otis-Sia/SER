@@ -14,17 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Find the button and the navigation links container
     const menuToggle = document.getElementById('menu-toggle');
-    const navLinks = document.getElementById('nav-links');
 
     // Check if the button exists on the page
     if (menuToggle) {
-        // Add a 'click' event listener to the button
         menuToggle.addEventListener('click', function() {
-            // When the button is clicked, add or remove the 'active' class
-            // from the navigation links container.
-            navLinks.classList.toggle('active');
+            // This line is the only change. It adds/removes 'nav-active'
+            // to the <body> tag.
+            document.body.classList.toggle('nav-active');
         });
     }
 });
