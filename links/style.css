@@ -168,7 +168,7 @@ nav ul li a {
     color: var(--primary-color);
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0100;
 }
 
 .menu-toggle .icon-close {
