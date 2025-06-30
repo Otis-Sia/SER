@@ -1,14 +1,9 @@
-/* --- Google Fonts Import --- */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-/* --- CSS Variables (Color Palette & Fonts) --- */
-
 :root {
     --primary-color: #009900;
     --secondary-color: #088395;
     --accent-color: #f5a623;
-    --background-color: #f9f9f9;
+    --background-color: #f0fdf6;
     --text-color: #333;
     --light-gray-color: #e0e0e0;
     --white-color: #ffffff;
@@ -16,10 +11,13 @@
     --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     --border-radius: 8px;
     --transition-speed: 0.3s ease;
+    --font-size-a: 16px;
+    --font-size-p: 17px;
+    --font-size-li: 15px;
+    --font-size-h1: 40px;
+    --font-size-h2: 25px;
+    --font-size-h3: 20px;
 }
-
-
-/* --- Global & Reset Styles --- */
 
 * {
     box-sizing: border-box;
@@ -33,7 +31,7 @@ html {
 
 body {
     font-family: var(--font-family);
-    background-color: var(--background-color);
+    background-color: var(--white-color);
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -76,9 +74,6 @@ section {
     margin-bottom: 3rem;
 }
 
-
-/* --- Utility Classes --- */
-
 .btn {
     display: inline-block;
     background-color: var(--primary-color);
@@ -106,9 +101,6 @@ section {
     background-color: #e0941c;
 }
 
-
-/* --- Header & Navigation --- */
-
 header {
     background-color: var(--white-color);
     box-shadow: var(--box-shadow);
@@ -128,7 +120,7 @@ nav {
 }
 
 .logo a {
-    font-size: 1.8rem;
+    font-size: var(--font-size-a);
     font-weight: 700;
     color: var(--primary-color);
 }
@@ -140,17 +132,11 @@ nav ul {
 }
 
 nav ul li a {
-    font-size: 1rem;
+    font-size: var(--font-size-a);
     font-weight: 500;
     position: relative;
     padding-bottom: 5px;
 }
-
-
-/* --- ADD THESE STYLES FOR RESPONSIVE NAVIGATION --- */
-
-
-/* Style for the hamburger menu button */
 
 .menu-toggle {
     display: none;
@@ -180,21 +166,12 @@ nav ul li a {
     align-items: center;
 }
 
-
-/* This is the media query where the magic happens */
-
-
-/* On screens 992px or less (tablets and phones) */
-
 @media (max-width: 992px) {
-    /* Hide the normal navigation links */
     .nav-links ul {
         display: none;
         flex-direction: column;
-        /* Stack them vertically */
         position: absolute;
         top: 75px;
-        /* Position it just below the header */
         right: 0;
         background-color: var(--white-color);
         width: 100%;
@@ -203,7 +180,6 @@ nav ul li a {
         border-bottom-left-radius: var(--border-radius);
         border-bottom-right-radius: var(--border-radius);
     }
-    /* When the menu is active, show the links */
     .nav-links.active ul {
         display: flex;
     }
@@ -216,31 +192,85 @@ nav ul li a {
         display: block;
         width: 100%;
     }
-    /* Show the hamburger menu button */
     .menu-toggle {
         display: block;
     }
-    /* Hide the register button from the main bar to avoid clutter */
-    /* Optional: you can move it inside the mobile menu if you like */
     .header-actions .btn {
         display: none;
     }
     body.nav-active .nav-links ul {
         display: flex;
-        /* ...show the menu */
     }
     body.nav-active .menu-toggle .icon-menu {
         display: none;
-        /* ...hide the hamburger icon */
     }
     body.nav-active .menu-toggle .icon-close {
         display: block;
-        /* ...show the 'X' icon */
+    }
+    .product-detail-container {
+        grid-template-columns: 1fr;
     }
 }
 
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .cart-item {
+        grid-template-columns: 80px 1fr 80px;
+        grid-template-areas: "img info remove" "img price quantity";
+        align-items: center;
+    }
+    .cart-item img {
+        grid-area: img;
+    }
+    .cart-item-info {
+        grid-area: info;
+    }
+    .item-price {
+        grid-area: price;
+        text-align: center;
+    }
+    .cart-item-quantity {
+        grid-area: quantity;
+    }
+    .remove-item-btn {
+        grid-area: remove;
+        justify-self: end;
+    }
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    main section {
+        padding: 1.5rem;
+    }
+    main h1 {
+        font-size: var(--font-size-h1);
+    }
+    main h2 {
+        font-size: var(--font-size-h2);
+    }
+}
 
-/* Underline effect on hover */
+@media (max-width: 480px) {
+    main {
+        padding: 1rem;
+    }
+    .hero h1 {
+        font-size: var(--font-size-h1);
+    }
+}
+
+.gallery-item {
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1 / 1;
+}
 
 nav ul li a::after {
     content: '';
@@ -260,9 +290,9 @@ nav ul li a:hover::after {
 .cart-count {
     background-color: var(--accent-color);
     color: var(--white-color);
-    border-radius: 50%;
+    border-radius: var(--border-radius);
     padding: 2px 8px;
-    font-size: 0.8rem;
+    font-size: var(--font-size-p);
     font-weight: 600;
     vertical-align: super;
     margin-left: 4px;
@@ -274,16 +304,6 @@ nav a {
     transition: background-color 0.3s;
 }
 
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-
-/* --- Homepage: Hero Section --- */
-
 .hero {
     text-align: center;
     padding: 4rem 2rem;
@@ -293,24 +313,21 @@ nav a {
 }
 
 .hero h1 {
-    font-size: 3rem;
+    font-size: var(--font-size-h1);
     color: var(--white-color);
     margin-bottom: 0.5rem;
 }
 
 .hero p {
-    font-size: 1.2rem;
+    font-size: var(--font-size-p);
     margin-bottom: 2rem;
     font-weight: 300;
 }
 
-
-/* --- Product Grid & Cards (Used on Homepage and Products Page) --- */
-
 .featured-products h2,
 .product-listing h2 {
     text-align: center;
-    font-size: 2rem;
+    font-size: var(--font-size-h2);
     margin-bottom: 2rem;
 }
 
@@ -321,7 +338,7 @@ nav a {
 }
 
 .product-card {
-    background-color: var(--white-color);
+    background-color: var(--back-color);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     overflow: hidden;
@@ -359,14 +376,14 @@ nav a {
 }
 
 .product-card h3 {
-    font-size: 1.2rem;
+    font-size: var(--font-size-h3);
     font-weight: 500;
     color: var(--text-color);
     margin-bottom: 0.5rem;
 }
 
 .product-card .price {
-    font-size: 1.3rem;
+    font-size: var(--font-size-p);
     font-weight: 600;
     color: var(--secondary-color);
     margin-bottom: 1rem;
@@ -374,11 +391,7 @@ nav a {
 
 .product-card .add-to-cart-btn {
     margin-top: auto;
-    /* Pushes button to the bottom */
 }
-
-
-/* --- Single Product Page --- */
 
 .product-detail-container {
     display: grid;
@@ -402,7 +415,7 @@ nav a {
 
 .thumbnail-images img {
     border: 2px solid transparent;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: border-color var(--transition-speed);
 }
@@ -413,11 +426,11 @@ nav a {
 }
 
 .product-info h1 {
-    font-size: 2.5rem;
+    font-size: var(--font-size-h1);
 }
 
 .product-info .price {
-    font-size: 2rem;
+    font-size: var(--font-size-p);
     color: var(--secondary-color);
     font-weight: 600;
     margin-bottom: 1.5rem;
@@ -426,9 +439,6 @@ nav a {
 .product-info p {
     margin-bottom: 1.5rem;
 }
-
-
-/* --- Shopping Cart Page --- */
 
 .shopping-cart h2 {
     text-align: center;
@@ -455,7 +465,7 @@ nav a {
 }
 
 .cart-item-info h3 {
-    font-size: 1.1rem;
+    font-size: var(--font-size-h3);
     margin-bottom: 0.2rem;
 }
 
@@ -469,7 +479,7 @@ nav a {
     text-align: center;
     padding: 8px;
     border: 1px solid var(--light-gray-color);
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 .remove-item-btn {
@@ -495,13 +505,10 @@ nav a {
 }
 
 .cart-summary p {
-    font-size: 1.5rem;
+    font-size: var(--font-size-p);
     font-weight: 600;
     margin-bottom: 1.5rem;
 }
-
-
-/* --- Footer --- */
 
 footer {
     text-align: center;
@@ -509,68 +516,6 @@ footer {
     margin-top: 3rem;
     background-color: var(--primary-color);
     color: var(--white-color);
-}
-
-
-/* --- Responsive Media Queries --- */
-
-@media (max-width: 992px) {
-    .product-detail-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    .cart-item {
-        grid-template-columns: 80px 1fr 80px;
-        grid-template-areas: "img info remove" "img price quantity";
-        align-items: center;
-    }
-    .cart-item img {
-        grid-area: img;
-    }
-    .cart-item-info {
-        grid-area: info;
-    }
-    .item-price {
-        grid-area: price;
-        text-align: center;
-    }
-    .cart-item-quantity {
-        grid-area: quantity;
-    }
-    .remove-item-btn {
-        grid-area: remove;
-        justify-self: end;
-    }
-}
-
-@media (max-width: 480px) {
-    main {
-        padding: 1rem;
-    }
-    .hero h1 {
-        font-size: 2.2rem;
-    }
-}
-
-
-/* --- Gallery Page Styles --- */
-
-.gallery-item {
-    background-color: var(--white-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    overflow: hidden;
-    /* This is key for the zoom effect */
-    position: relative;
-    /* Needed for the overlay */
-    aspect-ratio: 1 / 1;
-    /* Makes the gallery items square */
 }
 
 .gallery-item a {
@@ -583,17 +528,12 @@ footer {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Ensures the image covers the square area without distortion */
     transition: transform var(--transition-speed);
 }
 
 .gallery-item:hover img {
     transform: scale(1.1);
-    /* Zoom effect on hover */
 }
-
-
-/* Style for the hover overlay */
 
 .gallery-item .overlay {
     position: absolute;
@@ -602,23 +542,19 @@ footer {
     width: 100%;
     height: 100%;
     background-color: rgba(10, 77, 104, 0.7);
-    /* Use your primary color with transparency */
     color: var(--white-color);
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     transition: opacity var(--transition-speed);
-    font-size: 1.2rem;
+    font-size: var(--font-size-p);
     font-weight: 500;
 }
 
 .gallery-item:hover .overlay {
     opacity: 1;
 }
-
-
-/* --- Informational Content Sections (FAQs, Events, About) --- */
 
 main section {
     background-color: var(--white-color);
@@ -634,21 +570,27 @@ main section:hover {
 }
 
 main h1 {
-    font-size: 2.2rem;
+    font-size: var(--font-size-h1);
     text-align: center;
     margin-bottom: 1.5rem;
     color: var(--primary-color);
 }
 
 main h2 {
-    font-size: 1.6rem;
+    font-size: var(--font-size-h2);
     color: var(--secondary-color);
     margin-bottom: 1rem;
 }
 
-main p,
+main p {
+    line-height: 1.8;
+    margin-bottom: 0.8rem;
+    color: var(--text-color);
+    font-size: var(--font-size-p);
+}
+
 main li {
-    font-size: 1rem;
+    font-size: var(--font-size-li);
     line-height: 1.8;
     margin-bottom: 0.8rem;
     color: var(--text-color);
@@ -662,47 +604,15 @@ ul li::marker {
     color: var(--accent-color);
 }
 
-
-/* --- Highlight active nav link --- */
-
-nav ul li a.active {
-    font-weight: 600;
-    color: var(--secondary-color);
-}
-
-
-/* --- Responsive Tweaks for Info Pages --- */
-
-@media (max-width: 768px) {
-    main section {
-        padding: 1.5rem;
-    }
-    main h1 {
-        font-size: 1.8rem;
-    }
-    main h2 {
-        font-size: 1.4rem;
-    }
-}
-
-
-/* --- Blog Button / External CTA --- */
-
 section a.btn {
     margin-top: 1rem;
 }
-
-
-/* --- Active Page Highlighting in Navbar --- */
 
 nav ul li a.active {
     font-weight: 600;
     color: var(--secondary-color);
     border-bottom: 2px solid var(--secondary-color);
 }
-
-
-/* Contact Forms*/
 
 .contact-intro,
 .contact-form,
@@ -723,7 +633,7 @@ nav ul li a.active {
     width: 100%;
     padding: 0.7rem;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 .contact-form .btn {
@@ -731,7 +641,7 @@ nav ul li a.active {
     color: #fff;
     padding: 0.8rem;
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
 }
 
@@ -753,17 +663,19 @@ nav ul li a.active {
     margin-right: 10px;
 }
 
-
-/* About Page Styling */
-
 .about-intro,
 .about-mission,
 .about-vision,
-.about-values {
-    padding: 2rem 1rem;
+.about-values,
+.project-card {
+    padding: 1.5rem;
     max-width: 800px;
-    margin: auto;
     text-align: center;
+    margin: 1rem 0;
+    background-color: var(--background-color);
+    border-left: 6px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .about-values ul {
@@ -777,7 +689,7 @@ nav ul li a.active {
     margin: 3rem auto;
     padding: 2rem;
     background-color: #f5f5f5;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -795,7 +707,7 @@ nav ul li a.active {
 .form-container input {
     padding: 0.7rem;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 .form-container .btn {
@@ -803,7 +715,7 @@ nav ul li a.active {
     color: #fff;
     padding: 0.8rem;
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     font-weight: bold;
 }
@@ -813,25 +725,10 @@ nav ul li a.active {
     text-decoration: underline;
 }
 
-.project-section {
-    padding: 2rem;
-    max-width: 1000px;
-    margin: auto;
-}
-
 .project-section h2 {
     text-align: center;
     margin-bottom: 2rem;
     color: #0a6e3c;
-}
-
-.project-card {
-    background-color: #f0fdf6;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    border-left: 6px solid #0a6e3c;
-    border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .project-card h3 {
