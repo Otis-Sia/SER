@@ -1,0 +1,123 @@
+/* SER-specific pages: about, events, projects, gallery, faq, contact, community */
+
+
+/* About blocks */
+
+.about-intro,
+.about-mission,
+.about-vision,
+.about-values {
+    padding: 1.5rem;
+    max-width: 800px;
+    text-align: center;
+    margin: 1rem auto;
+    background-color: var(--background-color);
+    border-left: 6px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.about-values ul {
+    list-style-type: disc;
+    padding-left: 2rem;
+    text-align: left;
+}
+
+
+/* Projects */
+
+.project-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #0a6e3c;
+}
+
+
+/* Contact */
+
+.contact-intro,
+.contact-form,
+.contact-info {
+    padding: 2rem 1rem;
+    max-width: 900px;
+    margin: auto;
+}
+
+.contact-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+}
+
+
+/* Gallery */
+
+.gallery-item {
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1 / 1;
+}
+
+.gallery-item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-speed);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+.gallery-item .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 77, 104, 0.7);
+    color: var(--white-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition-speed);
+    font-size: var(--font-size-p);
+    font-weight: 500;
+}
+
+.gallery-item:hover .overlay {
+    opacity: 1;
+}
+
+
+/* Simple FAQ block styling */
+
+.faq-item {
+    background-color: var(--background-color);
+    border-left: 6px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.faq-item h2 {
+    margin-bottom: 0.5rem;
+}

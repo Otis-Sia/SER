@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact SER | Scouts Emergency Response</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/ser.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../">
+                    <img src="../assets/images/brand/logo-icon.png" alt="SER Logo" style="height:50px; width:auto;">
+                </a>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+                <ul>
+                    <li><a href="../">Home</a></li>
+                    <li><a href="../about/">About</a></li>
+                    <li><a href="../projects/">Projects</a></li>
+                    <li><a href="../events/">Events</a></li>
+                    <li><a href="../gallery/">Gallery</a></li>
+                    <li><a href="./">Contact</a></li>
+                    <li><a href="../faq/">FAQs</a></li>
+                    <li><a href="../community/">Community</a></li>
+                    <li><a href="../shop/">Shop</a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+                <a href="../login/register/" class="btn btn-accent">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Intro -->
+        <section class="contact-intro">
+            <h1>Contact Us</h1>
+            <p>
+                Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.
+            </p>
+        </section>
+
+        <!-- Form -->
+        <section class="contact-form">
+            <h2>Send a Message</h2>
+
+            <!-- NOTE: action="#" keeps it static for now.
+         Later you can connect to Formspree / Google Forms / backend. -->
+            <form action="#" method="post">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="6" placeholder="How can we help?" required></textarea>
+
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+        </section>
+
+        <!-- Contact Info -->
+        <section class="contact-info">
+            <h2>Other Ways to Reach Us</h2>
+
+            <ul style="padding-left:0;">
+                <li>
+                    <strong>Email:</strong>
+                    <a href="mailto:scoutsemergencyresponse@gmail.com">scoutsemergencyresponse@gmail.com</a>
+                </li>
+                <li>
+                    <strong>Phone:</strong>
+                    <a href="tel:+254742435314">+254 742 435 314</a>
+                </li>
+                <li>
+                    <strong>WhatsApp:</strong>
+                    <a href="https://wa.me/254742435314" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                </li>
+            </ul>
+
+            <div class="social-links" style="margin-top:1rem;">
+                <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="contact-cta" style="text-align:center;">
+            <h2>Want to Join SER?</h2>
+            <p>
+                Register to become part of our growing network of Scouts, volunteers, and responders.
+            </p>
+            <a href="../login/register/" class="btn btn-accent">Register Now</a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/nav.js"></script>
+</body>
+
+</html>

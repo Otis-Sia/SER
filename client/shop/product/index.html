@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product | SER Shop</title>
+
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/shop.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../../">
+                    <img src="../../assets/images/brand/logo-icon.png" alt="SER Logo" style="height:50px;">
+                </a>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+                <ul>
+                    <li><a href="../../">SER Home</a></li>
+                    <li><a href="../">Shop</a></li>
+                    <li><a href="../products/">Products</a></li>
+                    <li><a href="../cart/">Cart <span class="cart-count">(0)</span></a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+                <a href="../../login/register/" class="btn btn-accent">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="product-detail-container">
+            <div class="product-image-gallery">
+                <img src="https://via.placeholder.com/600x400" alt="Product Image" id="main-product-image">
+                <div class="thumbnail-images" id="thumbnail-images"></div>
+            </div>
+
+            <div class="product-info">
+                <h1 id="product-name">Product Name</h1>
+                <p class="price" id="product-price">KES 0</p>
+                <p id="product-description">Product description goes here.</p>
+                <button class="btn add-to-cart-btn" id="add-to-cart-btn">Add to Cart</button>
+                <p style="margin-top:1rem;">
+                    <a href="../products/">← Back to Products</a>
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/nav.js"></script>
+    <script src="../../assets/js/nav.js"></script>
+    <script src="../../assets/js/shop.js"></script>
+</body>
+
+</html>

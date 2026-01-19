@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products | SER Shop</title>
+
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/shop.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../../">
+                    <img src="../../assets/images/brand/logo-icon.png" alt="SER Logo" style="height:50px;">
+                </a>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+                <ul>
+                    <li><a href="../../">SER Home</a></li>
+                    <li><a href="../">Shop</a></li>
+                    <li><a href="./">Products</a></li>
+                    <li><a href="../cart/">Cart <span class="cart-count">(0)</span></a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+                <a href="../../login/register/" class="btn btn-accent">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="product-listing">
+            <h1 style="text-align:center;">All Products</h1>
+            <p style="text-align:center; max-width: 800px; margin: 0 auto 1.5rem auto;">
+                Browse SER merchandise and safety essentials. Each purchase supports community preparedness.
+            </p>
+
+            <div class="product-grid" id="product-grid"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/nav.js"></script>
+    <script src="../../assets/js/cart.js"></script>
+    <script src="../../assets/js/shop.js"></script>
+</body>
+
+</html>

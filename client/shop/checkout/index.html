@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | SER Shop</title>
+
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/shop.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../../">
+                    <img src="../../assets/images/brand/logo-icon.png" alt="SER Logo" style="height:50px;">
+                </a>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+                <ul>
+                    <li><a href="../../">SER Home</a></li>
+                    <li><a href="../">Shop</a></li>
+                    <li><a href="../products/">Products</a></li>
+                    <li><a href="../cart/">Cart <span class="cart-count">(0)</span></a></li>
+                    <li><a href="./">Checkout</a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+                <a href="../../login/register/" class="btn btn-accent">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section style="text-align:center;">
+            <h1>Checkout</h1>
+            <p style="max-width: 850px; margin: 0 auto;">
+                Checkout is currently handled through SER’s contact team. Submit your order details below and we’ll confirm availability and payment instructions.
+            </p>
+        </section>
+
+        <!-- Order Summary -->
+        <section>
+            <h2 style="text-align:center;">Order Summary</h2>
+
+            <div id="checkout-items" style="max-width: 900px; margin: 1.5rem auto 0 auto;"></div>
+
+            <div class="cart-summary" style="max-width: 900px; margin: 1.5rem auto 0 auto;">
+                <p>Total: <span id="checkout-total">KES 0</span></p>
+                <p style="font-size: 0.95rem; margin-top: 0.6rem;">
+                    You will receive payment instructions after SER confirms your order.
+                </p>
+            </div>
+        </section>
+
+        <!-- Checkout Form -->
+        <section class="contact-form" style="max-width: 900px; margin: 0 auto;">
+            <h2>Customer Details</h2>
+
+            <!-- Static site form placeholder -->
+            <form action="#" method="post" id="checkout-form">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required>
+
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+254..." required>
+
+                <label for="email">Email Address (optional)</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com">
+
+                <label for="location">Location (Town/Area)</label>
+                <input type="text" id="location" name="location" required>
+
+                <label for="notes">Order Notes (optional)</label>
+                <textarea id="notes" name="notes" rows="5" placeholder="Sizes, colors, delivery notes, etc."></textarea>
+
+                <button type="submit" class="btn btn-accent">Submit Order Request</button>
+
+                <p style="margin-top: 1rem; font-size: 0.95rem;">
+                    Prefer WhatsApp? Send your order directly:
+                    <a href="https://wa.me/254742435314" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                </p>
+            </form>
+        </section>
+
+        <section style="text-align:center;">
+            <a href="../cart/" class="btn">← Back to Cart</a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/nav.js"></script>
+    <script src="../assets/js/nav.js"></script>
+    <script src="../../assets/js/shop.js"></script>
+
+    <!-- Minimal inline JS to display checkout summary using localStorage cart -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const itemsEl = document.getElementById("checkout-items");
+            const totalEl = document.getElementById("checkout-total");
+
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            if (!itemsEl || !totalEl) return;
+
+            if (cart.length === 0) {
+                itemsEl.innerHTML = "<p style='text-align:center;'>Your cart is empty. Add items before checkout.</p>";
+                totalEl.textContent = "KES 0";
+                return;
+            }
+
+            let total = 0;
+
+            itemsEl.innerHTML = cart.map(item => {
+                const priceNumber = typeof item.price === "string" ?
+                    parseFloat(item.price.replace(/[^\d.]/g, "")) || 0 :
+                    (item.price || 0);
+
+                const qty = item.quantity || 1;
+                total += priceNumber * qty;
+
+                const name = item.name || "Product";
+                return `
+        <div class="cart-item" style="grid-template-columns: 1fr 120px 80px; max-width: 900px; margin: 0 auto;">
+          <div class="cart-item-info">
+            <h3 style="margin: 0;">${name}</h3>
+            <p style="margin: 0.2rem 0 0 0;">KES ${priceNumber.toFixed(0)}</p>
+          </div>
+          <div style="text-align:center;">x${qty}</div>
+          <div style="text-align:right; font-weight:600;">KES ${(priceNumber * qty).toFixed(0)}</div>
+        </div>
+      `;
+            }).join("");
+
+            totalEl.textContent = `KES ${total.toFixed(0)}`;
+        });
+    </script>
+
+</body>
+
+</html>
