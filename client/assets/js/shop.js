@@ -4,49 +4,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     // -------- Product Catalog (edit this anytime) --------
     // Use KES for consistency with Kenya context.
-    const PRODUCTS = [{
-            id: 1,
-            name: "SER T-Shirt",
-            price: 1200,
-            description: "Official SER T-shirt for events, training, and daily wear.",
-            image: "https://via.placeholder.com/600x400?text=SER+T-Shirt",
-            featured: true,
-            thumbnails: [
-                "https://via.placeholder.com/150?text=Tee+1",
-                "https://via.placeholder.com/150?text=Tee+2",
-                "https://via.placeholder.com/150?text=Tee+3",
-                "https://via.placeholder.com/150?text=Tee+4"
-            ]
-        },
-        {
-            id: 2,
-            name: "First Aid Kit (Basic)",
-            price: 2500,
-            description: "A starter kit for home, school, and Scout activities.",
-            image: "https://via.placeholder.com/600x400?text=First+Aid+Kit",
-            featured: true,
-            thumbnails: [
-                "https://via.placeholder.com/150?text=Kit+1",
-                "https://via.placeholder.com/150?text=Kit+2",
-                "https://via.placeholder.com/150?text=Kit+3",
-                "https://via.placeholder.com/150?text=Kit+4"
-            ]
-        },
-        {
-            id: 3,
-            name: "SER Cap",
-            price: 800,
-            description: "Lightweight SER cap for outdoor activities and field work.",
-            image: "https://via.placeholder.com/600x400?text=SER+Cap",
-            featured: false,
-            thumbnails: [
-                "https://via.placeholder.com/150?text=Cap+1",
-                "https://via.placeholder.com/150?text=Cap+2",
-                "https://via.placeholder.com/150?text=Cap+3",
-                "https://via.placeholder.com/150?text=Cap+4"
-            ]
-        }
-    ];
+    const API = "http://localhost:4000/api";
+
+    async function loadProducts() {
+        const res = await fetch(`${API}/products`);
+        return res.json();
+    };
 
     // -------- Helpers --------
     const money = (n) => `KES ${Number(n || 0).toFixed(0)}`;
