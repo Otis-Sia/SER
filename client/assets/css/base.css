@@ -11,12 +11,12 @@
     --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     --border-radius: 8px;
     --transition-speed: 0.3s ease;
-    --font-size-a: 16px;
-    --font-size-p: 17px;
-    --font-size-li: 15px;
-    --font-size-h1: 40px;
-    --font-size-h2: 25px;
-    --font-size-h3: 20px;
+    --font-size-a: clamp(0.95rem, 1.4vw, 1rem);
+    --font-size-p: clamp(1rem, 1.6vw, 1.0625rem);
+    --font-size-li: clamp(0.95rem, 1.4vw, 1rem);
+    --font-size-h1: clamp(2rem, 6vw, 2.5rem);
+    --font-size-h2: clamp(1.5rem, 4vw, 1.625rem);
+    --font-size-h3: clamp(1.25rem, 3.2vw, 1.375rem);
 }
 
 * {
@@ -316,10 +316,19 @@ footer {
     main {
         padding: 1.5rem;
     }
+    main section {
+        padding: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
     main {
         padding: 1rem;
+    }
+    header {
+        padding: 0.75rem 1rem;
+    }
+    main section {
+        padding: 1.25rem;
     }
 }

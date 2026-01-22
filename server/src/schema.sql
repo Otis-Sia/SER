@@ -34,6 +34,17 @@ CREATE TABLE IF NOT EXISTS posts (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Gallery items for gallery page
+CREATE TABLE IF NOT EXISTS gallery_items (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  category TEXT,
+  featured BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Admin users
 CREATE TABLE IF NOT EXISTS admins (
   id SERIAL PRIMARY KEY,
