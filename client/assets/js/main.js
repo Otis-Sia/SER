@@ -23,11 +23,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Mobile menu toggle
-    const menuToggle = document.getElementById("menu-toggle");
-    if (menuToggle) {
-        menuToggle.addEventListener("click", () => {
-            document.body.classList.toggle("nav-active");
-        });
-    }
+
 });
