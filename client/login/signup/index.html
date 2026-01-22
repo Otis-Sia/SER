@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Scouts Emergency Response</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/auth.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../../">
+                    <img src="../../assets/images/brand/logo.png" alt="SER Logo" style="height:50px;">
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="form-container">
+            <h1>Create an Account</h1>
+            <p style="text-align:center;">
+                Join Scouts Emergency Response and be part of a community ready to serve.
+            </p>
+
+            <form id="auth-form" action="#" method="post" data-mode="register">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+
+                <button type="submit" class="btn btn-accent">Sign Up</button>
+                <p id="auth-msg" class="msg" aria-live="polite" style="text-align:center; margin-top:0.75rem;"></p>
+            </form>
+
+            <p style="text-align:center; margin-top:1rem;">
+                Already have an account?
+                <a href="../">Sign in</a>
+            </p>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scouts Emergency Response. All rights reserved.</p>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/nav.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+</body>
+
+</html>

@@ -60,13 +60,21 @@
 
 /* Gallery */
 
+.gallery-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-auto-rows: 170px;
+    grid-auto-flow: dense;
+}
+
 .gallery-item {
     background-color: var(--white-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    border-radius: calc(var(--border-radius) + 6px);
+    box-shadow: 0 14px 30px rgba(10, 30, 40, 0.18);
     overflow: hidden;
     position: relative;
-    aspect-ratio: 1 / 1;
+    height: 100%;
 }
 
 .gallery-item a {
@@ -79,11 +87,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-speed);
+    filter: saturate(1.05) contrast(1.02);
+    transition: transform 0.6s ease, filter 0.6s ease;
 }
 
 .gallery-item:hover img {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    filter: saturate(1.12) contrast(1.05);
 }
 
 .gallery-item .overlay {
@@ -92,21 +102,62 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(10, 77, 104, 0.7);
+    background: linear-gradient(180deg, rgba(10, 77, 104, 0.05) 20%, rgba(10, 77, 104, 0.8) 100%);
     color: var(--white-color);
     display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    padding: 1.1rem;
+    opacity: 0.92;
     transition: opacity var(--transition-speed);
-    font-size: var(--font-size-p);
-    font-weight: 500;
 }
 
 .gallery-item:hover .overlay {
     opacity: 1;
 }
 
+.gallery-item .overlay-title {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 600;
+}
+
+.gallery-item .overlay-action {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.gallery-item a:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 4px;
+}
+
+.gallery-item:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.gallery-item:nth-child(3) {
+    grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+    .gallery-grid {
+        grid-auto-rows: 210px;
+    }
+    .gallery-item:nth-child(1),
+    .gallery-item:nth-child(3) {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-auto-rows: 230px;
+    }
+}
 
 /* Simple FAQ block styling */
 

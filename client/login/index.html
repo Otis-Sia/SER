@@ -31,7 +31,7 @@
                 Welcome back. Sign in to access SER resources and updates.
             </p>
 
-            <form action="#" method="post">
+            <form id="auth-form" action="#" method="post" data-mode="login">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required>
 
@@ -39,11 +39,12 @@
                 <input type="password" id="password" name="password" required>
 
                 <button type="submit" class="btn">Sign In</button>
+                <p id="auth-msg" class="msg" aria-live="polite" style="text-align:center; margin-top:0.75rem;"></p>
             </form>
 
             <p style="text-align:center; margin-top:1rem;">
                 Don’t have an account?
-                <a href="./register/">Register here</a>
+                <a href="./signup/">Sign up here</a>
             </p>
         </section>
 
