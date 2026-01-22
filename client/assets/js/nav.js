@@ -26,8 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mobile menu toggle
     const menuToggle = document.getElementById("menu-toggle");
     if (menuToggle) {
+        menuToggle.setAttribute("aria-expanded", "false");
+
         menuToggle.addEventListener("click", () => {
-            document.body.classList.toggle("nav-active");
+            const isActive = document.body.classList.toggle("nav-active");
+            menuToggle.setAttribute("aria-expanded", String(isActive));
+        });
+
+        navLinks.forEach((link) => {
+            link.addEventListener("click", () => {
+                if (!document.body.classList.contains("nav-active")) return;
+                document.body.classList.remove("nav-active");
+                menuToggle.setAttribute("aria-expanded", "false");
+            });
         });
     }
 });
