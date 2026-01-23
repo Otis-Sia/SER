@@ -2,6 +2,30 @@
 // - Highlights current page in navbar
 // - Toggles mobile nav via body.nav-active
 document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.querySelector("[data-theme-toggle]");
+    const themeLabel = themeToggle?.querySelector("[data-theme-label]");
+    const themeIcon = themeToggle?.querySelector("[data-theme-icon]");
+    const storageKey = "ser-theme";
+
+    const applyTheme = (theme) => {
+        const isDark = theme === "dark";
+        document.body.classList.toggle("dark-mode", isDark);
+        if (themeLabel) {
+            themeLabel.textContent = isDark ? "Light" : "Dark";
+        }
+        if (themeIcon) {
+            themeIcon.textContent = isDark ? "☀️" : "🌙";
+        }
+        if (themeToggle) {
+            themeToggle.setAttribute("aria-pressed", String(isDark));
+        }
+    };
+
+    const savedTheme = localStorage.getItem(storageKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
     // Highlight current page in nav
     const navLinks = document.querySelectorAll("nav a");
     const path = window.location.pathname;
@@ -22,6 +46,14 @@ document.addEventListener("DOMContentLoaded", () => {
             link.classList.add("active");
         }
     });
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const nextTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
+            localStorage.setItem(storageKey, nextTheme);
+            applyTheme(nextTheme);
+        });
+    }
 
     // Mobile menu toggle
     const menuToggle = document.getElementById("menu-toggle");
