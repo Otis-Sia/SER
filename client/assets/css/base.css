@@ -31,12 +31,18 @@ html {
 
 body {
     font-family: var(--font-family);
-    background-color: var(--background-color);
+    background-color: var(--white-color);
     color: var(--text-color);
     line-height: 1.6;
 }
 
+<<<<<<< ours
+<<<<<<< ours
 body.dark-mode {
+=======
+body.dark-mode,
+:root.dark-mode {
+>>>>>>> theirs
     color-scheme: dark;
     --primary-color: #5bd47f;
     --secondary-color: #3fb7c2;
@@ -48,6 +54,8 @@ body.dark-mode {
     --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
 }
 
+=======
+>>>>>>> theirs
 a {
     text-decoration: none;
     color: var(--primary-color);
@@ -205,33 +213,6 @@ nav {
     display: flex;
     align-items: center;
     gap: 1rem;
-}
-
-.theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    background-color: var(--light-gray-color);
-    color: var(--text-color);
-    font-weight: 500;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
-}
-
-.theme-toggle:hover,
-.theme-toggle:focus-visible {
-    background-color: transparent;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.theme-toggle__icon {
-    font-size: 1rem;
-    line-height: 1;
 }
 
 

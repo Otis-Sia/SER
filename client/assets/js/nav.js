@@ -2,6 +2,7 @@
 // - Highlights current page in navbar
 // - Toggles mobile nav via body.nav-active
 document.addEventListener("DOMContentLoaded", () => {
+<<<<<<< ours
     const themeToggle = document.querySelector("[data-theme-toggle]");
     const themeLabel = themeToggle?.querySelector("[data-theme-label]");
     const themeIcon = themeToggle?.querySelector("[data-theme-icon]");
@@ -9,6 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const applyTheme = (theme) => {
         const isDark = theme === "dark";
+<<<<<<< ours
+=======
+        document.documentElement.classList.toggle("dark-mode", isDark);
+>>>>>>> theirs
         document.body.classList.toggle("dark-mode", isDark);
         if (themeLabel) {
             themeLabel.textContent = isDark ? "Light" : "Dark";
@@ -26,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
         applyTheme(savedTheme);
     }
 
+=======
+>>>>>>> theirs
     // Highlight current page in nav
     const navLinks = document.querySelectorAll("nav a");
     const path = window.location.pathname;
@@ -47,14 +54,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+<<<<<<< ours
     if (themeToggle) {
         themeToggle.addEventListener("click", () => {
+<<<<<<< ours
             const nextTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
+=======
+            const nextTheme = document.documentElement.classList.contains("dark-mode") ? "light" : "dark";
+>>>>>>> theirs
             localStorage.setItem(storageKey, nextTheme);
             applyTheme(nextTheme);
         });
     }
 
+=======
+>>>>>>> theirs
     // Mobile menu toggle
     const menuToggle = document.getElementById("menu-toggle");
     if (menuToggle) {
