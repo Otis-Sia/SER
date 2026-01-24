@@ -5,7 +5,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cart | SER Shop</title>
-
+    <script>
+        (function () {
+            const storedTheme = localStorage.getItem("ser-theme");
+            if (storedTheme !== "light") {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <link rel="stylesheet" href="../../assets/css/shop.css">
 </head>
@@ -30,6 +37,10 @@
             </div>
 
             <div class="header-actions">
+                <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Toggle dark mode">
+                    <span class="theme-toggle__icon" data-theme-icon>🌙</span>
+                    <span data-theme-label>Dark</span>
+                </button>
                 <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
         <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

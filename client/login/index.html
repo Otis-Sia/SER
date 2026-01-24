@@ -7,6 +7,14 @@
     <title>Sign In | Scouts Emergency Response</title>
 
     <!-- CSS -->
+    <script>
+        (function () {
+            const storedTheme = localStorage.getItem("ser-theme");
+            if (storedTheme !== "light") {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -19,6 +27,12 @@
                 <a href="../">
                     <img src="../assets/images/brand/logo.png" alt="SER Logo" style="height:50px;">
                 </a>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Toggle dark mode">
+                    <span class="theme-toggle__icon" data-theme-icon>🌙</span>
+                    <span data-theme-label>Dark</span>
+                </button>
             </div>
         </nav>
     </header>
@@ -77,6 +91,7 @@
     <script src="../assets/js/cart.js"></script>
     <script src="../assets/js/shop.js"></script>
     <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/nav.js"></script>
 
 
 </body>
