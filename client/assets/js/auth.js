@@ -29,11 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function redirectByRole(role) {
-        if (role === "admin") {
-            window.location.href = "/admin/";
-        } else {
-            window.location.href = "/user/";
-        }
+        // Use relative URLs so it works on GitHub Pages subpaths (e.g. /SER/)
+        const target = role === "admin" ? "../admin/" : "../user/";
+        window.location.href = new URL(target, window.location.href).toString();
     }
 
     async function request(path, body) {

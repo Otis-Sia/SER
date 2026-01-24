@@ -64,18 +64,22 @@
 
     <section class="admin-card page-hero page-hero--compact" id="auth-card">
       <h1>Admin Console</h1>
-      <p class="muted">Sign in with an admin account to create products, posts, events, and gallery items.</p>
+      <p class="muted">
+        This page uses the same login session as your <b>Sign In</b> page.
+      </p>
 
-      <form id="login-form" class="admin-form">
-        <label for="email">Email</label>
-        <input id="email" type="email" required placeholder="admin@ser.org" />
-
-        <label for="password">Password</label>
-        <input id="password" type="password" required placeholder="••••••••" />
-
-        <button class="btn" type="submit">Sign In</button>
+      <div class="admin-form" style="gap: 0.75rem;">
         <p id="auth-msg" class="msg" aria-live="polite"></p>
-      </form>
+
+        <div style="display:flex; gap: 0.75rem; flex-wrap: wrap; justify-content:center;">
+          <a class="btn" href="../login/">Go to Sign In</a>
+          <button class="btn btn-accent" type="button" id="recheck-auth">I already signed in</button>
+        </div>
+
+        <p class="muted" style="text-align:center; margin: 0.5rem 0 0;">
+          If you signed in but still can’t access, your account role is not <b>admin</b>.
+        </p>
+      </div>
     </section>
 
     <section class="admin-card" id="panel" style="display:none;">

@@ -1,17 +1,23 @@
 // assets/js/admin.js
 // Admin console for creating Products, Events, Posts, and Gallery Items.
-// Stores JWT in localStorage under `ser_admin_token`.
+// ✅ Uses the SAME session as assets/js/auth.js (login/register page):
+//    - token: `ser_auth_token`
+//    - role:  `ser_auth_role`
 
 document.addEventListener("DOMContentLoaded", () => {
   const API = "http://localhost:4000/api";
-  const TOKEN_KEY = "ser_admin_token";
+
+  // Must match assets/js/auth.js
+  const TOKEN_KEY = "ser_auth_token";
+  const ROLE_KEY = "ser_auth_role";
+  const USER_KEY = "ser_auth_user";
 
   // ---- DOM ----
   const authCard = document.getElementById("auth-card");
   const panel = document.getElementById("panel");
   const logoutBtn = document.getElementById("logout-btn");
-  const loginForm = document.getElementById("login-form");
   const authMsg = document.getElementById("auth-msg");
+  const recheckBtn = document.getElementById("recheck-auth");
 
   const productForm = document.getElementById("product-form");
   const eventForm = document.getElementById("event-form");
@@ -25,8 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Helpers ----
   const getToken = () => localStorage.getItem(TOKEN_KEY);
-  const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
-  const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+  const getRole = () => localStorage.getItem(ROLE_KEY);
+  const clearSession = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ROLE_KEY);
+    localStorage.removeItem(USER_KEY);
+  };
 
   function setMsg(el, text, ok = true) {
     if (!el) return;
@@ -48,6 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const isJson = (res.headers.get("content-type") || "").includes("application/json");
     const body = isJson ? await res.json() : await res.text();
     if (!res.ok) {
+      // If token expired/invalid, clear and kick back to auth screen
+      if (res.status === 401) {
+        clearSession();
+      }
       const msg = (body && body.error) ? body.error : `Request failed (${res.status})`;
       throw new Error(msg);
     }
@@ -155,40 +169,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function setAuthed(on) {
-    authCard.style.display = on ? "none" : "block";
-    panel.style.display = on ? "block" : "none";
-    logoutBtn.style.display = on ? "inline-flex" : "none";
-    if (on) refreshAll();
+  function setAuthed(isAdmin) {
+    authCard.style.display = isAdmin ? "none" : "block";
+    panel.style.display = isAdmin ? "block" : "none";
+    logoutBtn.style.display = isAdmin ? "inline-flex" : "none";
+    if (isAdmin) refreshAll();
   }
 
-  // ---- Auth ----
-  if (loginForm) {
-    loginForm.addEventListener("submit", async(e) => {
-      e.preventDefault();
-      setMsg(authMsg, "Signing in…");
+  // ---- Auth (REUSE login session from /login/) ----
+  async function checkAdminAccess() {
+    const token = getToken();
+    const role = getRole();
 
-      const email = document.getElementById("email")?.value?.trim();
-      const password = document.getElementById("password")?.value;
+    if (!token) {
+      setMsg(authMsg, "Not signed in. Please sign in first.", false);
+      setAuthed(false);
+      return;
+    }
 
-      try {
-        const out = await api("/auth/login", {
-          method: "POST",
-          body: JSON.stringify({ email, password }),
-        });
-        setToken(out.token);
-        setMsg(authMsg, "Signed in.");
-        setAuthed(true);
-      } catch (err) {
-        setMsg(authMsg, err.message, false);
+    // Quick role gate from localStorage
+    if (role !== "admin") {
+      setMsg(authMsg, "Signed in, but not an admin account.", false);
+      setAuthed(false);
+      return;
+    }
+
+    // Stronger check: verify token still valid
+    try {
+      const me = await api("/auth/me", { method: "GET", headers: {} });
+      if (me?.role !== "admin") {
+        setMsg(authMsg, "Signed in, but not an admin account.", false);
+        setAuthed(false);
+        return;
       }
-    });
+      setMsg(authMsg, "");
+      setAuthed(true);
+    } catch (err) {
+      setMsg(authMsg, err.message || "Session expired. Please sign in again.", false);
+      setAuthed(false);
+    }
+  }
+
+  if (recheckBtn) {
+    recheckBtn.addEventListener("click", checkAdminAccess);
   }
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
-      clearToken();
+      clearSession();
       setAuthed(false);
+      setMsg(authMsg, "Logged out.", true);
     });
   }
 
@@ -271,6 +301,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Auto-auth if token exists
-  setAuthed(!!getToken());
+  // Auto-auth: only allow if logged in AND role is admin
+  checkAdminAccess();
 });
