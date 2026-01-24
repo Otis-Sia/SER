@@ -50,6 +50,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    const activeLink = document.querySelector("nav a.active");
+    const activeLabel = activeLink?.textContent?.trim();
+    if (activeLabel) {
+        const logo = document.querySelector("nav .logo");
+        if (logo) {
+            let labelEl = logo.querySelector(".current-page-label");
+            if (!labelEl) {
+                labelEl = document.createElement("span");
+                labelEl.className = "current-page-label";
+                logo.appendChild(labelEl);
+            }
+            labelEl.textContent = activeLabel;
+            labelEl.setAttribute("aria-label", `Current page: ${activeLabel}`);
+        }
+    }
+
     if (themeToggle) {
         themeToggle.addEventListener("click", () => {
             const nextTheme = document.documentElement.classList.contains("dark-mode") ? "light" : "dark";

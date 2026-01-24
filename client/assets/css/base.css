@@ -157,6 +157,24 @@ nav {
     padding-bottom: 5px;
 }
 
+.nav-links ul li a.active {
+    color: var(--secondary-color);
+    text-shadow: 0 0 6px rgba(8, 131, 149, 0.6), 0 0 16px rgba(0, 153, 0, 0.35);
+}
+
+.nav-links ul li a.active::after {
+    width: 100%;
+}
+
+.current-page-label {
+    display: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+}
+
 
 /* Hover underline */
 
@@ -436,6 +454,15 @@ footer a:focus-visible {
     nav {
         flex-direction: column;
         align-items: center;
+    }
+    .logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .current-page-label {
+        display: block;
     }
     main {
         padding: 1.5rem;
