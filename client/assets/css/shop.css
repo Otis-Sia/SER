@@ -3,21 +3,17 @@
 
 /* Hero */
 
-.hero {
+.shop-hero {
     text-align: center;
     padding: 4rem 2rem;
-    background: linear-gradient(rgba(10, 77, 104, 0.7), rgba(8, 131, 149, 0.7)), url('https://via.placeholder.com/1200x400.png/0a4d68/ffffff?text=SER+Shop') no-repeat center center/cover;
-    border-radius: var(--border-radius);
-    color: var(--white-color);
 }
 
-.hero h1 {
+.shop-hero h1 {
     font-size: var(--font-size-h1);
-    color: var(--white-color);
     margin-bottom: 0.5rem;
 }
 
-.hero p {
+.shop-hero p {
     font-size: var(--font-size-p);
     margin-bottom: 2rem;
     font-weight: 300;
