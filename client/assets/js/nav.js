@@ -3,8 +3,8 @@
 // - Toggles mobile nav via body.nav-active
 document.addEventListener("DOMContentLoaded", () => {
     const themeToggle = document.querySelector("[data-theme-toggle]");
-    const themeLabel = themeToggle ? .querySelector("[data-theme-label]");
-    const themeIcon = themeToggle ? .querySelector("[data-theme-icon]");
+    const themeLabel = themeToggle?.querySelector("[data-theme-label]");
+    const themeIcon = themeToggle?.querySelector("[data-theme-icon]");
     const storageKey = "ser-theme";
 
     const applyTheme = (theme) => {
