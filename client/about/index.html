@@ -8,7 +8,7 @@
 
     <!-- CSS -->
     <script>
-        (function () {
+        (function() {
             const storedTheme = localStorage.getItem("ser-theme");
             if (storedTheme !== "light") {
                 document.documentElement.classList.add("dark-mode");
@@ -111,13 +111,57 @@
         <section class="about-team">
             <h2>Our Team</h2>
             <p>
-                SER is led by Scouts and supported by trained mentors, emergency response instructors, and community volunteers. Together, we combine youth leadership with professional guidance to deliver safe, impactful programs.
+                SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts. Each team member brings a mix of scouting experience, emergency readiness training, and a shared commitment to serve during crises.
             </p>
-            <ul>
-                <li>Youth coordinators who plan trainings and community outreach.</li>
-                <li>Certified first aid and fire safety trainers who lead skill-building sessions.</li>
-                <li>Community partners who provide local insight and on-the-ground support.</li>
-            </ul>
+            <h3>Leadership Team (7 Teammates)</h3>
+            <div class="team-grid" style="display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin:1.5rem 0;">
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Team lead placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Team Lead</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Lead trainer placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Lead Trainer</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Programs lead placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Programs Lead</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Volunteer coordinator placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Volunteer Coordinator</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Finance officer placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Finance Officer</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Secretary placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Secretary</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Media and communication placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Media &amp; Communication</h4>
+                </article>
+            </div>
+            <h3>Volunteer Team (3 Volunteers)</h3>
+            <div class="team-grid" style="display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin:1.5rem 0;">
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Volunteer placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Volunteers</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Legal counsel placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Legal Counsel</h4>
+                </article>
+                <article class="team-card" style="text-align:center; padding:1rem; border:1px solid #e1e1e1; border-radius:12px;">
+                    <img src="https://via.placeholder.com/160" alt="Social media management placeholder portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover;">
+                    <h4>Social Media Management</h4>
+                </article>
+            </div>
+            <p>
+                Your role could be next, and we’ll help shape the title together based on your strengths and the needs of the mission.
+            </p>
         </section>
 
         <!-- Call to action -->
