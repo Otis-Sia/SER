@@ -8,14 +8,25 @@
 .about-vision,
 .about-values,
 .about-team {
-    padding: 1.5rem;
-    max-width: 800px;
+    padding: 2.5rem;
+    max-width: 900px;
     text-align: center;
-    margin: 1rem auto;
-    background-color: var(--background-color);
-    border-left: 6px solid var(--accent-color);
+    margin: 2rem auto;
+    background-color: var(--white-color);
+    border-left: none;
+    border-top: 4px solid var(--accent-color);
     border-radius: var(--border-radius);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--box-shadow);
+    transition: transform var(--transition-speed) var(--ease-out-quart), box-shadow var(--transition-speed);
+}
+
+.about-intro:hover,
+.about-mission:hover,
+.about-vision:hover,
+.about-values:hover,
+.about-team:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .about-values ul {
