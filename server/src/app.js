@@ -25,5 +25,13 @@ app.use("/api/events", eventsRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/gallery", galleryRouter);
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`SER API running on :${port}`));
+const port = Number(process.env.PORT || 0);
+const host = process.env.HOST || undefined;
+
+const server = app.listen(port, host, () => {
+  const address = server.address();
+  const actualPort = typeof address === "string" ? address : address?.port;
+  const actualHost = typeof address === "string" ? "local" : address?.address;
+  const hostLabel = actualHost && actualHost !== "::" ? actualHost : "0.0.0.0";
+  console.log(`SER API running on ${hostLabel}:${actualPort}`);
+});

@@ -13,8 +13,7 @@
             }
         })();
     </script>
-    <link rel="stylesheet" href="../../assets/css/base.css">
-    <link rel="stylesheet" href="../../assets/css/shop.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -23,7 +22,7 @@
         <nav>
             <div class="logo">
                 <a href="../../">
-                    <img src="../../assets/images/brand/logo.png" alt="SER Logo" style="height:50px;">
+                    <img src="../../assets/images/brand/logo.svg" alt="SER Logo" style="height:50px;">
                 </a>
             </div>
 
@@ -64,29 +63,29 @@
 
     <main>
 
-        <section class="page-hero" style="text-align:center;">
+        <section class="page-hero text-center">
             <h1>Checkout</h1>
-            <p style="max-width: 850px; margin: 0 auto;">
+            <p class="intro-text">
                 Checkout is currently handled through SER’s contact team. Submit your order details below and we’ll confirm availability and payment instructions.
             </p>
         </section>
 
         <!-- Order Summary -->
         <section>
-            <h2 style="text-align:center;">Order Summary</h2>
+            <h2 class="text-center">Order Summary</h2>
 
-            <div id="checkout-items" style="max-width: 900px; margin: 1.5rem auto 0 auto;"></div>
+            <div id="checkout-items" class="section-narrow mt-1_5"></div>
 
-            <div class="cart-summary" style="max-width: 900px; margin: 1.5rem auto 0 auto;">
+            <div class="cart-summary" class="section-narrow mt-1_5">
                 <p>Total: <span id="checkout-total">KES 0</span></p>
-                <p style="font-size: 0.95rem; margin-top: 0.6rem;">
+                <p class="text-sm mt-0_6">
                     You will receive payment instructions after SER confirms your order.
                 </p>
             </div>
         </section>
 
         <!-- Checkout Form -->
-        <section class="contact-form" style="max-width: 900px; margin: 0 auto;">
+        <section class="contact-form" class="intro-text">
             <h2>Customer Details</h2>
 
             <!-- Static site form placeholder -->
@@ -108,14 +107,14 @@
 
                 <button type="submit" class="btn btn-accent">Submit Order Request</button>
 
-                <p style="margin-top: 1rem; font-size: 0.95rem;">
+                <p class="mt-1 text-sm">
                     Prefer WhatsApp? Send your order directly:
                     <a href="https://wa.me/254742435314" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 </p>
             </form>
         </section>
 
-        <section style="text-align:center;">
+        <section class="text-center">
             <a href="../cart/" class="btn">← Back to Cart</a>
         </section>
 
@@ -146,9 +145,9 @@
     </footer>
 
     <script src="../../assets/js/main.js"></script>
-    <script src="../../assets/js/nav.js"></script>
-    <script src="../assets/js/nav.js"></script>
-    <script src="../../assets/js/shop.js"></script>
+    <script src="../../"></script>
+    <script src="../"></script>
+    <script src="../../"></script>
 
     <!-- Minimal inline JS to display checkout summary using localStorage cart -->
     <script>
@@ -183,7 +182,7 @@
             <h3 style="margin: 0;">${name}</h3>
             <p style="margin: 0.2rem 0 0 0;">KES ${priceNumber.toFixed(0)}</p>
           </div>
-          <div style="text-align:center;">x${qty}</div>
+          <div class="text-center">x${qty}</div>
           <div style="text-align:right; font-weight:600;">KES ${(priceNumber * qty).toFixed(0)}</div>
         </div>
       `;
@@ -196,3 +195,6 @@
 </body>
 
 </html>
+
+
+
