@@ -34,7 +34,7 @@ export default function About() {
           In early 2024, Embakasi East in Nairobi County experienced a tragic gas explosion in the Muradi area, which resulted in 17 deaths, 280 injuries, 6 missing persons, and 26 displacements. This marked the beginning of a series of disasters, including heavy rains between March and May that caused severe flooding affecting over 20 counties in Kenya. The floods led to the deaths of 291 people, injuries to 188, 75 went missing, and the displacement of over 55,776 families.
         </p>
         <p>
-          These repeated emergencies highlighted a critical gap in emergency preparedness and response, despite efforts from organizations like St. John's Ambulance, Red Cross Kenya, and the National Disaster Management Unit (NDMU). Recognizing the urgent need for lifesaving skills and community resilience, Scout Emergency Response was established.
+          These repeated emergencies highlighted a critical gap in emergency preparedness and response, despite efforts from organizations like St. John&apos;s Ambulance, Red Cross Kenya, and the National Disaster Management Unit (NDMU). Recognizing the urgent need for lifesaving skills and community resilience, Scout Emergency Response was established.
         </p>
         <p>
           Our initiative focuses on equipping individuals, especially the youth, with first aid and emergency response training to reduce the burden on healthcare systems and save lives. We are committed to building a safer, more prepared community through awareness, skill-building, and strategic action.

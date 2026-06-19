@@ -11,10 +11,15 @@ export default function Header() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("ser-theme");
-    if (storedTheme !== "light") {
-      document.documentElement.classList.add("dark-mode");
-      setIsDarkMode(true);
+    try {
+      const storedTheme = localStorage.getItem("ser-theme");
+      if (storedTheme !== "light") {
+        document.documentElement.classList.add("dark-mode");
+        // eslint-disable-next-line
+        setIsDarkMode(true);
+      }
+    } catch (e) {
+      console.warn("localStorage is not accessible");
     }
   }, []);
 
@@ -33,14 +38,19 @@ export default function Header() {
 
   const toggleTheme = () => {
     const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.remove('dark-mode');
-      localStorage.setItem('ser-theme', 'light');
-      setIsDarkMode(false);
-    } else {
-      root.classList.add('dark-mode');
-      localStorage.setItem('ser-theme', 'dark');
-      setIsDarkMode(true);
+    try {
+      if (isDarkMode) {
+        root.classList.remove('dark-mode');
+        localStorage.setItem('ser-theme', 'light');
+        setIsDarkMode(false);
+      } else {
+        root.classList.add('dark-mode');
+        localStorage.setItem('ser-theme', 'dark');
+        setIsDarkMode(true);
+      }
+    } catch (e) {
+      console.warn("localStorage is not accessible");
+      setIsDarkMode(!isDarkMode); // Still toggle state if localStorage fails
     }
   };
 
@@ -54,7 +64,7 @@ export default function Header() {
         </div>
 
         <div className="mobile-header-title">
-          Scout's Emergency Response
+          Scout&apos;s Emergency Response
         </div>
 
         <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
