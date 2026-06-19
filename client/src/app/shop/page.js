@@ -1,0 +1,30 @@
+import Link from 'next/link';
+
+export const metadata = {
+  title: 'SER Shop | Scouts Emergency Response',
+};
+
+export default function Shop() {
+  return (
+    <>
+      <section className="shop-hero page-hero">
+        <h1>Welcome to the SER Shop</h1>
+        <p>Support SER through official merchandise and essential safety items.</p>
+        <Link href="/shop/products" className="btn">Shop Now</Link>
+      </section>
+
+      <section className="featured-products">
+        <h2>Featured Products</h2>
+        <div className="product-grid" id="featured-products-grid"></div>
+      </section>
+
+      <section className="text-center">
+        <h2>Need Help Ordering?</h2>
+        <p className="intro-text">
+          If you&apos;d like bulk orders for events, Scout groups, or partnerships, contact SER and we&apos;ll assist.
+        </p>
+        <Link href="/contact" className="btn btn-accent">Contact SER</Link>
+      </section>
+    </>
+  );
+}

@@ -1,0 +1,111 @@
+'use client';
+
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
+
+export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("ser-theme");
+    if (storedTheme !== "light") {
+      document.documentElement.classList.add("dark-mode");
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('nav-active');
+    } else {
+      document.body.classList.remove('nav-active');
+    }
+    return () => document.body.classList.remove('nav-active');
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.remove('dark-mode');
+      localStorage.setItem('ser-theme', 'light');
+      setIsDarkMode(false);
+    } else {
+      root.classList.add('dark-mode');
+      localStorage.setItem('ser-theme', 'dark');
+      setIsDarkMode(true);
+    }
+  };
+
+  return (
+    <header>
+      <nav className={isMenuOpen ? 'nav-open' : ''}>
+        <div className="logo">
+          <Link href="/">
+            <img src="/assets/images/brand/logo.svg" alt="SER Logo" style={{ height: '50px' }} />
+          </Link>
+        </div>
+
+        <div className="mobile-header-title">
+          Scout's Emergency Response
+        </div>
+
+        <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+          <ul>
+            <li><Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
+            <li><Link href="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
+            <li><Link href="/projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
+            <li><Link href="/events" onClick={() => setIsMenuOpen(false)}>Events</Link></li>
+            <li><Link href="/gallery" onClick={() => setIsMenuOpen(false)}>Gallery</Link></li>
+            <li><Link href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
+            <li><Link href="/faq" onClick={() => setIsMenuOpen(false)}>FAQs</Link></li>
+            <li><Link href="/community" onClick={() => setIsMenuOpen(false)}>Community</Link></li>
+            <li><Link href="/shop" onClick={() => setIsMenuOpen(false)}>Shop</Link></li>
+          </ul>
+        </div>
+
+        <div className="header-actions">
+          <button 
+            className="theme-toggle" 
+            type="button" 
+            onClick={toggleTheme}
+            aria-pressed={isDarkMode} 
+            aria-label="Toggle dark mode"
+          >
+            <span className="theme-toggle__icon">{isDarkMode ? <Sun size={18} /> : <Moon size={18} />}</span>
+            <span>{isDarkMode ? 'Light' : 'Dark'}</span>
+          </button>
+          <button 
+            id="menu-toggle" 
+            className={`menu-toggle ${isMenuOpen ? 'active' : ''}`} 
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
+          >
+            {!isMenuOpen ? (
+              <svg className="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            ) : (
+              <svg className="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            )}
+          </button>
+        </div>
+      </nav>
+    </header>
+  );
+}
