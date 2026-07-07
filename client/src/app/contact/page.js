@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SocialIcons from '../../components/SocialIcons';
 
 export const metadata = {
   title: 'Contact SER | Scouts Emergency Response',
@@ -32,30 +33,23 @@ export default function Contact() {
 
       <section className="contact-info">
         <h2>Other Ways to Reach Us</h2>
-        <ul style={{ paddingLeft: 0 }}>
-          <li>
+        <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
+          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>Email:</strong>{' '}
             <a href="mailto:scoutsemergencyresponse@gmail.com">scoutsemergencyresponse@gmail.com</a>
           </li>
-          <li>
+          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>Phone:</strong>{' '}
-            <a href="tel:+254742435314">+254 742 435 314</a>
+            <a href="tel:0742435314">0742435314</a> (Local) / <a href="tel:+254742435314">+254 742 435 314</a> (International)
           </li>
-          <li>
+          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>WhatsApp:</strong>{' '}
             <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
           </li>
         </ul>
 
-        <h3 className="mt-1_5">Follow SER on Social Media</h3>
-        <div className="contact-social">
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
-          <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">TikTok</a>
-          <a href="https://x.com" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube</a>
-        </div>
+        <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>
+        <SocialIcons className="contact-social" showText={true} direction="column" />
       </section>
 
       <section className="contact-cta text-center">

@@ -8,24 +8,42 @@ export default function About() {
   return (
     <>
       <section className="about-intro page-hero">
-        <h1>About Scouts Emergency Response (SER)</h1>
+        <h1>About Scouts Emergency Response</h1>
         <p>
-          SER is a youth-led initiative that empowers Scouts and community members to actively respond to emergencies, natural disasters, and health crises through training, awareness, and service.
+          We are a youth-centered initiative that focuses on emergency preparedness and response skills among young people. The project aims to equip young people with practical knowledge and confidence to respond effectively during emergencies in schools, homes, and communities. Through training, awareness, and hands-on learning, SER empowers young people to become first responders in their communities.
         </p>
       </section>
 
-      <section className="about-mission">
-        <h2>Our Mission</h2>
-        <p>
-          To empower young people and communities in Kenya and beyond, by building their capacity in comprehensive emergency preparedness and response, including first aid skills, fire safety skills and psychological first aid skill to foster resilience and enhance safety.
-        </p>
-      </section>
+      <section className="about-pillars" style={{ marginTop: '2rem' }}>
+        <h2 className="brochure-title">Our <span>Pillars</span></h2>
+        
+        <div className="pillar-card">
+          <h3>Our Vision</h3>
+          <p>
+            To create a generation of empowered and prepared youth who can respond confidently, responsibly, and effectively to emergencies within their communities.
+          </p>
+        </div>
 
-      <section className="about-vision">
-        <h2>Vision</h2>
-        <p>
-          To cultivate a society where every young person and community possesses the awareness, skills, and confidence to effectively prepare for and respond to emergencies, fostering widespread resilience and readiness against any unforeseen event.
-        </p>
+        <div className="pillar-card">
+          <h3>Our Mission</h3>
+          <p>
+            To equip young people with practical emergency preparedness skills, knowledge, and leadership through training, awareness programs, and community engagement, enabling them to respond effectively and support their communities during emergencies and disasters.
+          </p>
+        </div>
+
+        <div className="pillar-card">
+          <h3>Goal</h3>
+          <p>
+            To build resilience, enhance the preparedness & response capability of young people & community emergency.
+          </p>
+        </div>
+
+        <div className="pillar-card">
+          <h3>Objective</h3>
+          <p>
+            To increase awareness among young people and communities on emergency preparedness.
+          </p>
+        </div>
       </section>
 
       <section className="about-story">

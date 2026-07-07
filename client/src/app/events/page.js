@@ -5,7 +5,22 @@ export const metadata = {
   title: 'Events | Scouts Emergency Response',
 };
 
-export default function Events() {
+async function getEvents() {
+  try {
+    const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });
+    if (!res.ok) {
+      return [];
+    }
+    return res.json();
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+    return [];
+  }
+}
+
+export default async function Events() {
+  const events = await getEvents();
+
   return (
     <>
       <section className="events-intro page-hero text-center">
@@ -28,41 +43,34 @@ export default function Events() {
       <section className="events-upcoming">
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Siren /> Upcoming SER Events</h2>
         <div className="product-grid grid-spaced">
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Fire Safety Awareness Workshop</h3>
-              <p><strong>Date:</strong> July 6, 2025</p>
-              <p><strong>Venue:</strong> Juja Scouts Hall</p>
-              <p>
-                Practical fire-safety education, prevention tips, and emergency response basics for Scouts and community members.
-              </p>
-              <Link className="btn" href="/contact">Ask to Join</Link>
-            </div>
-          </div>
+          {events.length === 0 ? (
+            <p className="intro-text">No upcoming events at the moment.</p>
+          ) : (
+            events.map((event) => {
+              const startDate = new Date(event.event_date);
+              const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Assume 1 hr
+              const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+              const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
+              const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
 
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Disaster Response Camp</h3>
-              <p><strong>Date:</strong> August 10–12, 2025</p>
-              <p><strong>Venue:</strong> Mount Kenya</p>
-              <p>
-                A hands-on camp focused on preparedness, simulations, teamwork, and field response readiness.
-              </p>
-              <Link className="btn" href="/contact">Ask to Join</Link>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Community First Aid Day</h3>
-              <p><strong>Date:</strong> September 21, 2025</p>
-              <p><strong>Venue:</strong> JKUAT Grounds</p>
-              <p>
-                Community engagement day for first aid demonstrations, training, and public safety awareness.
-              </p>
-              <Link className="btn" href="/contact">Ask to Join</Link>
-            </div>
-          </div>
+              return (
+                <div className="product-card" key={event.id}>
+                  <div className="product-card-info">
+                    <h3>{event.title}</h3>
+                    <p><strong>Date:</strong> {new Date(event.event_date).toLocaleDateString()}</p>
+                    <p><strong>Venue:</strong> {event.location}</p>
+                    <p>{event.description}</p>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                      <Link className="btn" href="/contact">Ask to Join</Link>
+                      <a className="btn btn-accent" href={googleCalUrl} target="_blank" rel="noopener noreferrer">
+                        Add to Calendar
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
 

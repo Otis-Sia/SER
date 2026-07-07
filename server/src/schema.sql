@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS events (
   event_date DATE NOT NULL,
   location TEXT NOT NULL,
   description TEXT,
+  google_event_id VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
