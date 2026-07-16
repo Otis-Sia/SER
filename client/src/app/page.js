@@ -50,7 +50,7 @@ export default async function Home() {
             position: 'relative',
             overflow: 'hidden',
             boxShadow: 'var(--box-shadow)',
-            aspectRatio: '4 / 3',
+            minHeight: '300px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
