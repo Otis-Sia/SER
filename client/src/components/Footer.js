@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import SocialIcons from './SocialIcons';
 
-export default function Footer() {
+export default function Footer({ osns = [] }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -54,7 +54,7 @@ export default function Footer() {
           <div className="footer-column">
             <h3>Connect</h3>
             <p className="footer-connect-text">Follow us on social media for updates, events, and stories from the field.</p>
-            <SocialIcons />
+            <SocialIcons osns={osns} />
           </div>
         </div>
 

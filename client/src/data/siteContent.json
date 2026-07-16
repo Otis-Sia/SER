@@ -1,0 +1,273 @@
+{
+  "siteMeta": {
+    "title": "Scouts Emergency Response",
+    "description": "Compassion in Action - Scouts Emergency Response",
+    "contactEmail": "hello@example.com",
+    "osns": [
+      {
+        "name": "Facebook",
+        "handle": "Scouts Emergency Response",
+        "url": "https://www.facebook.com/profile.php?id=61556534734628"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@scoutsemergencyresponse",
+        "url": "https://www.instagram.com/scoutsemergencyresponse"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@scouts.emergency",
+        "url": "https://www.tiktok.com/@scouts.emergency"
+      },
+      {
+        "name": "YouTube",
+        "handle": "#",
+        "url": "#"
+      }
+    ]
+  },
+  "navigation": [
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "Projects",
+      "href": "/projects"
+    },
+    {
+      "label": "Events",
+      "href": "/events"
+    },
+    {
+      "label": "Community",
+      "href": "/community"
+    },
+    {
+      "label": "Gallery",
+      "href": "/gallery"
+    },
+    {
+      "label": "Shop",
+      "href": "/shop"
+    },
+    {
+      "label": "FAQ",
+      "href": "/faq"
+    },
+    {
+      "label": "Join",
+      "href": "/join"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "home": {
+    "featuredInstagramPost": "https://www.instagram.com/p/DKoekfRteyB/",
+    "featuredTiktokPost": "https://www.tiktok.com/@scouts.emergency/photo/7662099423526259989",
+    "featuredFacebookPost": "https://www.facebook.com/permalink.php?story_fbid=pfbid0sYnPqYXhYotNwsVtABWAb8yhhJK26DY5rPFgBohFz2oxBowqfQMSJZebpBeoQHNml&id=61556534734628",
+    "hero": {
+      "heading": "Scouts Emergency Response",
+      "subheading": "Compassion in Action",
+      "ctaText": "Learn More",
+      "ctaLink": "/about"
+    },
+    "features": [
+      {
+        "title": "First Aid Training",
+        "description": "The trainings combines theory, demonstrations, and practical exercises to ensure participants gain real-life emergency response experience. We train schools and organized groups and also hold online trainings."
+      },
+      {
+        "title": "Emergency Response Services",
+        "description": "We also provide emergency response services at events, sports activities, and other functions, ensuring safety and rapid support when needed."
+      },
+      {
+        "title": "Psychological First Aid",
+        "description": "We provide Psychological First Aid (PFA) training and support to help youth offer comfort and mental support during emergencies."
+      },
+      {
+        "title": "Fire Safety Training",
+        "description": "We offer Fire Safety Training to teach youth how to prevent, respond to, and stay safe during fire emergencies."
+      }
+    ]
+  },
+  "about": {
+    "title": "About Us",
+    "quote": "Prepared youth save lives; showing up, learning, and responding makes all the difference.",
+    "vision": "To create a generation of empowered and prepared youth who can respond confidently, responsibly, and effectively to emergencies within their communities.",
+    "mission": "To equip young people with practical emergency preparedness skills, knowledge, and leadership through training, awareness programs, and community engagement, enabling them to respond effectively and support their communities during emergencies and disasters.",
+    "goal": "To build resilience, enhance the preparedness & response capability of young people & community emergency",
+    "objective": "To increase awareness among young people and communities on emergency preparedness",
+    "team": [
+      {
+        "name": "Team Lead",
+        "role": "Team Lead",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Lead Trainer",
+        "role": "Lead Trainer",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Programs Lead",
+        "role": "Programs Lead",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Volunteer Coordinator",
+        "role": "Volunteer Coordinator",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Finance Officer",
+        "role": "Finance Officer",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Secretary",
+        "role": "Secretary",
+        "image": "https://via.placeholder.com/160"
+      },
+      {
+        "name": "Media & Communication",
+        "role": "Media & Communication",
+        "image": "https://via.placeholder.com/160"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Our Work in the Field",
+    "description": "Scouts Emergency Response (SER) runs practical programs that build safety skills, strengthen preparedness, and support communities during emergencies.",
+    "items": [
+      {
+        "id": "p1",
+        "title": "ClickSafe Initiative",
+        "focus": "Cybersecurity & Online Safety",
+        "description": "A youth-led program training students and communities on safe internet use, digital responsibility, and protection from online risks.",
+        "link": "/contact",
+        "linkText": "Partner / Join"
+      },
+      {
+        "id": "p2",
+        "title": "Emergency Drill Simulations",
+        "focus": "Preparedness & Response Practice",
+        "description": "Practical emergency drills for Scouts and schools to build readiness for fire incidents, injuries, evacuations, and disaster scenarios.",
+        "link": "/events",
+        "linkText": "See Events"
+      },
+      {
+        "id": "p3",
+        "title": "First Aid Camps",
+        "focus": "Life-saving Skills",
+        "description": "Hands-on first aid training sessions with demonstrations, practice, and community outreach to improve rapid response and confidence.",
+        "link": "/contact",
+        "linkText": "Request Training"
+      },
+      {
+        "id": "p4",
+        "title": "Environmental Restoration Drives",
+        "focus": "Community Resilience",
+        "description": "Cleanup and restoration projects that reduce risk, protect public health, and support safer environments for communities.",
+        "link": "/community",
+        "linkText": "Join Community"
+      },
+      {
+        "id": "p5",
+        "title": "Community Safety Ambassadors",
+        "focus": "Awareness & Leadership",
+        "description": "Training Scouts and volunteers to champion first aid awareness, safe practices, and emergency readiness in local communities.",
+        "link": "",
+        "linkText": ""
+      }
+    ]
+  },
+  "events": {
+    "title": "Scouting Milestones & SER Events",
+    "description": "Scouts Emergency Response (SER) honors key Scouting moments and organizes community-centered preparedness events. Join us to learn, serve, and strengthen local readiness.",
+    "items": [
+      {
+        "id": "e1",
+        "title": "Emergency Prep Hubs",
+        "date": "2026-08-15",
+        "location": "Local Events",
+        "description": "Mobile kits and first aid stations deployed across local events."
+      }
+    ]
+  },
+  "gallery": {
+    "title": "Our Gallery",
+    "items": [
+      {
+        "title": "Robert Baden-Powell",
+        "image": "https://3.bp.blogspot.com/-rnOzbc-hyHE/Wo9tcLiRrEI/AAAAAAAAD60/JJ5hoKkHP8Y0WE0Jq7OlxQa0hEYuif4bQCLcBGAs/s1600/Lord%2BBaden-Powell.jpg",
+        "alt": "Robert Baden-Powell",
+        "description": "Founder of the Scout Movement."
+      },
+      {
+        "title": "Team Building Exercise",
+        "image": "https://tse3.mm.bing.net/th/id/OIP.QB05OWneQm76l48t7mQKLwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+        "alt": "Team building exercise",
+        "description": "Scouts participating in a team building activity."
+      },
+      {
+        "title": "First Aid Training",
+        "image": "https://tse3.mm.bing.net/th/id/OIP.6oWV6nHbsSzQOvgE53-5sAHaFE?rs=1&pid=ImgDetMain&o=7&rm=3",
+        "alt": "First aid training session",
+        "description": "Learning essential first aid skills."
+      },
+      {
+        "title": "Community Cleanup Drive",
+        "image": "/assets/images/gallery/community-cleanup.jpg",
+        "alt": "Community cleanup drive",
+        "description": "Scouts helping keep the community clean."
+      }
+    ],
+    "socialEmbeds": {
+      "facebook": "https://facebook.com/example",
+      "instagram": "https://instagram.com/example",
+      "tiktok": "https://tiktok.com/@example",
+      "youtube": "https://youtube.com/c/example"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions (FAQs)",
+    "description": "Here are some common questions about Scouts Emergency Response (SER). If you don't find what you're looking for, reach out and we'll help.",
+    "questions": [
+      {
+        "q": "What is Scouts Emergency Response (SER)?",
+        "a": "Scouts Emergency Response (SER) is an initiative that equips Scouts and community members with emergency preparedness and response skills, including first aid and disaster readiness."
+      },
+      {
+        "q": "How can I join SER?",
+        "a": "You can join by registering through our website or contacting your local Scout group. If you're not a Scout, you can still participate as a volunteer or partner."
+      },
+      {
+        "q": "What training do members receive?",
+        "a": "Members receive training in first aid, emergency preparedness, disaster response, and community safety. Training may include simulations, drills, and practical sessions depending on the event."
+      },
+      {
+        "q": "Are there age restrictions to join?",
+        "a": "No. SER welcomes people of all ages who want to contribute to safer communities. Some activities may be organized by age group for training purposes."
+      },
+      {
+        "q": "Mike Test",
+        "a": "1234"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.",
+    "email": "scoutsemergencyresponse@gmail.com",
+    "phone": "0742435314",
+    "phoneInternational": "+254 742 435 314",
+    "whatsappLink": "https://wa.me/254742435314"
+  }
+}

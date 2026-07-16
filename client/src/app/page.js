@@ -1,21 +1,26 @@
 import Link from 'next/link';
 import { HeartPulse, Siren, Brain, Flame } from 'lucide-react';
 import InteractiveInfiniteScroll from '../components/InteractiveInfiniteScroll';
+import InstagramEmbed from '../components/InstagramEmbed';
+import TiktokEmbed from '../components/TiktokEmbed';
+import FacebookEmbed from '../components/FacebookEmbed';
+import { getSiteContent } from './admin/actions';
 
-export default function Home() {
+export default async function Home() {
+  const siteContent = await getSiteContent();
   return (
     <>
       <section className="hero page-hero">
-        <h1>Scouts Emergency Response</h1>
-        <p>Compassion in Action</p>
-        <Link href="/about" className="btn">Learn More</Link>
+        <h1>{siteContent.home.hero.heading}</h1>
+        <p>{siteContent.home.hero.subheading}</p>
+        <Link href={siteContent.home.hero.ctaLink} className="btn">{siteContent.home.hero.ctaText}</Link>
       </section>
 
       {/* Why Scouts Emergency Response Section */}
       <section className="why-scouts-container">
         <div className="why-scouts-content">
           <h2 className="brochure-title-white">Why Scouts Emergency Response?</h2>
-          <p style={{ fontSize: '1.2rem', lineHeight: '1.7', marginBottom: '1.5rem', fontWeight: '500' }}>
+          <p style={{ fontSize: '1.15rem', color: '#ffffff', opacity: '0.9', lineHeight: '1.7', marginBottom: '1.5rem', fontWeight: '400', maxWidth: '600px' }}>
             Scouts Emergency Response focuses on equipping young people for emergency Preparedness through trainings, conducted both physically and virtually.
           </p>
           <Link href="/contact" className="btn btn-accent" style={{ backgroundColor: '#ffffff', color: 'var(--brochure-green)', border: 'none', boxShadow: 'none' }}>
@@ -80,7 +85,7 @@ export default function Home() {
               paddingBottom: '0.5rem',
               marginBottom: '1rem'
             }}>Compassion in Action</div>
-            <p style={{ fontSize: '0.9rem', opacity: '0.8', margin: 0, maxWidth: '280px' }}>
+            <p style={{ fontSize: '1.1rem', color: '#ffffff', opacity: '0.9', margin: 0, maxWidth: '340px', lineHeight: '1.6' }}>
               Equipping youth with life-saving skills for home, school, and community safety.
             </p>
           </div>
@@ -94,53 +99,23 @@ export default function Home() {
           We prepare the next generation of responders through comprehensive training and emergency services, built on hands-on practice and community-first resilience.
         </p>
         <div className="what-we-do-grid">
-          <div className="service-card">
-            <div className="service-card-header">
-              <div className="service-card-icon">
-                <HeartPulse size={24} />
+          {siteContent.home.features.map((feature, index) => {
+            const icons = [HeartPulse, Siren, Brain, Flame];
+            const IconComponent = icons[index % icons.length];
+            return (
+              <div className="service-card" key={index}>
+                <div className="service-card-header">
+                  <div className="service-card-icon">
+                    <IconComponent size={24} />
+                  </div>
+                  <h3>{feature.title}</h3>
+                </div>
+                <p>
+                  {feature.description}
+                </p>
               </div>
-              <h3>First Aid Training</h3>
-            </div>
-            <p>
-              The trainings combines theory, demonstrations, and practical exercises to ensure participants gain real-life emergency response experience. We train schools and organized groups and also hold online trainings.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-card-header">
-              <div className="service-card-icon">
-                <Siren size={24} />
-              </div>
-              <h3>Emergency Response Services</h3>
-            </div>
-            <p>
-              We also provide emergency response services at events, sports activities, and other functions, ensuring safety and rapid support when needed.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-card-header">
-              <div className="service-card-icon">
-                <Brain size={24} />
-              </div>
-              <h3>Psychological First Aid</h3>
-            </div>
-            <p>
-              We provide Psychological First Aid (PFA) training and support to help youth offer comfort and mental support during emergencies.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-card-header">
-              <div className="service-card-icon">
-                <Flame size={24} />
-              </div>
-              <h3>Fire Safety Training</h3>
-            </div>
-            <p>
-              We offer Fire Safety Training to teach youth how to prevent, respond to, and stay safe during fire emergencies.
-            </p>
-          </div>
+            );
+          })}
         </div>
       </section>
 
@@ -261,6 +236,15 @@ export default function Home() {
             <strong>Community Partnerships</strong>
             <p>Collaborations that keep resources and training moving year-round.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="socials-section">
+        <h2>Latest from our Socials</h2>
+        <div className="socials-grid">
+          <InstagramEmbed url={siteContent.home.featuredInstagramPost} />
+          <TiktokEmbed url={siteContent.home.featuredTiktokPost} />
+          <FacebookEmbed url={siteContent.home.featuredFacebookPost} />
         </div>
       </section>
 

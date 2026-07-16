@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from './Icons';
 
 // Random comment: Always remember to stay hydrated while coding!
 
-export default function Header() {
+export default function Header({ navigation = [] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -69,15 +69,13 @@ export default function Header() {
 
         <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
           <ul>
-            <li><Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
-            <li><Link href="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
-            <li><Link href="/projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
-            <li><Link href="/events" onClick={() => setIsMenuOpen(false)}>Events</Link></li>
-            <li><Link href="/gallery" onClick={() => setIsMenuOpen(false)}>Gallery</Link></li>
-            <li><Link href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
-            <li><Link href="/faq" onClick={() => setIsMenuOpen(false)}>FAQs</Link></li>
-            <li><Link href="/community" onClick={() => setIsMenuOpen(false)}>Community</Link></li>
-            <li><Link href="/shop" onClick={() => setIsMenuOpen(false)}>Shop</Link></li>
+            {navigation.map((nav, index) => (
+              <li key={index}>
+                <Link href={nav.href} onClick={() => setIsMenuOpen(false)}>
+                  {nav.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 

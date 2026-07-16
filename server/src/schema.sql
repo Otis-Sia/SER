@@ -62,3 +62,18 @@ CREATE TABLE IF NOT EXISTS admins (
   password_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Member applications (Join page)
+CREATE TABLE IF NOT EXISTS members (
+  id SERIAL PRIMARY KEY,
+  first_name TEXT NOT NULL,
+  middle_name TEXT,
+  last_name TEXT NOT NULL,
+  county TEXT NOT NULL,
+  sub_county TEXT NOT NULL,
+  crew TEXT NOT NULL,
+  blood_type VARCHAR(5),
+  email TEXT NOT NULL UNIQUE,
+  whatsapp TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

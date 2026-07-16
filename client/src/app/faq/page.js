@@ -1,16 +1,28 @@
-import Link from 'next/link';
+'use client';
 
-export const metadata = {
-  title: 'FAQs | Scouts Emergency Response',
-};
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { getSiteContent } from '../admin/actions';
 
 export default function FAQ() {
+  const [siteContent, setSiteContent] = useState(null);
+
+  useEffect(() => {
+    async function loadData() {
+      const content = await getSiteContent();
+      setSiteContent(content);
+    }
+    loadData();
+  }, []);
+
+  if (!siteContent) return <div>Loading...</div>;
+
   return (
     <>
       <section className="faq-intro page-hero text-center">
-        <h1>Frequently Asked Questions (FAQs)</h1>
+        <h1>{siteContent.faq.title}</h1>
         <p className="intro-text">
-          Here are some common questions about Scouts Emergency Response (SER). If you don&apos;t find what you&apos;re looking for, reach out and we&apos;ll help.
+          {siteContent.faq.description}
         </p>
         <div className="mt-1">
           <Link href="/contact" className="btn btn-accent">Contact SER</Link>
@@ -18,34 +30,12 @@ export default function FAQ() {
       </section>
 
       <section className="faq-content intro-text">
-        <div className="faq-item">
-          <h2>What is Scouts Emergency Response (SER)?</h2>
-          <p>
-            Scouts Emergency Response (SER) is an initiative that equips Scouts and community members with emergency preparedness and response skills, including first aid and disaster readiness.
-          </p>
-        </div>
-
-        <div className="faq-item">
-          <h2>How can I join SER?</h2>
-          <p>
-            You can join by registering through our website or contacting your local Scout group. If you&apos;re not a Scout, you can still participate as a volunteer or partner.
-          </p>
-          <p className="mt-0_5"></p>
-        </div>
-
-        <div className="faq-item">
-          <h2>What training do members receive?</h2>
-          <p>
-            Members receive training in first aid, emergency preparedness, disaster response, and community safety. Training may include simulations, drills, and practical sessions depending on the event.
-          </p>
-        </div>
-
-        <div className="faq-item">
-          <h2>Are there age restrictions to join?</h2>
-          <p>
-            No. SER welcomes people of all ages who want to contribute to safer communities. Some activities may be organized by age group for training purposes.
-          </p>
-        </div>
+        {siteContent.faq.questions.map((item, index) => (
+          <div className="faq-item" key={index}>
+            <h2>{item.q}</h2>
+            <p>{item.a}</p>
+          </div>
+        ))}
       </section>
 
       <section className="faq-cta text-center">

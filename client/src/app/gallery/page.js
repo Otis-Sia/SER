@@ -1,60 +1,47 @@
-import Link from 'next/link';
+'use client';
 
-export const metadata = {
-  title: 'Gallery | Scouts Emergency Response',
-};
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { getSiteContent } from '../admin/actions';
 
 export default function Gallery() {
+  const [siteContent, setSiteContent] = useState(null);
+
+  useEffect(() => {
+    async function loadData() {
+      const content = await getSiteContent();
+      setSiteContent(content);
+    }
+    loadData();
+  }, []);
+
+  if (!siteContent) return <div>Loading...</div>;
+
+  const { gallery } = siteContent;
+
   return (
     <>
       <section className="gallery-intro page-hero text-center">
-        <h1>Our Gallery</h1>
+        <h1>{gallery.title || 'Our Gallery'}</h1>
         <p className="intro-text">
-          A collection of moments from our events, projects, trainings, and community activities. (Tip: replace the placeholder images with real SER photos when ready.)
+          {gallery.description || 'A collection of moments from our events, projects, trainings, and community activities.'}
         </p>
       </section>
 
       <section className="gallery-section">
         <div className="gallery-grid">
-          <div className="gallery-item">
-            <a href="https://3.bp.blogspot.com/-rnOzbc-hyHE/Wo9tcLiRrEI/AAAAAAAAD60/JJ5hoKkHP8Y0WE0Jq7OlxQa0hEYuif4bQCLcBGAs/s1600/Lord%2BBaden-Powell.jpg" title="Robert Baden-Powell">
-              <img src="https://3.bp.blogspot.com/-rnOzbc-hyHE/Wo9tcLiRrEI/AAAAAAAAD60/JJ5hoKkHP8Y0WE0Jq7OlxQa0hEYuif4bQCLcBGAs/s1600/Lord%2BBaden-Powell.jpg" alt="Robert Baden-Powell" />
-              <div className="overlay">
-                <span className="overlay-title">Robert Baden-Powell</span>
-                <span className="overlay-action">View Image</span>
-              </div>
-            </a>
-          </div>
-
-          <div className="gallery-item">
-            <a href="https://tse3.mm.bing.net/th/id/OIP.QB05OWneQm76l48t7mQKLwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" title="Team Building Exercise">
-              <img src="https://tse3.mm.bing.net/th/id/OIP.QB05OWneQm76l48t7mQKLwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Team building exercise" />
-              <div className="overlay">
-                <span className="overlay-title">Team Building Exercise</span>
-                <span className="overlay-action">View Image</span>
-              </div>
-            </a>
-          </div>
-
-          <div className="gallery-item">
-            <a href="https://tse3.mm.bing.net/th/id/OIP.6oWV6nHbsSzQOvgE53-5sAHaFE?rs=1&pid=ImgDetMain&o=7&rm=3" title="First Aid Training">
-              <img src="https://tse3.mm.bing.net/th/id/OIP.6oWV6nHbsSzQOvgE53-5sAHaFE?rs=1&pid=ImgDetMain&o=7&rm=3" alt="First aid training session" />
-              <div className="overlay">
-                <span className="overlay-title">First Aid Training</span>
-                <span className="overlay-action">View Image</span>
-              </div>
-            </a>
-          </div>
-
-          <div className="gallery-item">
-            <a href="/assets/images/gallery/community-cleanup.jpg" title="Community Cleanup Drive">
-              <img src="/assets/images/gallery/community-cleanup.jpg" alt="Community cleanup drive" />
-              <div className="overlay">
-                <span className="overlay-title">Community Cleanup Drive</span>
-                <span className="overlay-action">View Image</span>
-              </div>
-            </a>
-          </div>
+          {gallery.items.map((item, index) => (
+            <div className="gallery-item" key={index}>
+              <a href={item.image} title={item.title}>
+                <img src={item.image} alt={item.alt || item.title} />
+                <div className="overlay">
+                  <span className="overlay-title">{item.title}</span>
+                  {item.description && <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>{item.description}</p>}
+                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>View Image</span>
+                </div>
+              </a>
+            </div>
+          ))}
         </div>
       </section>
 

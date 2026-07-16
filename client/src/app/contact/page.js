@@ -1,18 +1,19 @@
 import Link from 'next/link';
 import SocialIcons from '../../components/SocialIcons';
+import { getSiteContent } from '../admin/actions';
+
 
 export const metadata = {
   title: 'Contact SER | Scouts Emergency Response',
 };
 
-export default function Contact() {
+export default async function Contact() {
+  const siteContent = await getSiteContent();
   return (
     <>
       <section className="contact-intro page-hero">
-        <h1>Contact Us</h1>
-        <p>
-          Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.
-        </p>
+        <h1>{siteContent.contact.title}</h1>
+        <p>{siteContent.contact.description}</p>
       </section>
 
       <section className="contact-form">
@@ -36,20 +37,20 @@ export default function Contact() {
         <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
           <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>Email:</strong>{' '}
-            <a href="mailto:scoutsemergencyresponse@gmail.com">scoutsemergencyresponse@gmail.com</a>
+            <a href={`mailto:${siteContent.contact.email}`}>{siteContent.contact.email}</a>
           </li>
           <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>Phone:</strong>{' '}
-            <a href="tel:0742435314">0742435314</a> (Local) / <a href="tel:+254742435314">+254 742 435 314</a> (International)
+            <a href={`tel:${siteContent.contact.phone}`}>{siteContent.contact.phone}</a> (Local) / <a href={`tel:${siteContent.contact.phoneInternational}`}>{siteContent.contact.phoneInternational}</a> (International)
           </li>
           <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>WhatsApp:</strong>{' '}
-            <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+            <a href={siteContent.contact.whatsappLink} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
           </li>
         </ul>
 
         <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>
-        <SocialIcons className="contact-social" showText={true} direction="column" />
+        <SocialIcons osns={siteContent.siteMeta.osns} className="contact-social" showText={true} direction="column" />
       </section>
 
       <section className="contact-cta text-center">

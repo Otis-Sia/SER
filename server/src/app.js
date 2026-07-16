@@ -8,6 +8,7 @@ import eventsRouter from "./routes/events.js";
 import postsRouter from "./routes/posts.js";
 import galleryRouter from "./routes/gallery.js";
 import authRouter from "./routes/auth.js";
+import membersRouter from "./routes/members.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/gallery", galleryRouter);
+app.use("/api/members", membersRouter);
 
 const port = Number(process.env.PORT || 0);
 const host = process.env.HOST || undefined;

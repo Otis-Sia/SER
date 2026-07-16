@@ -1,17 +1,25 @@
+import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
+import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
   title: 'About SER | Scouts Emergency Response',
 };
 
-export default function About() {
+export default async function About() {
+  const siteContent = await getSiteContent();
+
   return (
     <>
       <section className="about-intro page-hero">
-        <h1>About Scouts Emergency Response</h1>
-        <p>
-          We are a youth-centered initiative that focuses on emergency preparedness and response skills among young people. The project aims to equip young people with practical knowledge and confidence to respond effectively during emergencies in schools, homes, and communities. Through training, awareness, and hands-on learning, SER empowers young people to become first responders in their communities.
-        </p>
+        <h1>{siteContent.about.title}</h1>
+        <p>{siteContent.about.mission}</p>
+        {siteContent.about.quote && (
+          <blockquote style={{ fontStyle: 'italic', marginTop: '1.5rem', fontSize: '1.2rem', color: 'var(--accent-color)' }}>
+            "{siteContent.about.quote}"
+          </blockquote>
+        )}
       </section>
 
       <section className="about-pillars" style={{ marginTop: '2rem' }}>
@@ -19,30 +27,22 @@ export default function About() {
         
         <div className="pillar-card">
           <h3>Our Vision</h3>
-          <p>
-            To create a generation of empowered and prepared youth who can respond confidently, responsibly, and effectively to emergencies within their communities.
-          </p>
+          <p>{siteContent.about.vision}</p>
         </div>
 
         <div className="pillar-card">
           <h3>Our Mission</h3>
-          <p>
-            To equip young people with practical emergency preparedness skills, knowledge, and leadership through training, awareness programs, and community engagement, enabling them to respond effectively and support their communities during emergencies and disasters.
-          </p>
+          <p>{siteContent.about.mission}</p>
         </div>
 
         <div className="pillar-card">
           <h3>Goal</h3>
-          <p>
-            To build resilience, enhance the preparedness & response capability of young people & community emergency.
-          </p>
+          <p>{siteContent.about.goal}</p>
         </div>
 
         <div className="pillar-card">
           <h3>Objective</h3>
-          <p>
-            To increase awareness among young people and communities on emergency preparedness.
-          </p>
+          <p>{siteContent.about.objective}</p>
         </div>
       </section>
 
@@ -74,55 +74,29 @@ export default function About() {
         <p>
           SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts. Each team member brings a mix of scouting experience, emergency readiness training, and a shared commitment to serve during crises.
         </p>
-        <h3>Meet the Team (7 Teammates)</h3>
+        <h3>Meet the Team</h3>
         <div className="team-grid">
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Team lead placeholder portrait" />
-            <h4>Team Lead</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Lead trainer placeholder portrait" />
-            <h4>Lead Trainer</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Programs lead placeholder portrait" />
-            <h4>Programs Lead</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Volunteer coordinator placeholder portrait" />
-            <h4>Volunteer Coordinator</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Finance officer placeholder portrait" />
-            <h4>Finance Officer</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Secretary placeholder portrait" />
-            <h4>Secretary</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Media and communication placeholder portrait" />
-            <h4>Media &amp; Communication</h4>
-          </article>
-        </div>
-        <h3>Volunteer Team (3 Volunteers)</h3>
-        <div className="team-grid">
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Volunteer placeholder portrait" />
-            <h4>Volunteers</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Legal counsel placeholder portrait" />
-            <h4>Lead Psychologist</h4>
-          </article>
-          <article className="team-card">
-            <img src="https://via.placeholder.com/160" alt="Social media management placeholder portrait" />
-            <h4>Communications Lead</h4>
-          </article>
+          {siteContent.about.team.map((member, idx) => (
+            <article className="team-card" key={idx}>
+              <img src={member.image} alt={member.name} />
+              <h4>{member.role}</h4>
+              {member.name !== member.role && <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8 }}>{member.name}</p>}
+            </article>
+          ))}
         </div>
         <p>
           Your role could be next, and we’ll help shape the title together based on your strengths and the needs of the mission.
         </p>
+      </section>
+
+      <section className="about-socials text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem 0' }}>
+        <h2>Follow us on TikTok</h2>
+        <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@scouts.emergency" data-unique-id="scouts.emergency" data-embed-type="creator" style={{ maxWidth: '780px', minWidth: '288px' }} >
+          <section>
+            <a target="_blank" rel="noreferrer" href="https://www.tiktok.com/@scouts.emergency?refer=creator_embed">@scouts.emergency</a>
+          </section>
+        </blockquote> 
+        <Script async src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
       </section>
 
       <section className="about-cta text-center">

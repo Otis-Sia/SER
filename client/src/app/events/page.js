@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { MapPin, Siren } from '../../components/Icons';
+import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
   title: 'Events | Scouts Emergency Response',
@@ -19,14 +20,15 @@ async function getEvents() {
 }
 
 export default async function Events() {
+  const siteContent = await getSiteContent();
   const events = await getEvents();
 
   return (
     <>
       <section className="events-intro page-hero text-center">
-        <h1>Scouting Milestones &amp; SER Events</h1>
+        <h1>{siteContent.events.title}</h1>
         <p className="intro-text">
-          Scouts Emergency Response (SER) honors key Scouting moments and organizes community-centered preparedness events. Join us to learn, serve, and strengthen local readiness.
+          {siteContent.events.description}
         </p>
       </section>
 
