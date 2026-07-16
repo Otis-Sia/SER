@@ -252,19 +252,13 @@ export default async function Home() {
         <h2>Our Partners</h2>
         <div className="partners-marquee">
           <div className="marquee-track">
-            <span>Kenya Scouts Association</span>
-            <span>Red Cross Kenya</span>
-            <span>St John Ambulance</span>
-            <span>National Disaster Management Unit</span>
-            <span>County Fire Department</span>
-            <span>County Health Promoters</span>
+            {siteContent.home.partners.map((partner, index) => (
+              <span key={`partner-1-${index}`}>{partner}</span>
+            ))}
             {/* Duplicate for seamless scroll */}
-            <span>Kenya Scouts Association</span>
-            <span>Red Cross Kenya</span>
-            <span>St John Ambulance</span>
-            <span>National Disaster Management Unit</span>
-            <span>County Fire Department</span>
-            <span>County Health Promoters</span>
+            {siteContent.home.partners.map((partner, index) => (
+              <span key={`partner-2-${index}`}>{partner}</span>
+            ))}
           </div>
         </div>
       </section>
