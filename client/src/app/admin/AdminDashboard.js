@@ -2,7 +2,68 @@
 
 import { useState } from "react";
 import styles from "./admin.module.css";
-import { updateSiteContent } from "./actions";
+import { updateSiteContent, uploadImage } from "./actions";
+
+function ImageField({ label, value, onChange, pathStr }) {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const result = await uploadImage(formData);
+    setIsUploading(false);
+
+    if (result.success) {
+      onChange(result.url);
+    } else {
+      alert("Failed to upload image: " + result.message);
+    }
+  };
+
+  const isPreviewable = typeof value === "string" && value.trim() !== "";
+
+  return (
+    <div className={styles.formGroup} key={pathStr}>
+      <label className={styles.label}>{label}</label>
+      {isPreviewable && (
+        <div className={styles.imagePreviewContainer}>
+          <img
+            src={value}
+            alt="Preview"
+            className={styles.imagePreview}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+      )}
+      <div className={styles.imageInputWrapper}>
+        <input
+          type="text"
+          className={styles.input}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Image URL or upload file..."
+        />
+        <label className={styles.uploadBtn}>
+          {isUploading ? "Uploading..." : "📷 Upload File"}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={isUploading}
+            style={{ display: "none" }}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard({ initialData }) {
   const [data, setData] = useState(initialData);
@@ -28,7 +89,7 @@ export default function AdminDashboard({ initialData }) {
 
   const handleChange = (path, value) => {
     setData((prev) => {
-      const newData = { ...prev };
+      const newData = JSON.parse(JSON.stringify(prev));
       let current = newData;
       for (let i = 0; i < path.length - 1; i++) {
         current = current[path[i]];
@@ -40,7 +101,7 @@ export default function AdminDashboard({ initialData }) {
 
   const handleArrayAdd = (path, template) => {
     setData((prev) => {
-      const newData = { ...prev };
+      const newData = JSON.parse(JSON.stringify(prev));
       let current = newData;
       for (let i = 0; i < path.length; i++) {
         current = current[path[i]];
@@ -52,7 +113,7 @@ export default function AdminDashboard({ initialData }) {
 
   const handleArrayDelete = (path, index) => {
     setData((prev) => {
-      const newData = { ...prev };
+      const newData = JSON.parse(JSON.stringify(prev));
       let current = newData;
       for (let i = 0; i < path.length; i++) {
         current = current[path[i]];
@@ -118,7 +179,30 @@ export default function AdminDashboard({ initialData }) {
     }
 
     if (typeof value === "string") {
-      const isLongText = value.length > 50 || key.toLowerCase().includes("description") || key.toLowerCase().includes("story") || key.toLowerCase().includes("mission");
+      const lowerKey = key.toLowerCase();
+      const isImage =
+        lowerKey.includes("image") ||
+        lowerKey.includes("photo") ||
+        lowerKey.includes("img") ||
+        lowerKey.includes("avatar") ||
+        lowerKey.includes("logo") ||
+        lowerKey.includes("icon") ||
+        lowerKey.includes("banner") ||
+        Boolean(value.match(/\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i));
+
+      if (isImage) {
+        return (
+          <ImageField
+            key={path.join(".")}
+            pathStr={path.join(".")}
+            label={key}
+            value={value}
+            onChange={(val) => handleChange(path, val)}
+          />
+        );
+      }
+
+      const isLongText = value.length > 50 || lowerKey.includes("description") || lowerKey.includes("story") || lowerKey.includes("mission");
       return (
         <div className={styles.formGroup} key={path.join(".")}>
           <label className={styles.label}>{key}</label>

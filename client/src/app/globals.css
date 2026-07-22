@@ -19,7 +19,7 @@
   /* Effects */
   --box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.12);
   --box-shadow-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.18);
-  --border-radius: 12px;
+  --border-radius: 6px;
 
   /* Animations */
   --transition-speed: 0.3s;
@@ -118,7 +118,7 @@ section {
   background-color: var(--primary-color);
   color: #fff;
   padding: 14px 28px;
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
@@ -282,7 +282,7 @@ nav {
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   border: 1px solid transparent;
   background-color: var(--light-gray-color);
   color: var(--text-color);
@@ -326,7 +326,7 @@ main section.page-hero {
   position: relative;
   overflow: hidden;
   padding: 3rem 2.5rem;
-  border-radius: calc(var(--border-radius) * 2);
+  border-radius: calc(var(--border-radius) + 4px);
   background-color: var(--white-color);
   background-image:
     url("/assets/images/backgrounds/hero-1.svg"),
@@ -897,7 +897,7 @@ footer a:focus-visible {
 
 .gallery-item {
     background-color: var(--white-color);
-    border-radius: calc(var(--border-radius) + 6px);
+    border-radius: calc(var(--border-radius) + 2px);
     box-shadow: 0 14px 30px rgba(10, 30, 40, 0.18);
     overflow: hidden;
     position: relative;
@@ -1032,7 +1032,7 @@ footer a:focus-visible {
                 
                 .highlight-card {
                     background: linear-gradient(135deg, rgba(0, 153, 0, 0.08), rgba(8, 131, 149, 0.18));
-                    border-radius: calc(var(--border-radius) + 6px);
+                    border-radius: calc(var(--border-radius) + 2px);
                     padding: 1.5rem;
                     position: relative;
                     overflow: hidden;
@@ -1150,7 +1150,7 @@ footer a:focus-visible {
                     flex: 0 0 min(320px, 80vw);
                     margin-right: 1.5rem;
                     background: var(--white-color);
-                    border-radius: calc(var(--border-radius) + 6px);
+                    border-radius: calc(var(--border-radius) + 2px);
                     box-shadow: 0 14px 28px rgba(10, 60, 50, 0.12);
                     overflow: hidden;
                     display: flex;
@@ -1562,7 +1562,7 @@ footer a:focus-visible {
 .admin-card {
   background-color: #fff;
   border: 1px solid #e6e6e6;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 1.25rem;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
@@ -1592,7 +1592,7 @@ footer a:focus-visible {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
-  border-radius: 10px;
+  border-radius: 6px;
   font: inherit;
 }
 
@@ -1621,7 +1621,7 @@ footer a:focus-visible {
 .tab {
   border: 1px solid #ddd;
   background: #fff;
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   padding: 0.5rem 0.9rem;
   cursor: pointer;
   font-weight: 600;
@@ -1644,7 +1644,7 @@ footer a:focus-visible {
 
 .list-item {
   border: 1px solid #eee;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 0.75rem;
   display: grid;
   gap: 0.35rem;
@@ -1673,7 +1673,7 @@ footer a:focus-visible {
 .user-card {
   background-color: #fff;
   border: 1px solid #e6e6e6;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 1.25rem;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
@@ -1688,7 +1688,7 @@ footer a:focus-visible {
 
 .panel {
   border: 1px solid #eee;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 1rem;
 }
 
@@ -1941,7 +1941,7 @@ body.dark-mode,
 .service-card {
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 2rem;
   transition: all var(--transition-speed) var(--ease-out-quart);
   display: flex;
@@ -1968,7 +1968,7 @@ body.dark-mode,
   background-color: rgba(255, 255, 255, 0.15);
   width: 50px;
   height: 50px;
-  border-radius: 10px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1999,7 +1999,7 @@ body.dark-mode,
 /* Decorative slanted image container */
 .slanted-image-wrapper {
   position: relative;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--box-shadow);
   aspect-ratio: 4 / 3;
@@ -2032,7 +2032,7 @@ body.dark-mode,
   background-color: var(--white-color);
   border-left: 5px solid var(--brochure-green);
   padding: 2rem;
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 8px 8px 0;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-speed);
   margin-bottom: 2rem;
@@ -2166,7 +2166,7 @@ body.dark-mode,
 
 .join-form-card {
   background: var(--white-color);
-  border-radius: calc(var(--border-radius) * 2);
+  border-radius: calc(var(--border-radius) + 4px);
   padding: 2.5rem 2.5rem 2rem;
   box-shadow: 0 16px 40px rgba(10, 60, 50, 0.12);
   border-top: 4px solid var(--primary-color);

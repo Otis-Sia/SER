@@ -237,6 +237,12 @@
         "image": "/assets/images/gallery/community-cleanup.jpg",
         "alt": "Community cleanup drive",
         "description": "Scouts helping keep the community clean."
+      },
+      {
+        "title": "First Aid Training",
+        "image": "https://i.imgur.com/yEFu6dw.jpeg",
+        "alt": "",
+        "description": "First Aid Training at Alliance High-School"
       }
     ],
     "socialEmbeds": {

@@ -33,3 +33,29 @@ export async function updateSiteContent(newData) {
     return { success: false, message: error.message };
   }
 }
+
+export async function uploadImage(formData) {
+  try {
+    const file = formData.get("file");
+    if (!file) {
+      return { success: false, message: "No file provided" };
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const uniqueFilename = `${Date.now()}-${sanitizedFilename}`;
+    const filePath = path.join(uploadsDir, uniqueFilename);
+
+    await fs.writeFile(filePath, buffer);
+
+    return { success: true, url: `/uploads/${uniqueFilename}` };
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return { success: false, message: error.message };
+  }
+}
