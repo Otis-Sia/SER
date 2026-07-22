@@ -9,6 +9,7 @@ import postsRouter from "./routes/posts.js";
 import galleryRouter from "./routes/gallery.js";
 import authRouter from "./routes/auth.js";
 import membersRouter from "./routes/members.js";
+import uploadRouter from "./routes/upload.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use("/api/events", eventsRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/gallery", galleryRouter);
 app.use("/api/members", membersRouter);
+app.use("/api/upload", uploadRouter);
 
 const port = Number(process.env.PORT || 0);
 const host = process.env.HOST || undefined;

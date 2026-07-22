@@ -3,6 +3,16 @@
 import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { randomUUID } from "crypto";
+
+const s3Client = new S3Client({
+  region: process.env.APP_AWS_REGION || "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 // Define the path to the content JSON file
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
@@ -33,3 +43,38 @@ export async function updateSiteContent(newData) {
     return { success: false, message: error.message };
   }
 }
+
+
+export async function uploadImage(formData) {
+  try {
+    const file = formData.get("file");
+    if (!file) {
+      return { success: false, message: "No file provided" };
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const ext = path.extname(file.name) || "";
+    const key = `SER-${randomUUID()}${ext}`;
+    const bucket = process.env.APP_AWS_S3_BUCKET_NAME || "juj4-shop-assets-2026";
+    const region = process.env.APP_AWS_REGION || "eu-north-1";
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || "image/jpeg",
+    });
+
+    await s3Client.send(command);
+
+    const url = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+
+    return { success: true, url, key };
+  } catch (error) {
+    console.error("Error uploading image to S3:", error);
+    return { success: false, message: error.message };
+  }
+}
+

@@ -19,7 +19,7 @@
   /* Effects */
   --box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.12);
   --box-shadow-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.18);
-  --border-radius: 12px;
+  --border-radius: 6px;
 
   /* Animations */
   --transition-speed: 0.3s;
@@ -118,7 +118,7 @@ section {
   background-color: var(--primary-color);
   color: #fff;
   padding: 14px 28px;
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
@@ -282,7 +282,7 @@ nav {
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   border: 1px solid transparent;
   background-color: var(--light-gray-color);
   color: var(--text-color);
@@ -326,7 +326,7 @@ main section.page-hero {
   position: relative;
   overflow: hidden;
   padding: 3rem 2.5rem;
-  border-radius: calc(var(--border-radius) * 2);
+  border-radius: calc(var(--border-radius) + 4px);
   background-color: var(--white-color);
   background-image:
     url("/assets/images/backgrounds/hero-1.svg"),
@@ -888,71 +888,85 @@ footer a:focus-visible {
 /* Gallery */
 
 .gallery-grid {
-    display: grid;
-    gap: 1.25rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    grid-auto-rows: 170px;
-    grid-auto-flow: dense;
+    columns: 3 280px;
+    column-gap: 1.25rem;
 }
 
 .gallery-item {
-    background-color: var(--white-color);
-    border-radius: calc(var(--border-radius) + 6px);
-    box-shadow: 0 14px 30px rgba(10, 30, 40, 0.18);
+    break-inside: avoid;
+    margin-bottom: 1.25rem;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     overflow: hidden;
     position: relative;
-    height: 100%;
+    transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.gallery-item:hover {
+    box-shadow: var(--box-shadow-hover);
+    transform: translateY(-4px);
 }
 
 .gallery-item a {
     display: block;
     width: 100%;
-    height: 100%;
 }
 
 .gallery-item img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(1.05) contrast(1.02);
-    transition: transform 0.6s ease, filter 0.6s ease;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    transition: transform 0.5s var(--ease-out-quart);
 }
 
 .gallery-item:hover img {
-    transform: scale(1.08);
-    filter: saturate(1.12) contrast(1.05);
+    transform: scale(1.04);
 }
 
 .gallery-item .overlay {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(180deg, rgba(10, 77, 104, 0.05) 20%, rgba(10, 77, 104, 0.8) 100%);
-    color: var(--white-color);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    gap: 0.35rem;
-    padding: 1.1rem;
-    opacity: 0.92;
-    transition: opacity var(--transition-speed);
+    gap: 0.3rem;
+    padding: 1.25rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
 .gallery-item:hover .overlay {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .gallery-item .overlay-title {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    font-weight: 600;
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    font-weight: 700;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-item .overlay-desc {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    line-height: 1.4;
+    margin-top: 0.25rem;
 }
 
 .gallery-item .overlay-action {
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    color: var(--primary-color);
 }
 
 .gallery-item a:focus-visible {
@@ -960,29 +974,20 @@ footer a:focus-visible {
     outline-offset: 4px;
 }
 
-.gallery-item:nth-child(1) {
-    grid-column: span 2;
-    grid-row: span 2;
-}
-
-.gallery-item:nth-child(3) {
-    grid-column: span 2;
-}
-
 @media (max-width: 900px) {
     .gallery-grid {
-        grid-auto-rows: 210px;
+        columns: 2 200px;
     }
-    .gallery-item:nth-child(1),
-    .gallery-item:nth-child(3) {
-        grid-column: span 1;
-        grid-row: span 1;
+    /* Show overlay always on touch devices */
+    .gallery-item .overlay {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 @media (max-width: 600px) {
     .gallery-grid {
-        grid-auto-rows: 230px;
+        columns: 1;
     }
 }
 
@@ -1032,7 +1037,7 @@ footer a:focus-visible {
                 
                 .highlight-card {
                     background: linear-gradient(135deg, rgba(0, 153, 0, 0.08), rgba(8, 131, 149, 0.18));
-                    border-radius: calc(var(--border-radius) + 6px);
+                    border-radius: calc(var(--border-radius) + 2px);
                     padding: 1.5rem;
                     position: relative;
                     overflow: hidden;
@@ -1150,7 +1155,7 @@ footer a:focus-visible {
                     flex: 0 0 min(320px, 80vw);
                     margin-right: 1.5rem;
                     background: var(--white-color);
-                    border-radius: calc(var(--border-radius) + 6px);
+                    border-radius: calc(var(--border-radius) + 2px);
                     box-shadow: 0 14px 28px rgba(10, 60, 50, 0.12);
                     overflow: hidden;
                     display: flex;
@@ -1562,7 +1567,7 @@ footer a:focus-visible {
 .admin-card {
   background-color: #fff;
   border: 1px solid #e6e6e6;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 1.25rem;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
@@ -1592,7 +1597,7 @@ footer a:focus-visible {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
-  border-radius: 10px;
+  border-radius: 6px;
   font: inherit;
 }
 
@@ -1621,7 +1626,7 @@ footer a:focus-visible {
 .tab {
   border: 1px solid #ddd;
   background: #fff;
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   padding: 0.5rem 0.9rem;
   cursor: pointer;
   font-weight: 600;
@@ -1644,7 +1649,7 @@ footer a:focus-visible {
 
 .list-item {
   border: 1px solid #eee;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 0.75rem;
   display: grid;
   gap: 0.35rem;
@@ -1673,7 +1678,7 @@ footer a:focus-visible {
 .user-card {
   background-color: #fff;
   border: 1px solid #e6e6e6;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 1.25rem;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
@@ -1688,7 +1693,7 @@ footer a:focus-visible {
 
 .panel {
   border: 1px solid #eee;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 1rem;
 }
 
@@ -1941,7 +1946,7 @@ body.dark-mode,
 .service-card {
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 2rem;
   transition: all var(--transition-speed) var(--ease-out-quart);
   display: flex;
@@ -1968,7 +1973,7 @@ body.dark-mode,
   background-color: rgba(255, 255, 255, 0.15);
   width: 50px;
   height: 50px;
-  border-radius: 10px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1999,7 +2004,7 @@ body.dark-mode,
 /* Decorative slanted image container */
 .slanted-image-wrapper {
   position: relative;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--box-shadow);
   aspect-ratio: 4 / 3;
@@ -2032,7 +2037,7 @@ body.dark-mode,
   background-color: var(--white-color);
   border-left: 5px solid var(--brochure-green);
   padding: 2rem;
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 8px 8px 0;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-speed);
   margin-bottom: 2rem;
@@ -2166,7 +2171,7 @@ body.dark-mode,
 
 .join-form-card {
   background: var(--white-color);
-  border-radius: calc(var(--border-radius) * 2);
+  border-radius: calc(var(--border-radius) + 4px);
   padding: 2.5rem 2.5rem 2rem;
   box-shadow: 0 16px 40px rgba(10, 60, 50, 0.12);
   border-top: 4px solid var(--primary-color);
