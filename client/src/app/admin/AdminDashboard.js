@@ -4,14 +4,16 @@ import { useState } from "react";
 import styles from "./admin.module.css";
 import { updateSiteContent, uploadImage } from "./actions";
 
-function ImageField({ label, value, onChange, pathStr }) {
+function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
+  const processFile = async (file) => {
     if (!file) return;
 
     setIsUploading(true);
+    setImgError(false);
     const formData = new FormData();
     formData.append("file", file);
 
@@ -25,41 +27,114 @@ function ImageField({ label, value, onChange, pathStr }) {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    processFile(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
   const isPreviewable = typeof value === "string" && value.trim() !== "";
 
   return (
     <div className={styles.formGroup} key={pathStr}>
       <label className={styles.label}>{label}</label>
-      {isPreviewable && (
-        <div className={styles.imagePreviewContainer}>
-          <img
-            src={value}
-            alt="Preview"
-            className={styles.imagePreview}
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+
+      <div
+        className={`${styles.dropzone} ${isDragging ? styles.dragging : ""}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {isPreviewable && (
+          imgError ? (
+            <div className={styles.imageErrorBadge}>
+              ⚠️ Preview Unavailable (Invalid or Broken Link)
+            </div>
+          ) : (
+            <div
+              className={styles.imagePreviewContainer}
+              onClick={() => onOpenModal && onOpenModal(value)}
+              title="Click to expand full size"
+            >
+              <img
+                src={value}
+                alt="Preview"
+                className={styles.imagePreview}
+                onError={() => setImgError(true)}
+                onLoad={() => setImgError(false)}
+              />
+              <div className={styles.imagePreviewOverlay}>
+                🔍 Expand Preview
+              </div>
+            </div>
+          )
+        )}
+
+        <div>
+          <p className={styles.dropzoneText}>
+            {isUploading
+              ? "⏳ Uploading image to S3..."
+              : isDragging
+              ? "📥 Drop image here to upload"
+              : "Drag & drop an image here, or browse / paste URL:"}
+          </p>
+          <div className={styles.imageInputWrapper}>
+            <input
+              type="text"
+              className={styles.input}
+              value={value}
+              onChange={(e) => {
+                setImgError(false);
+                onChange(e.target.value);
+              }}
+              placeholder="Image URL or upload file..."
+            />
+            {value && (
+              <button
+                type="button"
+                className={styles.clearBtn}
+                onClick={() => {
+                  setImgError(false);
+                  onChange("");
+                }}
+                title="Clear URL"
+              >
+                Clear
+              </button>
+            )}
+            <label className={styles.uploadBtn}>
+              {isUploading ? "Uploading..." : "📷 Browse"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isUploading}
+                style={{ display: "none" }}
+              />
+            </label>
+          </div>
         </div>
-      )}
-      <div className={styles.imageInputWrapper}>
-        <input
-          type="text"
-          className={styles.input}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Image URL or upload file..."
-        />
-        <label className={styles.uploadBtn}>
-          {isUploading ? "Uploading..." : "📷 Upload File"}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={isUploading}
-            style={{ display: "none" }}
-          />
-        </label>
       </div>
     </div>
   );
@@ -70,6 +145,7 @@ export default function AdminDashboard({ initialData }) {
   const [activeTab, setActiveTab] = useState(Object.keys(initialData)[0]);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  const [previewModalUrl, setPreviewModalUrl] = useState(null);
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
@@ -180,7 +256,8 @@ export default function AdminDashboard({ initialData }) {
 
     if (typeof value === "string") {
       const lowerKey = key.toLowerCase();
-      const isImage =
+      const isPostUrl = lowerKey.includes("post") || lowerKey.includes("embed");
+      const isImageKey =
         lowerKey.includes("image") ||
         lowerKey.includes("photo") ||
         lowerKey.includes("img") ||
@@ -188,7 +265,22 @@ export default function AdminDashboard({ initialData }) {
         lowerKey.includes("logo") ||
         lowerKey.includes("icon") ||
         lowerKey.includes("banner") ||
-        Boolean(value.match(/\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i));
+        lowerKey.includes("picture") ||
+        lowerKey.includes("src") ||
+        lowerKey.includes("thumbnail");
+      const isImageUrl =
+        !isPostUrl &&
+        (value.startsWith("http://") ||
+          value.startsWith("https://") ||
+          value.startsWith("/") ||
+          value.startsWith("data:image/")) &&
+        (value.includes(".s3.") ||
+          value.includes("amazonaws.com") ||
+          value.includes("/assets/") ||
+          value.includes("/uploads/") ||
+          Boolean(value.match(/\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i)));
+
+      const isImage = (isImageKey || isImageUrl) && !isPostUrl;
 
       if (isImage) {
         return (
@@ -198,6 +290,7 @@ export default function AdminDashboard({ initialData }) {
             label={key}
             value={value}
             onChange={(val) => handleChange(path, val)}
+            onOpenModal={(url) => setPreviewModalUrl(url)}
           />
         );
       }
@@ -231,30 +324,54 @@ export default function AdminDashboard({ initialData }) {
       return (
         <div className={styles.section} key={path.join(".")}>
           <h3 className={styles.sectionTitle}>{key}</h3>
-          {value.map((item, index) => (
-            <div className={styles.nestedGroup} key={index}>
-              <button 
-                className={styles.deleteButton}
-                onClick={() => handleArrayDelete(path, index)}
-              >
-                Delete
-              </button>
-              {isStringArray ? (
-                <div className={styles.formGroup}>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={item}
-                    onChange={(e) => handleChange([...path, index], e.target.value)}
-                  />
-                </div>
-              ) : (
-                Object.entries(item).map(([subKey, subValue]) => 
-                  renderField(subKey, subValue, [...path, index, subKey])
-                )
-              )}
-            </div>
-          ))}
+          {value.map((item, index) => {
+            const itemImage =
+              typeof item === "object" && item !== null
+                ? item.image || item.photo || item.avatar || item.src || item.logo || item.picture
+                : null;
+
+            return (
+              <div className={styles.nestedGroup} key={index}>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => handleArrayDelete(path, index)}
+                >
+                  Delete
+                </button>
+
+                {itemImage && typeof itemImage === "string" && itemImage.trim() !== "" && (
+                  <div className={styles.cardHeaderPreview}>
+                    <img
+                      src={itemImage}
+                      alt="Thumbnail"
+                      className={styles.cardThumbnail}
+                      onClick={() => setPreviewModalUrl(itemImage)}
+                      style={{ cursor: "pointer" }}
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    />
+                    <strong style={{ fontSize: "0.95rem" }}>
+                      {item.title || item.name || `Item #${index + 1}`}
+                    </strong>
+                  </div>
+                )}
+
+                {isStringArray ? (
+                  <div className={styles.formGroup}>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={item}
+                      onChange={(e) => handleChange([...path, index], e.target.value)}
+                    />
+                  </div>
+                ) : (
+                  Object.entries(item).map(([subKey, subValue]) =>
+                    renderField(subKey, subValue, [...path, index, subKey])
+                  )
+                )}
+              </div>
+            );
+          })}
           <button 
             className={styles.addButton}
             onClick={() => handleArrayAdd(path, template)}
@@ -318,6 +435,15 @@ export default function AdminDashboard({ initialData }) {
       <div className={`${styles.toast} ${toast.show ? styles.show : ""} ${toast.type === "error" ? styles.error : ""}`}>
         {toast.message}
       </div>
+
+      {previewModalUrl && (
+        <div className={styles.modalOverlay} onClick={() => setPreviewModalUrl(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseBtn} onClick={() => setPreviewModalUrl(null)}>✕</button>
+            <img src={previewModalUrl} alt="Enlarged Preview" className={styles.modalImage} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

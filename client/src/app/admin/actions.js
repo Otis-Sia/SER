@@ -3,6 +3,16 @@
 import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { randomUUID } from "crypto";
+
+const s3Client = new S3Client({
+  region: process.env.APP_AWS_REGION || "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 // Define the path to the content JSON file
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
@@ -34,6 +44,7 @@ export async function updateSiteContent(newData) {
   }
 }
 
+
 export async function uploadImage(formData) {
   try {
     const file = formData.get("file");
@@ -44,18 +55,26 @@ export async function uploadImage(formData) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    const ext = path.extname(file.name) || "";
+    const key = `SER-${randomUUID()}${ext}`;
+    const bucket = process.env.APP_AWS_S3_BUCKET_NAME || "juj4-shop-assets-2026";
+    const region = process.env.APP_AWS_REGION || "eu-north-1";
 
-    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const uniqueFilename = `${Date.now()}-${sanitizedFilename}`;
-    const filePath = path.join(uploadsDir, uniqueFilename);
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || "image/jpeg",
+    });
 
-    await fs.writeFile(filePath, buffer);
+    await s3Client.send(command);
 
-    return { success: true, url: `/uploads/${uniqueFilename}` };
+    const url = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+
+    return { success: true, url, key };
   } catch (error) {
-    console.error("Error uploading image:", error);
+    console.error("Error uploading image to S3:", error);
     return { success: false, message: error.message };
   }
 }
+
