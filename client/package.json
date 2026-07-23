@@ -31,5 +31,8 @@
     "eslint-config-next": "16.2.9",
     "postcss": "^8.5.19",
     "tailwindcss": "^4.3.3"
+  },
+  "overrides": {
+    "jose": "4.15.9"
   }
 }
