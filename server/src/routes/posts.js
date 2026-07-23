@@ -1,128 +1,213 @@
 import express from "express";
-import { pool } from "../db.js";
+import { db } from "../utils/firebase.js";
 import { requireAdmin } from "../middleware/auth.js";
 import slugify from "slugify";
 
 const router = express.Router();
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatPost(doc) {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    ...data,
+    // Normalize Firestore Timestamps to ISO strings
+    created_at: data.created_at?.toDate?.()?.toISOString?.() ?? data.created_at ?? new Date().toISOString(),
+    updated_at: data.updated_at?.toDate?.()?.toISOString?.() ?? data.updated_at ?? new Date().toISOString(),
+    published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
+  };
+}
+
+// ── Public Routes ─────────────────────────────────────────────────────────────
+
 // Public: list published posts (newest first)
-router.get("/", async(_req, res) => {
-    const { rows } = await pool.query(
-        `SELECT id, title, slug, cover_url, published_at, created_at, updated_at
-     FROM posts
-     WHERE published = true
-     ORDER BY published_at DESC`
-    );
-    res.json(rows);
+router.get("/", async (_req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
+    const snapshot = await db
+      .collection("posts")
+      .where("published", "==", true)
+      .orderBy("published_at", "desc")
+      .get();
+
+    const posts = snapshot.docs.map((doc) => {
+      const p = formatPost(doc);
+      // Return only public fields
+      return {
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        cover_url: p.cover_url,
+        published_at: p.published_at,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+      };
+    });
+
+    res.json(posts);
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-// Admin: list all posts
-router.get("/all", requireAdmin, async(_req, res) => {
-    const { rows } = await pool.query(
-        `SELECT *
-     FROM posts
-     ORDER BY created_at DESC`
-    );
-    res.json(rows);
+// Admin: list ALL posts (including drafts)
+router.get("/all", async (_req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
+    const snapshot = await db
+      .collection("posts")
+      .orderBy("created_at", "desc")
+      .get();
+
+    res.json(snapshot.docs.map(formatPost));
+  } catch (err) {
+    console.error("Error fetching all posts:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Public: get single post by slug
-router.get("/slug/:slug", async(req, res) => {
-    const { slug } = req.params;
-    const { rows } = await pool.query(
-        `SELECT *
-     FROM posts
-     WHERE slug = $1 AND published = true`,
-        [slug]
-    );
-    if (rows.length === 0) {
-        return res.status(404).json({ error: "Post not found" });
+router.get("/slug/:slug", async (req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
+    const snapshot = await db
+      .collection("posts")
+      .where("slug", "==", req.params.slug)
+      .where("published", "==", true)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "Post not found" });
     }
-    res.json(rows[0]);
+
+    res.json(formatPost(snapshot.docs[0]));
+  } catch (err) {
+    console.error("Error fetching post by slug:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
+// ── Admin Routes ──────────────────────────────────────────────────────────────
+
 // Admin: create post
-router.post("/", requireAdmin, async(req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
     const { title, slug, cover_url, body_md, published } = req.body;
 
     if (!title || !body_md) {
-        return res.status(400).json({ error: "title and body_md are required" });
+      return res.status(400).json({ error: "title and body_md are required" });
     }
 
+    const isPublished = published !== false;
     const safeSlug = (slug && String(slug).trim())
-        ? slugify(String(slug), { lower: true, strict: true })
-        : slugify(String(title), { lower: true, strict: true });
+      ? slugify(String(slug), { lower: true, strict: true })
+      : slugify(String(title), { lower: true, strict: true });
 
-    try {
-        const { rows } = await pool.query(
-            `INSERT INTO posts (title, slug, cover_url, body_md, published, published_at)
-       VALUES ($1,$2,$3,$4,$5, CASE WHEN $5 THEN now() ELSE NULL END)
-       RETURNING *`,
-            [title, safeSlug, cover_url || null, body_md, published !== false]
-        );
-
-        res.status(201).json(rows[0]);
-    } catch (err) {
-        if (err?.code === "23505") {
-            return res.status(409).json({ error: "A post with that slug already exists" });
-        }
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
+    // Check slug uniqueness
+    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    if (!existing.empty) {
+      return res.status(409).json({ error: "A post with that slug already exists" });
     }
+
+    const now = new Date().toISOString();
+    const postData = {
+      title,
+      slug: safeSlug,
+      cover_url: cover_url || null,
+      body_md,
+      published: isPublished,
+      published_at: isPublished ? now : null,
+      created_at: now,
+      updated_at: now,
+    };
+
+    const docRef = await db.collection("posts").add(postData);
+
+    res.status(201).json({ id: docRef.id, ...postData });
+  } catch (err) {
+    console.error("Error creating post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Admin: update post
-router.put("/:id", requireAdmin, async(req, res) => {
+router.put("/:id", requireAdmin, async (req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
     const { id } = req.params;
     const { title, slug, cover_url, body_md, published } = req.body;
 
     if (!title || !body_md) {
-        return res.status(400).json({ error: "title and body_md are required" });
+      return res.status(400).json({ error: "title and body_md are required" });
     }
 
+    const isPublished = published !== false;
     const safeSlug = (slug && String(slug).trim())
-        ? slugify(String(slug), { lower: true, strict: true })
-        : slugify(String(title), { lower: true, strict: true });
+      ? slugify(String(slug), { lower: true, strict: true })
+      : slugify(String(title), { lower: true, strict: true });
 
-    try {
-        const { rows } = await pool.query(
-            `UPDATE posts
-       SET title = $1, slug = $2, cover_url = $3, body_md = $4, published = $5, updated_at = now()
-       WHERE id = $6
-       RETURNING *`,
-            [title, safeSlug, cover_url || null, body_md, published !== false, id]
-        );
-
-        if (rows.length === 0) {
-            return res.status(404).json({ error: "Post not found" });
-        }
-
-        res.json(rows[0]);
-    } catch (err) {
-        if (err?.code === "23505") {
-            return res.status(409).json({ error: "A post with that slug already exists" });
-        }
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
+    // Check slug uniqueness (excluding this doc)
+    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    if (!existing.empty && existing.docs[0].id !== id) {
+      return res.status(409).json({ error: "A post with that slug already exists" });
     }
+
+    const docRef = db.collection("posts").doc(id);
+    const docSnap = await docRef.get();
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const existing_published_at = docSnap.data().published_at;
+    const now = new Date().toISOString();
+
+    const updateData = {
+      title,
+      slug: safeSlug,
+      cover_url: cover_url || null,
+      body_md,
+      published: isPublished,
+      published_at: isPublished ? (existing_published_at || now) : null,
+      updated_at: now,
+    };
+
+    await docRef.update(updateData);
+
+    res.json({ id, ...docSnap.data(), ...updateData });
+  } catch (err) {
+    console.error("Error updating post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Admin: delete post
-router.delete("/:id", requireAdmin, async(req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: "Database not available" });
+
     const { id } = req.params;
-    try {
-        const { rowCount } = await pool.query(
-            `DELETE FROM posts WHERE id = $1`,
-            [id]
-        );
-        if (rowCount === 0) {
-            return res.status(404).json({ error: "Post not found" });
-        }
-        res.json({ success: true });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
+    const docRef = db.collection("posts").doc(id);
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: "Post not found" });
     }
+
+    await docRef.delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 export default router;
