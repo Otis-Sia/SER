@@ -8,8 +8,9 @@ import {
   getMemberRegistrations,
   deleteMemberRegistration,
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+import BlogManager from "./BlogManager";
 
 function MemberRegistrationsView({ showToast }) {
   const [members, setMembers] = useState([]);
@@ -748,7 +749,7 @@ export default function AdminDashboard({ initialData }) {
     return null;
   };
 
-  const tabs = ["registrations", ...Object.keys(initialData)];
+  const tabs = ["registrations", "blogs", ...Object.keys(initialData)];
 
   return (
     <div className={styles.adminContainer}>
@@ -760,7 +761,9 @@ export default function AdminDashboard({ initialData }) {
             className={`${styles.navButton} ${activeTab === tab ? styles.active : ""}`}
             onClick={() => setActiveTab(tab)}
           >
-            {tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
+            : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
+            : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
@@ -768,9 +771,11 @@ export default function AdminDashboard({ initialData }) {
       <div className={styles.mainContent}>
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>
-            {activeTab === "registrations" ? "Membership Form Responses" : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
+            {activeTab === "registrations" ? "Membership Form Responses" 
+            : activeTab === "blogs" ? "Blog Posts Management"
+            : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "registrations" && (
+          {activeTab !== "registrations" && activeTab !== "blogs" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
@@ -784,6 +789,8 @@ export default function AdminDashboard({ initialData }) {
         <div className={styles.formContainer}>
           {activeTab === "registrations" ? (
             <MemberRegistrationsView showToast={showToast} />
+          ) : activeTab === "blogs" ? (
+            <BlogManager showToast={showToast} />
           ) : (
             renderField(activeTab, data[activeTab], [activeTab])
           )}

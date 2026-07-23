@@ -227,3 +227,74 @@ export async function deleteMemberRegistration(id) {
   }
 }
 
+export async function getAdminPosts() {
+  try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
+    const res = await fetch(`${API_BASE}/api/posts/all`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch posts");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return [];
+  }
+}
+
+export async function createPost(data) {
+  try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
+    const res = await fetch(`${API_BASE}/api/posts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to create post");
+    }
+    revalidatePath("/blog");
+    return { success: true, data: await res.json() };
+  } catch (error) {
+    console.error("Error creating post:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updatePost(id, data) {
+  try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
+    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to update post");
+    }
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${data.slug}`);
+    return { success: true, data: await res.json() };
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deletePost(id) {
+  try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
+    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to delete post");
+    }
+    revalidatePath("/blog");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return { success: false, message: error.message };
+  }
+}
+

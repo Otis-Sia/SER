@@ -1136,6 +1136,27 @@ footer a:focus-visible {
                     margin-bottom: 0;
                 }
                 
+                /* Auto-scrolling Marquee */
+                @keyframes marquee-scroll {
+                    0%   { transform: translateX(0); }
+                    100% { transform: translateX(-33.333%); }
+                }
+
+                .marquee-wrapper {
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    padding: 1rem 0 1.5rem;
+                    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+                }
+
+                .marquee-track {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee-scroll 40s linear infinite;
+                }
+
                 .interactive-infinite-scroll {
                     display: flex;
                     overflow-x: auto;

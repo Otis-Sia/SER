@@ -105,6 +105,33 @@
       "Mike Test",
       "123",
       "Qwer"
+    ],
+    "onTheGroundMoments": [
+      {
+        "image": "/assets/images/home/response-team.svg",
+        "title": "Response Teams",
+        "description": "Coordinated scouts ready to mobilize in minutes."
+      },
+      {
+        "image": "/assets/images/home/training-day.svg",
+        "title": "Training Days",
+        "description": "Hands-on drills that keep communities prepared."
+      },
+      {
+        "image": "/assets/images/home/community-support.svg",
+        "title": "Community Support",
+        "description": "Outreach efforts that bring safety to every block."
+      },
+      {
+        "image": "/assets/images/home/rescue-gear.svg",
+        "title": "Rescue Gear",
+        "description": "Essential kits and tools packed for quick deployment."
+      },
+      {
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "title": "Volunteer Outreach",
+        "description": "Growing our network of compassionate responders."
+      }
     ]
   },
   "about": {

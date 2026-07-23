@@ -128,41 +128,15 @@ export default async function Home() {
       <section>
         <h2>On-the-Ground Moments</h2>
         <InteractiveInfiniteScroll>
-          <article className="image-card">
-            <img src="/assets/images/home/response-team.svg" alt="Illustration of a response team preparing for action" />
-            <div className="image-caption">
-              <h3>Response Teams</h3>
-              <p>Coordinated scouts ready to mobilize in minutes.</p>
-            </div>
-          </article>
-          <article className="image-card">
-            <img src="/assets/images/home/training-day.svg" alt="Illustration of a training day session" />
-            <div className="image-caption">
-              <h3>Training Days</h3>
-              <p>Hands-on drills that keep communities prepared.</p>
-            </div>
-          </article>
-          <article className="image-card">
-            <img src="/assets/images/home/community-support.svg" alt="Illustration representing community support" />
-            <div className="image-caption">
-              <h3>Community Support</h3>
-              <p>Outreach efforts that bring safety to every block.</p>
-            </div>
-          </article>
-          <article className="image-card">
-            <img src="/assets/images/home/rescue-gear.svg" alt="Illustration of rescue gear and supplies" />
-            <div className="image-caption">
-              <h3>Rescue Gear</h3>
-              <p>Essential kits and tools packed for quick deployment.</p>
-            </div>
-          </article>
-          <article className="image-card">
-            <img src="/assets/images/home/volunteer-outreach.svg" alt="Illustration of volunteer outreach" />
-            <div className="image-caption">
-              <h3>Volunteer Outreach</h3>
-              <p>Rover Scouts engaging partners across the region.</p>
-            </div>
-          </article>
+          {(siteContent.home.onTheGroundMoments || []).map((moment, index) => (
+            <article className="image-card" key={index}>
+              <img src={moment.image} alt={moment.title} />
+              <div className="image-caption">
+                <h3>{moment.title}</h3>
+                <p>{moment.description}</p>
+              </div>
+            </article>
+          ))}
         </InteractiveInfiniteScroll>
       </section>
 
