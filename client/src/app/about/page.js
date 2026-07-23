@@ -4,7 +4,16 @@ import Script from 'next/script';
 import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
-  title: 'About SER | Scouts Emergency Response',
+  title: 'About Us | Scouts Emergency Response',
+  description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment across Kenya.',
+  openGraph: {
+    title: 'About Us | Scouts Emergency Response',
+    description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment.',
+    url: '/about',
+  },
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 export default async function About() {

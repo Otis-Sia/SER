@@ -1,7 +1,16 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'SER Community | Scouts Emergency Response',
+  title: 'Community & Network | Scouts Emergency Response',
+  description: 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.',
+  openGraph: {
+    title: 'Community & Network | Scouts Emergency Response',
+    description: 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.',
+    url: '/community',
+  },
+  alternates: {
+    canonical: '/community',
+  },
 };
 
 export default function Community() {

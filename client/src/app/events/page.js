@@ -3,7 +3,16 @@ import { MapPin, Siren } from '../../components/Icons';
 import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
-  title: 'Events | Scouts Emergency Response',
+  title: 'Upcoming Training & Events | Scouts Emergency Response',
+  description: 'View upcoming emergency preparedness workshops, first aid training sessions, and community safety events hosted by Scouts Emergency Response.',
+  openGraph: {
+    title: 'Upcoming Training & Events | Scouts Emergency Response',
+    description: 'View upcoming emergency preparedness workshops, first aid training sessions, and community safety events.',
+    url: '/events',
+  },
+  alternates: {
+    canonical: '/events',
+  },
 };
 
 async function getEvents() {

@@ -5,7 +5,16 @@ import { getSiteContent } from '../admin/actions';
 
 
 export const metadata = {
-  title: 'Contact SER | Scouts Emergency Response',
+  title: 'Contact Us | Scouts Emergency Response',
+  description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
+  openGraph: {
+    title: 'Contact Us | Scouts Emergency Response',
+    description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
+    url: '/contact',
+  },
+  alternates: {
+    canonical: '/contact',
+  },
 };
 
 export default async function Contact() {

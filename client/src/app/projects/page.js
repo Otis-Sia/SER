@@ -3,7 +3,16 @@ import { ShieldAlert, FireExtinguisher, HeartPulse, Leaf, Users } from 'lucide-r
 import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
-  title: 'Projects | Scouts Emergency Response',
+  title: 'Our Projects | Scouts Emergency Response',
+  description: 'Explore community emergency initiatives, first aid training campaigns, and youth safety programs led by Scouts Emergency Response.',
+  openGraph: {
+    title: 'Our Projects | Scouts Emergency Response',
+    description: 'Explore community emergency initiatives, first aid training campaigns, and youth safety programs led by Scouts Emergency Response.',
+    url: '/projects',
+  },
+  alternates: {
+    canonical: '/projects',
+  },
 };
 
 export default async function Projects() {

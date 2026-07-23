@@ -1,22 +1,21 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getSiteContent } from '../admin/actions';
 
-export default function Gallery() {
-  const [siteContent, setSiteContent] = useState(null);
+export const metadata = {
+  title: 'Media Gallery | Scouts Emergency Response',
+  description: 'Explore photos and highlights from emergency training sessions, youth workshops, and disaster response drills organized by Scouts Emergency Response.',
+  openGraph: {
+    title: 'Media Gallery | Scouts Emergency Response',
+    description: 'Explore photos and highlights from emergency training sessions, youth workshops, and disaster response drills.',
+    url: '/gallery',
+  },
+  alternates: {
+    canonical: '/gallery',
+  },
+};
 
-  useEffect(() => {
-    async function loadData() {
-      const content = await getSiteContent();
-      setSiteContent(content);
-    }
-    loadData();
-  }, []);
-
-  if (!siteContent) return <div>Loading...</div>;
-
+export default async function Gallery() {
+  const siteContent = await getSiteContent();
   const { gallery } = siteContent;
 
   return (
@@ -33,11 +32,17 @@ export default function Gallery() {
           {gallery.items.map((item, index) => (
             <div className="gallery-item" key={index}>
               <a href={item.image} title={item.title}>
-                <img src={item.image} alt={item.alt || item.title} />
+                <img src={item.image} alt={item.alt || item.title || `SER Event photo ${index + 1}`} loading="lazy" />
                 <div className="overlay">
                   <span className="overlay-title">{item.title}</span>
-                  {item.description && <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>{item.description}</p>}
-                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>View Image</span>
+                  {item.description && (
+                    <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
+                      {item.description}
+                    </p>
+                  )}
+                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
+                    View Image
+                  </span>
                 </div>
               </a>
             </div>
@@ -52,8 +57,12 @@ export default function Gallery() {
         </p>
 
         <div className="cta-actions">
-          <Link href="/events" className="btn">View Events</Link>
-          <Link href="/contact" className="btn btn-accent">Contact SER</Link>
+          <Link href="/events" className="btn">
+            View Events
+          </Link>
+          <Link href="/contact" className="btn btn-accent">
+            Contact SER
+          </Link>
         </div>
       </section>
     </>

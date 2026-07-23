@@ -1,7 +1,16 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'SER Shop | Scouts Emergency Response',
+  title: 'Official Shop & Gear | Scouts Emergency Response',
+  description: 'Support Scouts Emergency Response (SER) by purchasing official merchandise, emergency kits, badges, and safety gear.',
+  openGraph: {
+    title: 'Official Shop & Gear | Scouts Emergency Response',
+    description: 'Support Scouts Emergency Response (SER) by purchasing official merchandise, emergency kits, badges, and safety gear.',
+    url: '/shop',
+  },
+  alternates: {
+    canonical: '/shop',
+  },
 };
 
 export default function Shop() {
