@@ -149,10 +149,10 @@ async function seedFirestore() {
     });
     await productBatch.commit();
 
-    console.log("✅ Firestore NoSQL Database seeding completed successfully!");
+    console.log("[SUCCESS] Firestore NoSQL Database seeding completed successfully!");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error seeding Firestore database:", error);
+    console.error("[ERROR] Error seeding Firestore database:", error);
     process.exit(1);
   }
 }

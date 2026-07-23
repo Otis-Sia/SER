@@ -496,6 +496,206 @@
   background: var(--primary-color);
 }
 
+/* Registration Responses View Styles */
+.regMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.metricCard {
+  background: var(--white-color);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+:root.dark-mode .metricCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.metricVal {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1.2;
+}
+
+.metricLbl {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+.regControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.regSearchInput {
+  background-color: var(--background-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  min-width: 200px;
+  flex: 1;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+:root.dark-mode .regSearchInput {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.regSelectInput {
+  background-color: var(--background-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  cursor: pointer;
+  white-space: nowrap;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+:root.dark-mode .regSelectInput {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.refreshBtn {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  height: 42px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+:root.dark-mode .refreshBtn {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.refreshBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.csvBtn {
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  height: 42px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.csvBtn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.tableWrapper {
+  background: var(--white-color);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+:root.dark-mode .tableWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.regTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.regTable th {
+  background: rgba(0, 0, 0, 0.03);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+
+:root.dark-mode .regTable th {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.regTable td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  vertical-align: middle;
+}
+
+:root.dark-mode .regTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.regTable tr:hover {
+  background: rgba(18, 154, 68, 0.04);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(18, 154, 68, 0.12);
+  color: var(--primary-color);
+}
+
+.whatsappLink {
+  color: #25d366;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.whatsappLink:hover {
+  text-decoration: underline;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .adminContainer {

@@ -107,6 +107,22 @@ main {
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  main {
+    padding: 1rem 0.75rem;
+  }
+
+  section {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
 section {
   margin-bottom: 3rem;
 }
@@ -2266,32 +2282,154 @@ body.dark-mode .join-form-header p,
 }
 
 .join-field input,
-.join-field select {
-  padding: 0.7rem 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: calc(var(--border-radius) - 2px);
-  font-family: var(--font-family);
+.join-field select,
+.join-field textarea {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
   font-size: 0.95rem;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  background-color: #f8fafc;
+  color: var(--text-color, #0f172a);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
   outline: none;
 }
 
-.join-field input::placeholder {
-  color: rgba(0, 0, 0, 0.35);
+.join-field input:hover,
+.join-field select:hover,
+.join-field textarea:hover {
+  border-color: #94a3b8;
+  background-color: #ffffff;
 }
 
-body.dark-mode .join-field input::placeholder,
-:root.dark-mode .join-field input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+.join-field input:focus,
+.join-field select:focus,
+.join-field textarea:focus {
+  border-color: var(--primary-color, #16a34a);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3.5px rgba(22, 163, 74, 0.18);
+}
+
+.join-field input::placeholder,
+.join-field textarea::placeholder {
+  color: #64748b;
 }
 
 body.dark-mode .join-field input,
 body.dark-mode .join-field select,
+body.dark-mode .join-field textarea,
 :root.dark-mode .join-field input,
-:root.dark-mode .join-field select {
-  border-color: rgba(255, 255, 255, 0.15);
+:root.dark-mode .join-field select,
+:root.dark-mode .join-field textarea {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #f8fafc;
+}
+
+body.dark-mode .join-field input:focus,
+body.dark-mode .join-field select:focus,
+body.dark-mode .join-field textarea:focus,
+:root.dark-mode .join-field input:focus,
+:root.dark-mode .join-field select:focus,
+:root.dark-mode .join-field textarea:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-color, #22c55e);
+}
+
+.join-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.join-field-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.35rem;
+  display: block;
+}
+
+.join-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.join-option-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-md, 8px);
+  background-color: #f8fafc;
+  cursor: pointer;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+}
+
+.join-option-label:hover {
+  border-color: var(--primary-color, #16a34a);
+  background-color: rgba(22, 163, 74, 0.05);
+}
+
+body.dark-mode .join-option-label,
+:root.dark-mode .join-option-label {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.join-option-label input[type="radio"],
+.join-option-label input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.join-whatsapp-box {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.1) 0%, rgba(18, 140, 126, 0.05) 100%);
+  border: 1.5px solid #25D366;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.join-whatsapp-box h4 {
+  color: #128C7E;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.join-whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #25D366;
+  color: white !important;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  margin: 0.75rem 0;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.join-whatsapp-link:hover {
+  background-color: #128C7E;
+  transform: translateY(-1px);
+}
+
+.join-declaration-box {
+  background-color: rgba(0, 0, 0, 0.02);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 0.5rem;
 }
 
 .join-field input:focus,
