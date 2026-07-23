@@ -7,10 +7,19 @@ import {
   uploadImage,
   getMemberRegistrations,
   deleteMemberRegistration,
+  getAdminUserData,
+  getAdminRole,
+  getAdminUsers,
+  addAdminUser,
+  deleteAdminUser
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
+import AdminUsersTab from "./AdminUsersTab";
+import ChangePasswordScreen from "./ChangePasswordScreen";
+import { auth } from "@/lib/firebaseClient";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 function MemberRegistrationsView({ showToast }) {
   const [members, setMembers] = useState([]);
@@ -493,32 +502,75 @@ function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
   );
 }
 
-export default function AdminDashboard({ initialData, adminUsername }) {
-  // Role-based access: "Grandpa" is a blog-only editor
-  const isBlogOnlyUser = adminUsername === process.env.NEXT_PUBLIC_BLOG_EDITOR_USERNAME ||
-    adminUsername === "Grandpa";
+export default function AdminDashboard({ initialData }) {
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userUsername, setUserUsername] = useState("");
+  const [userName, setUserName] = useState("");
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userData = await getAdminUserData(currentUser.email);
+        if (userData) {
+          setUserRole(userData.role || "Admin");
+          setUserUsername(userData.username || "");
+          setUserName(userData.name || "");
+          setMustChangePassword(userData.mustChangePassword === true);
+        } else {
+          setUserRole("Admin");
+          setUserUsername("");
+          setUserName("");
+          setMustChangePassword(false);
+        }
+      } else {
+        setUserRole(null);
+        setUserUsername("");
+        setUserName("");
+        setMustChangePassword(false);
+      }
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const adminUsername = user ? user.email : "";
+  const isBlogOnlyUser = userRole === "Author";
   const [data, setData] = useState(initialData);
-  const [activeTab, setActiveTab] = useState(isBlogOnlyUser ? "blogs" : Object.keys(initialData)[0]);
+  const [activeTab, setActiveTab] = useState(Object.keys(initialData)[0]);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [previewModalUrl, setPreviewModalUrl] = useState(null);
+
+  useEffect(() => {
+    if (isBlogOnlyUser) {
+      setActiveTab("blogs");
+    }
+  }, [isBlogOnlyUser]);
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
   };
 
-  const handleLogout = () => {
-    // Force the browser to overwrite the cached Basic Auth credentials
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/admin", true, "logout", "logout");
-    xhr.send();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        window.location.href = "/";
-      }
-    };
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    try {
+      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+    } catch (err) {
+      setLoginError("Invalid email or password.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
   };
 
   const handleSave = async () => {
@@ -766,11 +818,75 @@ export default function AdminDashboard({ initialData, adminUsername }) {
   };
 
   // Filter tabs based on user role
-  const allTabs = ["registrations", "blogs", ...Object.keys(initialData)];
-  const tabs = isBlogOnlyUser ? ["blogs"] : allTabs;
+  const allDataTabs = Object.keys(initialData);
+  let tabs = [];
+  
+  if (userRole === "Super Admin") {
+    tabs = ["registrations", "blogs", "users", ...allDataTabs];
+  } else if (userRole === "Admin") {
+    tabs = ["registrations", "blogs", ...allDataTabs];
+  } else if (userRole === "Project Lead") {
+    tabs = ["registrations", "blogs", ...allDataTabs.filter(t => t.toLowerCase() === 'events')];
+  } else if (userRole === "Author") {
+    tabs = ["blogs"];
+  }
+
+  if (!tabs.length && user) tabs = ["blogs"];
+
+  if (authLoading) {
+    return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}><FiLoader className={styles.spinner} style={{ fontSize: '3rem', color: 'var(--primary-color)' }} /></div>;
+  }
+
+  if (user && mustChangePassword) {
+    return <ChangePasswordScreen user={user} initialName={userName} initialUsername={userUsername} onPasswordChanged={() => setMustChangePassword(false)} />;
+  }
 
   return (
-    <div className={styles.adminContainer}>
+    <div style={{ position: 'relative' }}>
+      {!user && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: 'var(--card-bg, #fff)',
+            padding: '2.5rem',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            width: '90%',
+            maxWidth: '400px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            color: 'var(--text-primary, #000)'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Admin Access</h2>
+              <p style={{ color: 'var(--text-secondary, #666)' }}>Sign in to manage the dashboard</p>
+            </div>
+            {loginError && <div style={{ color: '#ef4444', background: '#fef2f2', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem' }}>{loginError}</div>}
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email Address</label>
+                <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', background: 'var(--bg-primary, #fff)', color: 'var(--text-primary, #000)' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Password</label>
+                <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', background: 'var(--bg-primary, #fff)', color: 'var(--text-primary, #000)' }} />
+              </div>
+              <button type="submit" style={{ width: '100%', padding: '0.875rem', background: 'var(--primary-color, #2563eb)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '0.5rem' }}>Sign In</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+    <div className={styles.adminContainer} style={{ filter: !user ? 'blur(5px)' : 'none', pointerEvents: !user ? 'none' : 'auto' }}>
       <div className={styles.sidebar}>
         <h2 className={styles.sidebarTitle}>Admin Panel</h2>
         {adminUsername && (
@@ -789,7 +905,7 @@ export default function AdminDashboard({ initialData, adminUsername }) {
               <span style={{ fontSize: '1rem' }}>👤</span>
               <span>{adminUsername}</span>
               <span style={{ marginLeft: 'auto', opacity: 0.75, fontWeight: 400 }}>
-                {isBlogOnlyUser ? 'Blog Editor' : 'Super Admin'}
+                {userRole || 'Unknown Role'}
               </span>
             </div>
             <button
@@ -809,6 +925,7 @@ export default function AdminDashboard({ initialData, adminUsername }) {
           >
             {tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
             : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
+            : tab === "users" ? <><FiUsers style={{ marginRight: '6px' }} /> Users</>
             : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
@@ -820,9 +937,10 @@ export default function AdminDashboard({ initialData, adminUsername }) {
           <h1 className={styles.headerTitle}>
             {activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
+            : activeTab === "users" ? "User Management"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "registrations" && activeTab !== "blogs" && (
+          {activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
@@ -837,7 +955,9 @@ export default function AdminDashboard({ initialData, adminUsername }) {
           {activeTab === "registrations" ? (
             <MemberRegistrationsView showToast={showToast} />
           ) : activeTab === "blogs" ? (
-            <BlogManager showToast={showToast} />
+            <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
+          ) : activeTab === "users" ? (
+            <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} />
           ) : (
             renderField(activeTab, data[activeTab], [activeTab])
           )}
@@ -856,6 +976,7 @@ export default function AdminDashboard({ initialData, adminUsername }) {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

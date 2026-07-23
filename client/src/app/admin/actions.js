@@ -24,7 +24,7 @@ const s3Client = new S3Client({
   },
 });
 
-import { getAdminDb } from "@/lib/firebaseAdmin";
+import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
 
 // Define the path to the content JSON file
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
@@ -264,7 +264,7 @@ export async function createPost(data) {
     const db = getAdminDb();
     if (!db) throw new Error("Database not initialized");
 
-    const { title, slug, cover_url, body_md, published, author } = data;
+    const { title, slug, cover_url, body_md, published, author, created_by_email } = data;
     if (!title || !body_md) throw new Error("Title and body are required");
 
     const isPublished = published !== false;
@@ -284,6 +284,7 @@ export async function createPost(data) {
       body_md,
       published: isPublished,
       published_at: isPublished ? now : null,
+      created_by_email: created_by_email || null,
       created_at: now,
       updated_at: now,
     };
@@ -361,3 +362,152 @@ export async function deletePost(id) {
   }
 }
 
+export async function addAdminUser(email, password, role) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    const userRecord = await auth.createUser({
+      email,
+      password,
+    });
+
+    await auth.setCustomUserClaims(userRecord.uid, { role });
+
+    await db.collection("admin_users").doc(email).set({
+      uid: userRecord.uid,
+      email,
+      role,
+      mustChangePassword: true,
+      createdAt: new Date().toISOString()
+    });
+
+    return { success: true, user: { email, role, uid: userRecord.uid } };
+  } catch (error) {
+    console.error("Error creating admin user:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function getAdminUsers() {
+  try {
+    const db = getAdminDb();
+    if (!db) return [];
+    
+    const snapshot = await db.collection("admin_users").orderBy("createdAt", "desc").get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching admin users:", error);
+    return [];
+  }
+}
+
+export async function deleteAdminUser(email, uid) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    if (uid) {
+      await auth.deleteUser(uid);
+    }
+    
+    await db.collection("admin_users").doc(email).delete();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting admin user:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function getAdminRole(email) {
+  try {
+    if (!email) return null;
+    const db = getAdminDb();
+    if (!db) return null;
+
+    const docRef = await db.collection("admin_users").doc(email).get();
+    if (docRef.exists) {
+      return docRef.data().role;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching admin role:", error);
+    return null;
+  }
+}
+export async function updateAdminRole(email, uid, newRole) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    if (uid) {
+      await auth.setCustomUserClaims(uid, { role: newRole });
+    }
+    
+    await db.collection("admin_users").doc(email).update({ role: newRole });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating admin role:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function resetAdminPassword(email, uid, temporaryPassword) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    if (!uid) throw new Error("User ID is required to reset password");
+    
+    // Update password in Firebase Auth
+    await auth.updateUser(uid, { password: temporaryPassword });
+    
+    // Flag user to change password again
+    await db.collection("admin_users").doc(email).update({ mustChangePassword: true });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error resetting admin password:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function getAdminUserData(email) {
+  try {
+    if (!email) return null;
+    const db = getAdminDb();
+    if (!db) return null;
+
+    const docRef = await db.collection("admin_users").doc(email).get();
+    if (docRef.exists) {
+      return docRef.data();
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching admin user data:", error);
+    return null;
+  }
+}
+
+export async function clearMustChangePassword(email, name, username) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Firebase Admin not initialized");
+    
+    await db.collection("admin_users").doc(email).update({ 
+      mustChangePassword: false,
+      name: name || "",
+      username: username || ""
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error clearing mustChangePassword:", error);
+    return { success: false, message: error.message };
+  }
+}

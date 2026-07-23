@@ -1,5 +1,6 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import fs from "fs";
 import path from "path";
 
@@ -32,22 +33,32 @@ function getServiceAccount() {
 }
 
 let dbInstance = null;
+let authInstance = null;
 
-export function getAdminDb() {
-  if (dbInstance) return dbInstance;
-
+function initFirebaseAdmin() {
   const serviceAccount = getServiceAccount();
   if (serviceAccount && !getApps().length) {
     const app = initializeApp({
       credential: cert(serviceAccount),
     });
     dbInstance = getFirestore(app);
+    authInstance = getAuth(app);
     console.log("Firebase Admin initialized for project:", serviceAccount.project_id);
   } else if (getApps().length) {
-    dbInstance = getFirestore(getApps()[0]);
+    const app = getApps()[0];
+    dbInstance = getFirestore(app);
+    authInstance = getAuth(app);
   } else {
     console.warn("Firebase Admin: No service account credentials found.");
   }
+}
 
+export function getAdminDb() {
+  if (!dbInstance) initFirebaseAdmin();
   return dbInstance;
+}
+
+export function getAdminAuth() {
+  if (!authInstance) initFirebaseAdmin();
+  return authInstance;
 }

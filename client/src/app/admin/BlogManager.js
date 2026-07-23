@@ -17,7 +17,7 @@ const ReactQuill = dynamic(
   { ssr: false }
 );
 
-export default function BlogManager({ showToast }) {
+export default function BlogManager({ showToast, currentUserEmail, currentUserRole, currentUserUsername }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState(null);
@@ -41,10 +41,11 @@ export default function BlogManager({ showToast }) {
     setFormData({
       title: "",
       slug: "",
-      author: "",
+      author: currentUserUsername || "Admin",
       cover_url: "",
       body_md: "",
-      published: true
+      published: true,
+      created_by_email: currentUserEmail
     });
   };
 
@@ -56,7 +57,8 @@ export default function BlogManager({ showToast }) {
       author: post.author || "",
       cover_url: post.cover_url || "",
       body_md: post.body_md,
-      published: post.published
+      published: post.published,
+      created_by_email: post.created_by_email || currentUserEmail
     });
   };
 
@@ -191,6 +193,9 @@ export default function BlogManager({ showToast }) {
             value={formData.author}
             onChange={(e) => setFormData({ ...formData, author: e.target.value })}
             placeholder="e.g. John Doe"
+            readOnly={currentUserRole === "Author"}
+            style={currentUserRole === "Author" ? { backgroundColor: "#f1f5f9", cursor: "not-allowed", color: "#64748b" } : {}}
+            title={currentUserRole === "Author" ? "Authors cannot change their display name" : ""}
           />
         </div>
 
@@ -300,8 +305,12 @@ export default function BlogManager({ showToast }) {
                 </td>
                 <td style={{ padding: '12px' }}>{new Date(post.created_at).toLocaleDateString()}</td>
                 <td style={{ padding: '12px', textAlign: 'right' }}>
-                  <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
-                  <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
+                  {(currentUserRole !== "Author" || post.created_by_email === currentUserEmail) && (
+                    <>
+                      <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
+                      <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

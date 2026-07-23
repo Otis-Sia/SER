@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ---------------------------------------------------------
+    // Helper Functions
+    // ---------------------------------------------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Fetches the user's role from the 'users' collection
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == "Super admin";
+    }
+
+    function canEditPosts() {
+      let role = getUserRole();
+      return isAuthenticated() && (role == "Super admin" || role == "Author" || role == "Project Lead");
+    }
+
+    // ---------------------------------------------------------
+    // Rules
+    // ---------------------------------------------------------
+    
+    // 1. User Management (The 'users' collection for roles)
+    // Only Super admins can create/edit users. Users can read their own role.
+    match /users/{userId} {
+      allow read: if isSuperAdmin() || request.auth.uid == userId;
+      allow write: if isSuperAdmin();
+    }
+
+    // 2. Site Content & Meta (Super Admin Only for writes)
+    match /site_content/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    match /projects/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    match /gallery/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    match /faqs/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // 3. Blog Posts (Author, Super admin, Project Lead for writes)
+    match /posts/{document} {
+      allow read: if true;
+      allow write: if canEditPosts();
+    }
+
+    // 4. Members (Registration forms - assumed to be read/write by Super admin)
+    // Adjust write rule to `if true` if public users need to submit forms.
+    match /members/{document} {
+      allow read: if isSuperAdmin();
+      allow write: if isSuperAdmin(); 
+    }
+
+    // 5. Other Collections (Default to Super admin write)
+    match /events/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    match /products/{document} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
