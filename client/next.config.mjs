@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '../server/.env') });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  serverExternalPackages: ['firebase-admin'],
 };
 
 export default nextConfig;
