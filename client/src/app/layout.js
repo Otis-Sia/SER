@@ -10,6 +10,12 @@ export async function generateMetadata() {
   return {
     title: siteContent.siteMeta.title,
     description: siteContent.siteMeta.description,
+    openGraph: {
+      title: siteContent.siteMeta.title,
+      description: siteContent.siteMeta.description,
+      siteName: siteContent.siteMeta.title,
+      type: 'website',
+    },
   };
 }
 
