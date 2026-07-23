@@ -6,7 +6,7 @@ import JsonLd from "../components/JsonLd";
 import "./globals.css";
 import { getSiteContent } from "./admin/actions";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://seresponse.org';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org';
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();

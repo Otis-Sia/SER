@@ -5,6 +5,16 @@ import path from "path";
 import { revalidatePath } from "next/cache";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
+import jwt from "jsonwebtoken";
+
+// Helper to generate a trusted admin token for API calls
+function getAdminToken() {
+  return jwt.sign(
+    { id: "nextjs-server-action", email: "admin@server-action", role: "admin" },
+    process.env.JWT_SECRET || "change-me-please",
+    { expiresIn: "1h" }
+  );
+}
 
 const s3Client = new S3Client({
   region: process.env.APP_AWS_REGION || "eu-north-1",
@@ -229,10 +239,20 @@ export async function deleteMemberRegistration(id) {
 
 export async function getAdminPosts() {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts/all`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch posts");
-    return await res.json();
+    const db = getAdminDb();
+    if (!db) return [];
+    
+    const snapshot = await db.collection("posts").orderBy("created_at", "desc").get();
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate?.()?.toISOString?.() ?? data.created_at ?? new Date().toISOString(),
+        updated_at: data.updated_at?.toDate?.()?.toISOString?.() ?? data.updated_at ?? new Date().toISOString(),
+        published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
+      };
+    });
   } catch (error) {
     console.error("Error fetching posts:", error);
     return [];
@@ -241,18 +261,37 @@ export async function getAdminPosts() {
 
 export async function createPost(data) {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || "Failed to create post");
-    }
-    revalidatePath("/blog");
-    return { success: true, data: await res.json() };
+    const db = getAdminDb();
+    if (!db) throw new Error("Database not initialized");
+
+    const { title, slug, cover_url, body_md, published, author } = data;
+    if (!title || !body_md) throw new Error("Title and body are required");
+
+    const isPublished = published !== false;
+    const safeSlug = (slug && String(slug).trim())
+      ? String(slug).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      : String(title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    if (!existing.empty) throw new Error("A post with that slug already exists");
+
+    const now = new Date().toISOString();
+    const postData = {
+      title,
+      slug: safeSlug,
+      author: author || "Admin",
+      cover_url: cover_url || null,
+      body_md,
+      published: isPublished,
+      published_at: isPublished ? now : null,
+      created_at: now,
+      updated_at: now,
+    };
+
+    const docRef = await db.collection("posts").add(postData);
+    revalidatePath("/community");
+    
+    return { success: true, data: { id: docRef.id, ...postData } };
   } catch (error) {
     console.error("Error creating post:", error);
     return { success: false, message: error.message };
@@ -261,19 +300,45 @@ export async function createPost(data) {
 
 export async function updatePost(id, data) {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || "Failed to update post");
+    const db = getAdminDb();
+    if (!db) throw new Error("Database not initialized");
+
+    const { title, slug, cover_url, body_md, published, author } = data;
+    if (!title || !body_md) throw new Error("Title and body are required");
+
+    const isPublished = published !== false;
+    const safeSlug = (slug && String(slug).trim())
+      ? String(slug).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      : String(title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    if (!existing.empty && existing.docs[0].id !== id) {
+      throw new Error("A post with that slug already exists");
     }
-    revalidatePath("/blog");
-    revalidatePath(`/blog/${data.slug}`);
-    return { success: true, data: await res.json() };
+
+    const docRef = db.collection("posts").doc(id);
+    const docSnap = await docRef.get();
+    if (!docSnap.exists) throw new Error("Post not found");
+
+    const existing_published_at = docSnap.data().published_at;
+    const now = new Date().toISOString();
+
+    const updateData = {
+      title,
+      slug: safeSlug,
+      author: author || "Admin",
+      cover_url: cover_url || null,
+      body_md,
+      published: isPublished,
+      published_at: isPublished ? (existing_published_at || now) : null,
+      updated_at: now,
+    };
+
+    await docRef.update(updateData);
+    revalidatePath("/community");
+    revalidatePath(`/blog/${safeSlug}`);
+    
+    return { success: true, data: { id, ...docSnap.data(), ...updateData } };
   } catch (error) {
     console.error("Error updating post:", error);
     return { success: false, message: error.message };
@@ -282,15 +347,13 @@ export async function updatePost(id, data) {
 
 export async function deletePost(id) {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || "Failed to delete post");
-    }
-    revalidatePath("/blog");
+    const db = getAdminDb();
+    if (!db) throw new Error("Database not initialized");
+
+    const docRef = db.collection("posts").doc(id);
+    await docRef.delete();
+    
+    revalidatePath("/community");
     return { success: true };
   } catch (error) {
     console.error("Error deleting post:", error);

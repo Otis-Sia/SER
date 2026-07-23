@@ -1,5 +1,5 @@
 export default async function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://seresponse.org';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org';
   const currentDate = new Date().toISOString();
 
   const routes = [

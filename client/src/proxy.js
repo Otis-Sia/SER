@@ -12,7 +12,10 @@ export function proxy(request) {
       user === process.env.ADMIN_USERNAME &&
       pwd === process.env.ADMIN_PASSWORD
     ) {
-      return NextResponse.next();
+      const response = NextResponse.next();
+      // Pass the authenticated username downstream so server components can apply RBAC
+      response.headers.set('x-admin-username', user);
+      return response;
     }
   }
 

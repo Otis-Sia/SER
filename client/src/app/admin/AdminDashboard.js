@@ -8,7 +8,7 @@ import {
   getMemberRegistrations,
   deleteMemberRegistration,
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
 
@@ -493,9 +493,13 @@ function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
   );
 }
 
-export default function AdminDashboard({ initialData }) {
+export default function AdminDashboard({ initialData, adminUsername }) {
+  // Role-based access: "Grandpa" is a blog-only editor
+  const isBlogOnlyUser = adminUsername === process.env.NEXT_PUBLIC_BLOG_EDITOR_USERNAME ||
+    adminUsername === "Grandpa";
+
   const [data, setData] = useState(initialData);
-  const [activeTab, setActiveTab] = useState(Object.keys(initialData)[0]);
+  const [activeTab, setActiveTab] = useState(isBlogOnlyUser ? "blogs" : Object.keys(initialData)[0]);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [previewModalUrl, setPreviewModalUrl] = useState(null);
@@ -503,6 +507,18 @@ export default function AdminDashboard({ initialData }) {
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
+  };
+
+  const handleLogout = () => {
+    // Force the browser to overwrite the cached Basic Auth credentials
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/admin", true, "logout", "logout");
+    xhr.send();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        window.location.href = "/";
+      }
+    };
   };
 
   const handleSave = async () => {
@@ -749,12 +765,42 @@ export default function AdminDashboard({ initialData }) {
     return null;
   };
 
-  const tabs = ["registrations", "blogs", ...Object.keys(initialData)];
+  // Filter tabs based on user role
+  const allTabs = ["registrations", "blogs", ...Object.keys(initialData)];
+  const tabs = isBlogOnlyUser ? ["blogs"] : allTabs;
 
   return (
     <div className={styles.adminContainer}>
       <div className={styles.sidebar}>
         <h2 className={styles.sidebarTitle}>Admin Panel</h2>
+        {adminUsername && (
+          <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{
+              padding: '0.5rem 0.75rem',
+              borderRadius: '8px',
+              background: isBlogOnlyUser ? 'rgba(59,130,246,0.12)' : 'rgba(18,154,68,0.12)',
+              fontSize: '0.8rem',
+              color: isBlogOnlyUser ? '#3b82f6' : 'var(--primary-color)',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}>
+              <span style={{ fontSize: '1rem' }}>👤</span>
+              <span>{adminUsername}</span>
+              <span style={{ marginLeft: 'auto', opacity: 0.75, fontWeight: 400 }}>
+                {isBlogOnlyUser ? 'Blog Editor' : 'Super Admin'}
+              </span>
+            </div>
+            <button
+              className={styles.navButton}
+              onClick={handleLogout}
+              style={{ color: '#ef4444', padding: '0.4rem 0.75rem', minHeight: 'auto' }}
+            >
+              <FiLogOut style={{ marginRight: '6px' }} /> Logout
+            </button>
+          </div>
+        )}
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -766,6 +812,7 @@ export default function AdminDashboard({ initialData }) {
             : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
+
       </div>
 
       <div className={styles.mainContent}>

@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import dynamic from 'next/dynamic';
 import styles from "./admin.module.css";
 import { getAdminPosts, createPost, updatePost, deletePost, uploadImage } from "./actions";
 import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader } from "react-icons/fi";
+import 'react-quill-new/dist/quill.snow.css';
+
+const ReactQuill = dynamic(
+  async () => {
+    const { default: RQ } = await import("react-quill-new");
+    const ReactQuillWrapper = ({ forwardedRef, ...props }) => <RQ ref={forwardedRef} {...props} />;
+    ReactQuillWrapper.displayName = 'ReactQuillWrapper';
+    return ReactQuillWrapper;
+  },
+  { ssr: false }
+);
 
 export default function BlogManager({ showToast }) {
   const [posts, setPosts] = useState([]);
@@ -11,6 +23,7 @@ export default function BlogManager({ showToast }) {
   const [editingPost, setEditingPost] = useState(null);
   const [formData, setFormData] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const quillRef = useRef(null);
 
   const loadPosts = async () => {
     setLoading(true);
@@ -28,6 +41,7 @@ export default function BlogManager({ showToast }) {
     setFormData({
       title: "",
       slug: "",
+      author: "",
       cover_url: "",
       body_md: "",
       published: true
@@ -39,6 +53,7 @@ export default function BlogManager({ showToast }) {
     setFormData({
       title: post.title,
       slug: post.slug,
+      author: post.author || "",
       cover_url: post.cover_url || "",
       body_md: post.body_md,
       published: post.published
@@ -74,6 +89,57 @@ export default function BlogManager({ showToast }) {
       showToast("Upload failed: " + res.message, "error");
     }
   };
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      const form = new FormData();
+      form.append("file", file);
+      
+      showToast("Uploading image to S3...");
+      const res = await uploadImage(form);
+      
+      if (res.success) {
+        if (quillRef.current) {
+          const editor = quillRef.current.getEditor();
+          const range = editor.getSelection(true);
+          editor.insertEmbed(range.index, 'image', res.url);
+          editor.setSelection(range.index + 1);
+        }
+      } else {
+        showToast("Image upload failed: " + res.message, "error");
+      }
+    };
+  }, [showToast]);
+
+  const quillModules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        ['link', 'image'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler
+      }
+    }
+  }), [imageHandler]);
+
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'indent',
+    'link', 'image'
+  ];
 
   const handleSave = async () => {
     if (!formData.title || !formData.body_md) {
@@ -118,6 +184,17 @@ export default function BlogManager({ showToast }) {
         </div>
 
         <div className={styles.formGroup}>
+          <label className={styles.label}>Author's Name</label>
+          <input
+            className={styles.input}
+            type="text"
+            value={formData.author}
+            onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+            placeholder="e.g. John Doe"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
           <label className={styles.label}>Slug (optional - auto-generated from title if blank)</label>
           <input
             className={styles.input}
@@ -144,22 +221,33 @@ export default function BlogManager({ showToast }) {
               <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploadingImage} />
             </label>
           </div>
-          {formData.cover_url && <img src={formData.cover_url} alt="Cover Preview" style={{ marginTop: '1rem', maxHeight: '150px', borderRadius: '4px' }} />}
+          {formData.cover_url && (
+            <div style={{ marginTop: '1rem', width: '100%', maxHeight: '200px', borderRadius: '8px', overflow: 'hidden', background: 'var(--light-gray-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img
+                src={formData.cover_url}
+                alt="Cover Preview"
+                style={{ maxWidth: '100%', maxHeight: '200px', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '6px', display: 'block' }}
+              />
+            </div>
+          )}
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Markdown Body</label>
-          <textarea
-            className={styles.textarea}
-            value={formData.body_md}
-            onChange={(e) => setFormData({ ...formData, body_md: e.target.value })}
-            rows={15}
-            placeholder="# Hello World\nWrite your markdown here..."
-            style={{ fontFamily: 'monospace' }}
-          />
+          <label className={styles.label}>Blog Content</label>
+          <div style={{ background: '#fff', color: '#000', borderRadius: '4px', overflow: 'hidden' }}>
+            <ReactQuill 
+              forwardedRef={quillRef}
+              theme="snow" 
+              value={formData.body_md} 
+              onChange={(val) => setFormData({ ...formData, body_md: val })} 
+              modules={quillModules}
+              formats={quillFormats}
+              style={{ height: '300px', paddingBottom: '42px' }}
+            />
+          </div>
         </div>
 
-        <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
           <input
             type="checkbox"
             id="published"

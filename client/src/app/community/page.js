@@ -1,5 +1,37 @@
 import Link from 'next/link';
 
+import CommunityClient from './CommunityClient';
+
+import { getAdminDb } from "@/lib/firebaseAdmin";
+
+async function getPosts() {
+  try {
+    const db = getAdminDb();
+    if (!db) return [];
+    
+    const snapshot = await db.collection("posts")
+      .orderBy("published_at", "desc")
+      .get();
+      
+    // Filter published posts in memory to avoid needing a Firestore composite index
+    const docs = snapshot.docs.filter(doc => doc.data().published === true);
+    
+    return docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        slug: data.slug,
+        cover_url: data.cover_url,
+        published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
+      };
+    });
+  } catch (error) {
+    console.error("Failed to fetch blog posts:", error);
+    return [];
+  }
+}
+
 export const metadata = {
   title: 'Community & Network | Scouts Emergency Response',
   description: 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.',
@@ -13,7 +45,9 @@ export const metadata = {
   },
 };
 
-export default function Community() {
+export default async function Community() {
+  const posts = await getPosts();
+
   return (
     <>
       <section className="community-intro page-hero">
@@ -23,59 +57,7 @@ export default function Community() {
         </p>
       </section>
 
-      <section className="community-pillars">
-        <h2>What Our Community Does</h2>
-        <div className="product-grid">
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Knowledge Sharing</h3>
-              <p>
-                Members exchange resources, emergency tips, training materials, and lessons learned from the field.
-              </p>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Volunteer Engagement</h3>
-              <p>
-                Connect with like-minded volunteers and take part in SER trainings, drills, and outreach programs.
-              </p>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Storytelling &amp; Impact</h3>
-              <p>
-                Read and share stories from Scouts and communities whose lives have been strengthened through preparedness and action.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="community-blog text-center">
-        <h2>Community Blog &amp; Updates</h2>
-        <p>
-          We publish stories, insights, and updates from the SER field on our community blog. Follow along and stay informed.
-        </p>
-        <a href="https://your-blog-link.blogspot.com" target="_blank" rel="noopener noreferrer" className="btn">
-          Visit Community Blog
-        </a>
-      </section>
-
-      <section className="community-cta text-center">
-        <h2>Be Part of the Action</h2>
-        <p>
-          Whether you&apos;re looking to volunteer, learn, or collaborate, the SER Community welcomes you.
-        </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/projects" className="btn">Explore Projects</Link>
-          <Link href="/contact" className="btn">Get in Touch</Link>
-          <Link href="/login/signup" className="btn btn-accent">Register</Link>
-        </div>
-      </section>
+      <CommunityClient posts={posts} />
     </>
   );
 }

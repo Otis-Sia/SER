@@ -1,16 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import styles from "../blog.module.css";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
 
+import { getAdminDb } from "@/lib/firebaseAdmin";
+
 async function getPostBySlug(slug) {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts/slug/${slug}`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return await res.json();
+    if (!slug) return null;
+    const db = getAdminDb();
+    if (!db) return null;
+
+    const snapshot = await db.collection("posts")
+      .where("slug", "==", slug)
+      .where("published", "==", true)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return null;
+    
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      created_at: data.created_at?.toDate?.()?.toISOString?.() ?? data.created_at ?? new Date().toISOString(),
+      updated_at: data.updated_at?.toDate?.()?.toISOString?.() ?? data.updated_at ?? new Date().toISOString(),
+      published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
+    };
   } catch (error) {
     console.error("Failed to fetch post:", error);
     return null;
@@ -18,17 +35,19 @@ async function getPostBySlug(slug) {
 }
 
 export async function generateMetadata({ params }) {
-  const post = await getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
   if (!post) return { title: "Post Not Found | SER" };
   
   return {
     title: `${post.title} | SER Blog`,
-    description: post.body_md.substring(0, 150) + "...",
+    description: post.body_md ? post.body_md.substring(0, 150) + "..." : "",
   };
 }
 
 export default async function BlogPostPage({ params }) {
-  const post = await getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
@@ -36,8 +55,8 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <div className={styles.postContainer}>
-      <Link href="/blog" className={styles.backLink}>
-        <FiArrowLeft /> Back to Blog
+      <Link href="/community" className={styles.backLink}>
+        <FiArrowLeft /> Back to Community
       </Link>
 
       <article>
@@ -56,11 +75,10 @@ export default async function BlogPostPage({ params }) {
           />
         )}
 
-        <div className={styles.postBody}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {post.body_md}
-          </ReactMarkdown>
-        </div>
+        <div 
+          className={styles.postBody} 
+          dangerouslySetInnerHTML={{ __html: post.body_md }} 
+        />
       </article>
     </div>
   );
