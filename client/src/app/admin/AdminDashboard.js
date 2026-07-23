@@ -514,30 +514,46 @@ export default function AdminDashboard({ initialData }) {
   const [loginError, setLoginError] = useState("");
 
   useEffect(() => {
+    // Safety timeout: Never keep the user on infinite loading spinner for more than 4 seconds
+    const timer = setTimeout(() => {
+      setAuthLoading(false);
+    }, 4000);
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        const userData = await getAdminUserData(currentUser.email);
-        if (userData) {
-          setUserRole(userData.role || "Admin");
-          setUserUsername(userData.username || "");
-          setUserName(userData.name || "");
-          setMustChangePassword(userData.mustChangePassword === true);
+      try {
+        if (currentUser) {
+          const userData = await getAdminUserData(currentUser.email).catch(() => null);
+          if (userData) {
+            setUserRole(userData.role || "Admin");
+            setUserUsername(userData.username || "");
+            setUserName(userData.name || "");
+            setMustChangePassword(userData.mustChangePassword === true);
+          } else {
+            setUserRole("Admin");
+            setUserUsername("");
+            setUserName("");
+            setMustChangePassword(false);
+          }
         } else {
-          setUserRole("Admin");
+          setUserRole(null);
           setUserUsername("");
           setUserName("");
           setMustChangePassword(false);
         }
-      } else {
-        setUserRole(null);
-        setUserUsername("");
-        setUserName("");
-        setMustChangePassword(false);
+      } catch (err) {
+        console.error("Error loading user role data:", err);
+        if (currentUser) setUserRole("Admin");
+      } finally {
+        clearTimeout(timer);
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   const adminUsername = user ? user.email : "";
