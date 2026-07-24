@@ -77,7 +77,7 @@ export default async function BlogPostPage({ params }) {
 
         <div 
           className={styles.postBody} 
-          dangerouslySetInnerHTML={{ __html: post.body_md }} 
+          dangerouslySetInnerHTML={{ __html: post.body_md?.replace(/&nbsp;/g, ' ') || '' }} 
         />
       </article>
     </div>

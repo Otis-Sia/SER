@@ -12,7 +12,9 @@ import {
   getAdminUsers,
   addAdminUser,
   deleteAdminUser,
-  getDashboardStats
+  getDashboardStats,
+  flagMemberRegistration,
+  updateMemberRegistration
 } from "./actions";
 import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
@@ -23,13 +25,24 @@ import { auth } from "@/lib/firebaseClient";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager } from "./CollectionManagers";
 
+const KENYA_COUNTIES = [
+  'Mombasa', 'Kwale', 'Kilifi', 'Tana River', 'Lamu', 'Taita-Taveta', 'Garissa', 'Wajir', 'Mandera',
+  'Marsabit', 'Isiolo', 'Meru', 'Tharaka-Nithi', 'Embu', 'Kitui', 'Machakos', 'Makueni', 'Nyandarua',
+  'Nyeri', 'Kirinyaga', 'Murang\'a', 'Kiambu', 'Turkana', 'West Pokot', 'Samburu', 'Trans-Nzoia',
+  'Uasin Gishu', 'Elgeyo-Marakwet', 'Nandi', 'Baringo', 'Laikipia', 'Nakuru', 'Narok', 'Kajiado',
+  'Kericho', 'Bomet', 'Kakamega', 'Vihiga', 'Bungoma', 'Busia', 'Siaya', 'Kisumu', 'Homa Bay',
+  'Migori', 'Kisii', 'Nyamira', 'Nairobi'
+];
 
-function MemberRegistrationsView({ showToast }) {
+
+function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail }) {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCounty, setSelectedCounty] = useState("ALL");
   const [selectedMemberModal, setSelectedMemberModal] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
 
   const loadMembers = async () => {
     setLoading(true);
@@ -53,6 +66,63 @@ function MemberRegistrationsView({ showToast }) {
     } else {
       showToast("Error deleting: " + res.message, "error");
     }
+  };
+
+  const handleFlagMember = async (id, name, flagged) => {
+    if (!confirm(`Are you sure you want to ${flagged ? 'flag' : 'unflag'} ${name}?`)) return;
+
+    const res = await flagMemberRegistration(id, flagged, currentUserEmail);
+    if (res.success) {
+      showToast(`Member ${name} ${flagged ? 'flagged' : 'unflagged'} successfully.`);
+      loadMembers();
+    } else {
+      showToast("Error: " + res.message, "error");
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!confirm(`Save changes for this member?`)) return;
+    const res = await updateMemberRegistration(selectedMemberModal.id, editFormData);
+    if (res.success) {
+      showToast("Member details updated successfully.");
+      setIsEditing(false);
+      setSelectedMemberModal({ ...selectedMemberModal, ...editFormData });
+      setMembers(prev => prev.map(m => m.id === selectedMemberModal.id ? { ...m, ...editFormData } : m));
+    } else {
+      showToast("Error updating member: " + res.message, "error");
+    }
+  };
+
+  const handleEditClick = (member) => {
+    setIsEditing(true);
+    setEditFormData({
+      firstName: member.firstName || "",
+      lastName: member.lastName || "",
+      email: member.email || "",
+      phone: member.phone || member.whatsapp || "",
+      idNumber: member.idNumber || "",
+      county: member.county || member.currentAddress || "",
+      subCounty: member.subCounty || "",
+      crew: member.crew || member.crewDetails || "",
+      bloodType: member.bloodType || "",
+      gender: member.gender || "",
+      currentAddress: member.currentAddress || "",
+      otherAddress: member.otherAddress || "",
+      nextOfKinName: member.nextOfKinName || "",
+      nextOfKinPhone: member.nextOfKinPhone || "",
+      isScout: member.isScout || "",
+      educationLevel: member.educationLevel || "",
+      trainings: Array.isArray(member.trainings) ? member.trainings.join(', ') : member.trainings || "",
+      certifications: member.certifications || "",
+      communityPreparedness: member.communityPreparedness || "",
+      availability: member.availability || "",
+      willingToParticipate: member.willingToParticipate || "",
+      whyJoin: member.whyJoin || "",
+      hopeToContribute: member.hopeToContribute || "",
+      calendarRecommendations: member.calendarRecommendations || "",
+      memberGoals: member.memberGoals || "",
+      joinedWhatsapp: member.joinedWhatsapp || false
+    });
   };
 
   const filteredMembers = members.filter((m) => {
@@ -212,6 +282,14 @@ function MemberRegistrationsView({ showToast }) {
                   <tr key={m.id}>
                     <td>
                       <strong>{name}</strong>
+                      {m.flagged && (
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px', background: '#fee2e2', color: '#ef4444' }}>Flagged</span>
+                          {(currentUserRole === "Super Admin" || currentUserRole === "Project Lead") && m.flaggedByEmail && (
+                            <span style={{ fontSize: '0.75rem', color: '#666', marginLeft: '4px' }} title={`Flagged by ${m.flaggedByEmail}`}>(by {m.flaggedByEmail})</span>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td>
                       <div>{m.currentAddress || m.county || "—"}</div>
@@ -249,13 +327,32 @@ function MemberRegistrationsView({ showToast }) {
                         >
                           <FiEye style={{ marginRight: '4px' }} /> Details
                         </button>
-                        <button
-                          className={styles.deleteButton}
-                          style={{ position: "static", padding: "0.25rem 0.5rem" }}
-                          onClick={() => handleDelete(m.id, name)}
-                        >
-                          Delete
-                        </button>
+                        {(currentUserRole === "Super Admin" || currentUserRole === "Project Lead") && (
+                          <button
+                            className={styles.deleteButton}
+                            style={{ position: "static", padding: "0.25rem 0.5rem" }}
+                            onClick={() => handleDelete(m.id, name)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                        {!m.flagged ? (
+                          <button
+                            onClick={() => handleFlagMember(m.id, name, true)}
+                            style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
+                          >
+                            Flag / Restrict
+                          </button>
+                        ) : (
+                          (currentUserRole === "Project Lead" || currentUserRole === "Super Admin") && (
+                            <button
+                              onClick={() => handleFlagMember(m.id, name, false)}
+                              style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            >
+                              Unflag
+                            </button>
+                          )
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -275,14 +372,144 @@ function MemberRegistrationsView({ showToast }) {
             onClick={(e) => e.stopPropagation()}
           >
             <button className={styles.modalCloseBtn} onClick={() => setSelectedMemberModal(null)}><FiX /></button>
-            <h2 style={{ color: 'var(--primary-color)', marginBottom: '0.25rem' }}>
-              Member Application Details
-            </h2>
-            <p style={{ opacity: 0.7, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              Submitted on: {selectedMemberModal.createdAt ? new Date(selectedMemberModal.createdAt).toLocaleString() : 'N/A'}
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div>
+                <h2 style={{ color: 'var(--primary-color)', marginBottom: '0.25rem' }}>
+                  {isEditing ? 'Edit Member Application' : 'Member Application Details'}
+                </h2>
+                <p style={{ opacity: 0.7, fontSize: '0.9rem', margin: 0 }}>
+                  Submitted on: {selectedMemberModal.createdAt ? new Date(selectedMemberModal.createdAt).toLocaleString() : 'N/A'}
+                </p>
+              </div>
+              {!isEditing && currentUserRole === "Super Admin" && (
+                <button onClick={() => handleEditClick(selectedMemberModal)} style={{ background: '#2196F3', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>
+                  Edit Details
+                </button>
+              )}
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {isEditing ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>First Name</label>
+                    <input className={styles.input} type="text" value={editFormData.firstName} onChange={e => setEditFormData({...editFormData, firstName: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Last Name</label>
+                    <input className={styles.input} type="text" value={editFormData.lastName} onChange={e => setEditFormData({...editFormData, lastName: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Email</label>
+                    <input className={styles.input} type="email" value={editFormData.email} onChange={e => setEditFormData({...editFormData, email: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Phone</label>
+                    <input className={styles.input} type="text" value={editFormData.phone} onChange={e => setEditFormData({...editFormData, phone: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>ID Number</label>
+                    <input className={styles.input} type="text" value={editFormData.idNumber} onChange={e => setEditFormData({...editFormData, idNumber: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Gender</label>
+                    <input className={styles.input} type="text" value={editFormData.gender} onChange={e => setEditFormData({...editFormData, gender: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Blood Type</label>
+                    <input className={styles.input} type="text" value={editFormData.bloodType} onChange={e => setEditFormData({...editFormData, bloodType: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>County</label>
+                    <select className={styles.input} value={editFormData.county} onChange={e => setEditFormData({...editFormData, county: e.target.value})}>
+                      <option value="">Select a county...</option>
+                      {KENYA_COUNTIES.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Sub County</label>
+                    <input className={styles.input} type="text" value={editFormData.subCounty} onChange={e => setEditFormData({...editFormData, subCounty: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Crew</label>
+                    <input className={styles.input} type="text" value={editFormData.crew} onChange={e => setEditFormData({...editFormData, crew: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Current Address</label>
+                    <input className={styles.input} type="text" value={editFormData.currentAddress} onChange={e => setEditFormData({...editFormData, currentAddress: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Other Address</label>
+                    <input className={styles.input} type="text" value={editFormData.otherAddress} onChange={e => setEditFormData({...editFormData, otherAddress: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Next of Kin Name</label>
+                    <input className={styles.input} type="text" value={editFormData.nextOfKinName} onChange={e => setEditFormData({...editFormData, nextOfKinName: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Next of Kin Phone</label>
+                    <input className={styles.input} type="text" value={editFormData.nextOfKinPhone} onChange={e => setEditFormData({...editFormData, nextOfKinPhone: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Is Scout</label>
+                    <input className={styles.input} type="text" value={editFormData.isScout} onChange={e => setEditFormData({...editFormData, isScout: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Education Level</label>
+                    <input className={styles.input} type="text" value={editFormData.educationLevel} onChange={e => setEditFormData({...editFormData, educationLevel: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Trainings / Experience</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.trainings} onChange={e => setEditFormData({...editFormData, trainings: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Certifications</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.certifications} onChange={e => setEditFormData({...editFormData, certifications: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Community Preparedness Assessment</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.communityPreparedness} onChange={e => setEditFormData({...editFormData, communityPreparedness: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Availability Level</label>
+                    <input className={styles.input} type="text" value={editFormData.availability} onChange={e => setEditFormData({...editFormData, availability: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Willing to Participate in Deployments</label>
+                    <input className={styles.input} type="text" value={editFormData.willingToParticipate} onChange={e => setEditFormData({...editFormData, willingToParticipate: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Why Join SER</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.whyJoin} onChange={e => setEditFormData({...editFormData, whyJoin: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Hope to Contribute</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.hopeToContribute} onChange={e => setEditFormData({...editFormData, hopeToContribute: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>2026 Calendar Recommendations</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.calendarRecommendations} onChange={e => setEditFormData({...editFormData, calendarRecommendations: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Member Goals</label>
+                    <textarea className={styles.input} style={{ width: '100%', minHeight: '60px' }} value={editFormData.memberGoals} onChange={e => setEditFormData({...editFormData, memberGoals: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', marginTop: '0.5rem', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={editFormData.joinedWhatsapp} onChange={e => setEditFormData({...editFormData, joinedWhatsapp: e.target.checked})} />
+                      Joined WhatsApp Group
+                    </label>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  <button onClick={handleSaveEdit} className={styles.saveButton}>Save Changes</button>
+                  <button onClick={() => setIsEditing(false)} style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Personal Info */}
               <div className={styles.section} style={{ marginBottom: 0, padding: '1.25rem' }}>
                 <h3 className={styles.sectionTitle} style={{ marginTop: 0 }}>1. Personal &amp; Contact Details</h3>
@@ -362,6 +589,7 @@ function MemberRegistrationsView({ showToast }) {
                 <div><strong>Declaration Agreed:</strong> <div>Yes</div></div>
               </div>
             </div>
+            )}
           </div>
         </div>
       )}
@@ -546,39 +774,39 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
         ) : (
           <>
             {tabs.includes('blogs') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.blogs || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Total Blogs</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Total Blogs</div>
               </div>
             )}
             {tabs.includes('events') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.events || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Upcoming Events</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Upcoming Events</div>
               </div>
             )}
             {tabs.includes('projects') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.projects || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Active Projects</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Active Projects</div>
               </div>
             )}
             {tabs.includes('registrations') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.member_registrations || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Member Registrations</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Member Registrations</div>
               </div>
             )}
             {tabs.includes('users') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.admin_users || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Admin Users</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Admin Users</div>
               </div>
             )}
             {tabs.includes('products') && (
-              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.products || 0}</div>
-                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Shop Products</div>
+                <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Shop Products</div>
               </div>
             )}
           </>
@@ -598,16 +826,16 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
               justifyContent: 'center',
               gap: '0.75rem',
               padding: '1.5rem',
-              background: '#fff',
-              border: '1px solid #eaeaea',
+              background: 'var(--white-color, #fff)',
+              border: '1px solid var(--light-gray-color, #eaeaea)',
               borderRadius: '8px',
               cursor: 'pointer',
-              color: 'var(--text-primary)',
+              color: 'var(--text-color)',
               transition: 'all 0.2s ease',
               boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
             }}
             onMouseOver={e => Object.assign(e.currentTarget.style, { borderColor: 'var(--primary-color)', transform: 'translateY(-2px)', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' })}
-            onMouseOut={e => Object.assign(e.currentTarget.style, { borderColor: '#eaeaea', transform: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' })}
+            onMouseOut={e => Object.assign(e.currentTarget.style, { borderColor: 'var(--light-gray-color, #eaeaea)', transform: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' })}
           >
             <div style={{ fontSize: '2rem', color: 'var(--primary-color)' }}>
               {getTabIcon(tab)}
@@ -1011,7 +1239,7 @@ export default function AdminDashboard({ initialData }) {
   if (userRole === "Super Admin") {
     tabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", ...allDataTabs];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", "users", "events", "faq", ...allDataTabs.filter(t => ["contact"].includes(t.toLowerCase()))];
+    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery", ...allDataTabs.filter(t => ["contact"].includes(t.toLowerCase()))];
   } else if (userRole === "Project Lead") {
     tabs = ["registrations", "blogs", "users", "events", "gallery", "projects", "products"];
   } else if (userRole === "Author") {
@@ -1148,7 +1376,7 @@ export default function AdminDashboard({ initialData }) {
           {activeTab === "overview" ? (
             <OverviewDashboard userName={userName} userRole={userRole} tabs={tabs} setActiveTab={setActiveTab} />
           ) : activeTab === "registrations" ? (
-            <MemberRegistrationsView showToast={showToast} />
+            <MemberRegistrationsView showToast={showToast} currentUserRole={userRole} currentUserEmail={adminUsername} />
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
           ) : activeTab === "users" ? (

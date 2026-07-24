@@ -8,11 +8,21 @@ import { submitMemberRegistration } from '../admin/actions';
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'N/A (Don\'t know)'];
 
+const KENYA_COUNTIES = [
+  'Mombasa', 'Kwale', 'Kilifi', 'Tana River', 'Lamu', 'Taita-Taveta', 'Garissa', 'Wajir', 'Mandera',
+  'Marsabit', 'Isiolo', 'Meru', 'Tharaka-Nithi', 'Embu', 'Kitui', 'Machakos', 'Makueni', 'Nyandarua',
+  'Nyeri', 'Kirinyaga', 'Murang\'a', 'Kiambu', 'Turkana', 'West Pokot', 'Samburu', 'Trans-Nzoia',
+  'Uasin Gishu', 'Elgeyo-Marakwet', 'Nandi', 'Baringo', 'Laikipia', 'Nakuru', 'Narok', 'Kajiado',
+  'Kericho', 'Bomet', 'Kakamega', 'Vihiga', 'Bungoma', 'Busia', 'Siaya', 'Kisumu', 'Homa Bay',
+  'Migori', 'Kisii', 'Nyamira', 'Nairobi'
+];
+
 export default function JoinForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    currentAddress: '',
+    county: '',
+    subCounty: '',
     otherAddress: '',
     phone: '',
     idNumber: '',
@@ -50,7 +60,8 @@ export default function JoinForm() {
     formData.phone.trim() !== '' &&
     formData.idNumber.trim() !== '' &&
     formData.dob.trim() !== '' &&
-    formData.currentAddress.trim() !== '' &&
+    formData.county.trim() !== '' &&
+    formData.subCounty.trim() !== '' &&
     formData.otherAddress.trim() !== '' &&
     formData.nextOfKinName.trim() !== '' &&
     formData.nextOfKinPhone.trim() !== '' &&
@@ -124,8 +135,8 @@ export default function JoinForm() {
       firstName,
       lastName,
       middleName: nameParts.length > 2 ? nameParts[1] : '',
-      county: formData.currentAddress.includes('-') ? formData.currentAddress.split('-').pop().trim() : formData.currentAddress,
-      subCounty: formData.currentAddress.includes('-') ? formData.currentAddress.split('-')[0].trim() : formData.currentAddress,
+      county: formData.county,
+      subCounty: formData.subCounty,
       crew: formData.crewDetails || 'N/A',
       whatsapp: formData.phone,
     };
@@ -155,7 +166,8 @@ export default function JoinForm() {
     setFormData({
       name: '',
       email: '',
-      currentAddress: '',
+      county: '',
+      subCounty: '',
       otherAddress: '',
       phone: '',
       idNumber: '',
@@ -366,7 +378,8 @@ export default function JoinForm() {
               <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--primary-color)' }}>2. Address &amp; Residence</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', fontSize: '0.9rem' }}>
-                  <div><strong>Current Residence:</strong> <div>{formData.currentAddress}</div></div>
+                  <div><strong>County:</strong> <div>{formData.county}</div></div>
+                  <div><strong>Sub-County:</strong> <div>{formData.subCounty}</div></div>
                   <div><strong>Other Address:</strong> <div>{formData.otherAddress}</div></div>
                 </div>
               </div>
@@ -579,20 +592,43 @@ export default function JoinForm() {
           <fieldset className="join-fieldset">
             <legend>2. Address &amp; Residence</legend>
 
-            <div className="join-field" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="currentAddress">
-                Current Address - Sub-county and County <span className="required-star">*</span>
-              </label>
-              <textarea
-                id="currentAddress"
-                name="currentAddress"
-                rows="2"
-                placeholder="e.g. Thika West - Kiambu or Embakasi - Nairobi"
-                value={formData.currentAddress}
-                onChange={handleChange}
-                required
-              />
-              <span className="join-field-hint">This refers to your main residence right now.</span>
+            <div className="join-row join-row--2" style={{ marginBottom: '1rem' }}>
+              <div className="join-field">
+                <label htmlFor="county">
+                  County <span className="required-star">*</span>
+                </label>
+                <select
+                  id="county"
+                  name="county"
+                  value={formData.county}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="" disabled>Select your county</option>
+                  {KENYA_COUNTIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+                <span className="join-field-hint">Select your current residential county.</span>
+              </div>
+
+              <div className="join-field">
+                <label htmlFor="subCounty">
+                  Sub-County <span className="required-star">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="subCounty"
+                  name="subCounty"
+                  placeholder="e.g. Thika West or Embakasi"
+                  value={formData.subCounty}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="join-field-hint">Enter your specific sub-county or area.</span>
+              </div>
             </div>
 
             <div className="join-field">

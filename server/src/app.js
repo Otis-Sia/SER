@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 
 import productsRouter from "./routes/products.js";
 import eventsRouter from "./routes/events.js";
@@ -15,7 +16,15 @@ dotenv.config();
 
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 app.use(helmet());
+app.use(limiter);
 app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 

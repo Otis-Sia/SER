@@ -338,7 +338,7 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
                 </td>
                 <td style={{ padding: '12px' }}>{new Date(post.created_at).toLocaleDateString()}</td>
                 <td style={{ padding: '12px', textAlign: 'right' }}>
-                  {(currentUserRole !== "Author" || post.created_by_email === currentUserEmail) && (
+                  {post.created_by_email === currentUserEmail && (
                     <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
                   )}
                   {post.created_by_email === currentUserEmail && (

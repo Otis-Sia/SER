@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -72,6 +72,8 @@ export async function updateSiteContent(newData) {
       throw new Error("Invalid data format");
     }
 
+    const oldData = await getSiteContent();
+
     const db = getAdminDb();
     if (db) {
       const docRef = db.collection("site_content").doc("main");
@@ -85,6 +87,15 @@ export async function updateSiteContent(newData) {
     // Backup write to local file
     await fs.writeFile(contentFilePath, JSON.stringify(newData, null, 2), "utf8");
     revalidatePath("/", "layout");
+
+    // Delete orphaned S3 images after successful update
+    const oldUrls = extractS3Urls(oldData);
+    const newUrls = extractS3Urls(newData);
+    const missingUrls = oldUrls.filter(url => !newUrls.includes(url));
+    for (const url of missingUrls) {
+      await deleteFromS3(url);
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error updating site content:", error);
@@ -123,6 +134,42 @@ export async function uploadImage(formData) {
   } catch (error) {
     console.error("Error uploading image to S3:", error);
     return { success: false, message: error.message };
+  }
+}
+
+const extractS3Urls = (obj) => {
+  let urls = [];
+  if (typeof obj === "string") {
+    if (obj.includes("amazonaws.com/SER-")) {
+      urls.push(obj);
+    }
+  } else if (Array.isArray(obj)) {
+    for (const item of obj) {
+      urls = urls.concat(extractS3Urls(item));
+    }
+  } else if (typeof obj === "object" && obj !== null) {
+    for (const key in obj) {
+      urls = urls.concat(extractS3Urls(obj[key]));
+    }
+  }
+  return urls;
+};
+
+async function deleteFromS3(url) {
+  try {
+    const urlObj = new URL(url);
+    const bucket = process.env.APP_AWS_S3_BUCKET_NAME || "juj4-shop-assets-2026";
+    // Key is everything after the first slash
+    const key = urlObj.pathname.substring(1); 
+    
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+    await s3Client.send(command);
+    console.log(`Deleted orphaned S3 object: ${key}`);
+  } catch (error) {
+    console.error("Error deleting from S3:", error);
   }
 }
 
@@ -237,6 +284,41 @@ export async function deleteMemberRegistration(id) {
   }
 }
 
+export async function flagMemberRegistration(id, flagged, byEmail) {
+  try {
+    const db = getAdminDb();
+    if (db && id) {
+      await db.collection("members").doc(id).update({
+        flagged: flagged,
+        flaggedByEmail: flagged ? byEmail : null
+      });
+      return { success: true };
+    }
+    return { success: false, message: "Could not flag record" };
+  } catch (error) {
+    console.error("Error flagging member registration:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateMemberRegistration(id, updatedData) {
+  try {
+    const db = getAdminDb();
+    if (db && id) {
+      // Remove restricted fields before updating
+      const dataToUpdate = { ...updatedData };
+      delete dataToUpdate.id;
+      
+      await db.collection("members").doc(id).update(dataToUpdate);
+      return { success: true };
+    }
+    return { success: false, message: "Could not update record" };
+  } catch (error) {
+    console.error("Error updating member registration:", error);
+    return { success: false, message: error.message };
+  }
+}
+
 export async function getAdminPosts() {
   try {
     const db = getAdminDb();
@@ -339,6 +421,13 @@ export async function updatePost(id, data) {
     revalidatePath("/community");
     revalidatePath(`/blog/${safeSlug}`);
     
+    const oldUrls = extractS3Urls(docSnap.data());
+    const newUrls = extractS3Urls(updateData);
+    const missingUrls = oldUrls.filter(url => !newUrls.includes(url));
+    for (const url of missingUrls) {
+      await deleteFromS3(url);
+    }
+
     return { success: true, data: { id, ...docSnap.data(), ...updateData } };
   } catch (error) {
     console.error("Error updating post:", error);
@@ -352,9 +441,19 @@ export async function deletePost(id) {
     if (!db) throw new Error("Database not initialized");
 
     const docRef = db.collection("posts").doc(id);
+    const docSnap = await docRef.get();
+    
     await docRef.delete();
     
     revalidatePath("/community");
+    
+    if (docSnap.exists) {
+      const urls = extractS3Urls(docSnap.data());
+      for (const url of urls) {
+        await deleteFromS3(url);
+      }
+    }
+    
     return { success: true };
   } catch (error) {
     console.error("Error deleting post:", error);
@@ -384,7 +483,7 @@ export async function toggleHidePost(id, hidden, email) {
   }
 }
 
-export async function addAdminUser(email, password, role) {
+export async function addAdminUser(name, email, password, role) {
   try {
     const auth = getAdminAuth();
     const db = getAdminDb();
@@ -393,19 +492,21 @@ export async function addAdminUser(email, password, role) {
     const userRecord = await auth.createUser({
       email,
       password,
+      displayName: name,
     });
 
     await auth.setCustomUserClaims(userRecord.uid, { role });
 
     await db.collection("admin_users").doc(email).set({
       uid: userRecord.uid,
+      name,
       email,
       role,
       mustChangePassword: true,
       createdAt: new Date().toISOString()
     });
 
-    return { success: true, user: { email, role, uid: userRecord.uid } };
+    return { success: true, user: { name, email, role, uid: userRecord.uid } };
   } catch (error) {
     console.error("Error creating admin user:", error);
     return { success: false, message: error.message };
@@ -440,6 +541,38 @@ export async function deleteAdminUser(email, uid) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting admin user:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateAdminEmail(oldEmail, newEmail, uid) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    if (!newEmail || !newEmail.includes("@")) throw new Error("Invalid new email address");
+
+    // 1. Update email in Firebase Auth
+    if (uid) {
+      await auth.updateUser(uid, { email: newEmail });
+    }
+
+    // 2. Fetch old user document
+    const oldDocRef = await db.collection("admin_users").doc(oldEmail).get();
+    if (!oldDocRef.exists) throw new Error("User document not found");
+    const userData = oldDocRef.data();
+
+    // 3. Create new document and delete old document
+    await db.collection("admin_users").doc(newEmail).set({
+      ...userData,
+      email: newEmail
+    });
+    await db.collection("admin_users").doc(oldEmail).delete();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating admin email:", error);
     return { success: false, message: error.message };
   }
 }
@@ -593,12 +726,25 @@ async function updateDocument(collectionName, id, data) {
     const db = getAdminDb();
     if (!db) throw new Error("Firebase Admin not initialized");
     
-    await db.collection(collectionName).doc(id).update({
+    const docRef = db.collection(collectionName).doc(id);
+    const docSnap = await docRef.get();
+    
+    await docRef.update({
       ...data,
       updatedAt: new Date().toISOString()
     });
     
     revalidatePath("/", "layout");
+    
+    if (docSnap.exists) {
+      const oldUrls = extractS3Urls(docSnap.data());
+      const newUrls = extractS3Urls(data);
+      const missingUrls = oldUrls.filter(url => !newUrls.includes(url));
+      for (const url of missingUrls) {
+        await deleteFromS3(url);
+      }
+    }
+    
     return { success: true };
   } catch (error) {
     console.error(`Error updating ${collectionName}/${id}:`, error);
@@ -611,8 +757,19 @@ async function deleteDocument(collectionName, id) {
     const db = getAdminDb();
     if (!db) throw new Error("Firebase Admin not initialized");
     
-    await db.collection(collectionName).doc(id).delete();
+    const docRef = db.collection(collectionName).doc(id);
+    const docSnap = await docRef.get();
+    
+    await docRef.delete();
     revalidatePath("/", "layout");
+    
+    if (docSnap.exists) {
+      const urls = extractS3Urls(docSnap.data());
+      for (const url of urls) {
+        await deleteFromS3(url);
+      }
+    }
+    
     return { success: true };
   } catch (error) {
     console.error(`Error deleting ${collectionName}/${id}:`, error);
