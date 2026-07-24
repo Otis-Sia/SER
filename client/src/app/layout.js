@@ -96,7 +96,7 @@ export default async function RootLayout({ children }) {
       '@type': 'PostalAddress',
       addressCountry: 'KE',
     },
-    sameAs: (siteContent.siteMeta?.osns || []).map((social) => social.link).filter(Boolean),
+    sameAs: (siteContent.contact?.osns || []).map((social) => social.link).filter(Boolean),
   };
 
   return (
@@ -108,7 +108,7 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <Header navigation={siteContent.navigation} />
         <main>{children}</main>
-        <Footer osns={siteContent.siteMeta?.osns} />
+        <Footer osns={siteContent.contact?.osns} />
         <FloatingActionButton />
         <ClientLogic />
       </body>

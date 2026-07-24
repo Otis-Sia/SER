@@ -32,7 +32,9 @@ router.get("/", async (_req, res) => {
       .orderBy("published_at", "desc")
       .get();
 
-    const posts = snapshot.docs.map((doc) => {
+    const posts = snapshot.docs
+      .filter(doc => !doc.data().hidden)
+      .map((doc) => {
       const p = formatPost(doc);
       // Return only public fields
       return {
@@ -82,7 +84,7 @@ router.get("/slug/:slug", async (req, res) => {
       .limit(1)
       .get();
 
-    if (snapshot.empty) {
+    if (snapshot.empty || snapshot.docs[0].data().hidden) {
       return res.status(404).json({ error: "Post not found" });
     }
 

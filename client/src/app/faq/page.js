@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getSiteContent } from '../admin/actions';
+import { getSiteContent, getFaqs } from '../admin/actions';
 import JsonLd from '../../components/JsonLd';
 
 export const metadata = {
@@ -17,16 +17,17 @@ export const metadata = {
 
 export default async function FAQ() {
   const siteContent = await getSiteContent();
+  const faqs = await getFaqs();
 
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: (siteContent.faq?.questions || []).map((item) => ({
+    mainEntity: faqs.map((item) => ({
       '@type': 'Question',
-      name: item.q,
+      name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.a,
+        text: item.answer,
       },
     })),
   };
@@ -35,8 +36,8 @@ export default async function FAQ() {
     <>
       <JsonLd data={faqSchema} />
       <section className="faq-intro page-hero text-center">
-        <h1>{siteContent.faq.title}</h1>
-        <p className="intro-text">{siteContent.faq.description}</p>
+        <h1>{siteContent.faq_meta?.title || siteContent.faq?.title || 'Frequently Asked Questions'}</h1>
+        <p className="intro-text">{siteContent.faq_meta?.description || siteContent.faq?.description}</p>
         <div className="mt-1">
           <Link href="/contact" className="btn btn-accent">
             Contact SER
@@ -45,10 +46,10 @@ export default async function FAQ() {
       </section>
 
       <section className="faq-content intro-text">
-        {siteContent.faq.questions.map((item, index) => (
-          <article className="faq-item" key={index}>
-            <h2>{item.q}</h2>
-            <p>{item.a}</p>
+        {faqs.map((item, index) => (
+          <article className="faq-item" key={item.id || index}>
+            <h2>{item.question}</h2>
+            <p>{item.answer}</p>
           </article>
         ))}
       </section>

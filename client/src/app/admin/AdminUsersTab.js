@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import styles from "./admin.module.css";
-import { FiLoader, FiTrash2 } from "react-icons/fi";
-import { getAdminUsers, addAdminUser, deleteAdminUser, updateAdminRole, resetAdminPassword } from "./actions";
+import { FiLoader, FiTrash2, FiFlag } from "react-icons/fi";
+import { getAdminUsers, addAdminUser, deleteAdminUser, updateAdminRole, resetAdminPassword, flagAdminUser } from "./actions";
 
-export default function AdminUsersTab({ showToast, currentUserEmail }) {
+export default function AdminUsersTab({ showToast, currentUserEmail, currentUserRole }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newEmail, setNewEmail] = useState("");
@@ -50,6 +50,21 @@ export default function AdminUsersTab({ showToast, currentUserEmail }) {
     const res = await deleteAdminUser(email, uid);
     if (res.success) {
       showToast(`User ${email} deleted`);
+      loadUsers();
+    } else {
+      showToast(`Error: ${res.message}`, "error");
+    }
+  };
+
+  const handleFlagUser = async (email, flagged) => {
+    if (email === currentUserEmail) {
+      showToast("Cannot flag yourself", "error");
+      return;
+    }
+    if (!confirm(`Are you sure you want to ${flagged ? 'flag' : 'unflag'} ${email}?`)) return;
+    const res = await flagAdminUser(email, flagged, currentUserEmail);
+    if (res.success) {
+      showToast(`User ${email} ${flagged ? 'flagged' : 'unflagged'} successfully`);
       loadUsers();
     } else {
       showToast(`Error: ${res.message}`, "error");
@@ -126,7 +141,10 @@ export default function AdminUsersTab({ showToast, currentUserEmail }) {
             <tbody>
               {users.map(u => (
                 <tr key={u.id}>
-                  <td>{u.email}</td>
+                  <td>
+                    {u.email}
+                    {u.flagged && <span style={{ marginLeft: '8px', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px', background: '#fee2e2', color: '#ef4444' }}>Flagged</span>}
+                  </td>
                   <td>
                     {u.email === currentUserEmail ? (
                       <span className={styles.badge}>{u.role}</span>
@@ -150,9 +168,22 @@ export default function AdminUsersTab({ showToast, currentUserEmail }) {
                         <button onClick={() => handleResetPassword(u.email, u.uid)} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
                           Reset Password
                         </button>
-                        <button onClick={() => handleDeleteUser(u.email, u.uid)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                          <FiTrash2 /> Delete
-                        </button>
+                        
+                        {(currentUserRole === "Project Lead" || currentUserRole === "Super Admin") ? (
+                          <button onClick={() => handleDeleteUser(u.email, u.uid)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                            <FiTrash2 /> Delete
+                          </button>
+                        ) : (
+                          !u.flagged ? (
+                            <button onClick={() => handleFlagUser(u.email, true)} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                              <FiFlag /> Flag
+                            </button>
+                          ) : (
+                            <button onClick={() => handleFlagUser(u.email, false)} style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                              <FiFlag /> Unflag
+                            </button>
+                          )
+                        )}
                       </div>
                     )}
                   </td>

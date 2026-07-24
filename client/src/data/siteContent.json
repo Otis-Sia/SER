@@ -2,29 +2,7 @@
   "siteMeta": {
     "title": "Scouts Emergency Response",
     "description": "Compassion in Action - Scouts Emergency Response",
-    "contactEmail": "hello@example.com",
-    "osns": [
-      {
-        "name": "Facebook",
-        "handle": "Scouts Emergency Response",
-        "url": "https://www.facebook.com/profile.php?id=61556534734628"
-      },
-      {
-        "name": "Instagram",
-        "handle": "@scoutsemergencyresponse",
-        "url": "https://www.instagram.com/scoutsemergencyresponse"
-      },
-      {
-        "name": "TikTok",
-        "handle": "@scouts.emergency",
-        "url": "https://www.tiktok.com/@scouts.emergency"
-      },
-      {
-        "name": "YouTube",
-        "handle": "#",
-        "url": "#"
-      }
-    ]
+    "contactEmail": "hello@example.com"
   },
   "navigation": [
     {
@@ -50,10 +28,6 @@
     {
       "label": "Gallery",
       "href": "/gallery"
-    },
-    {
-      "label": "Shop",
-      "href": "/shop"
     },
     {
       "label": "FAQ",
@@ -305,6 +279,33 @@
     "email": "scoutsemergencyresponse@gmail.com",
     "phone": "0742435314",
     "phoneInternational": "+254 742 435 314",
-    "whatsappLink": "https://wa.me/254742435314"
+    "whatsappLink": "https://wa.me/254742435314",
+    "osns": [
+      {
+        "name": "Facebook",
+        "handle": "Scouts Emergency Response",
+        "url": "https://www.facebook.com/profile.php?id=61556534734628"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@scoutsemergencyresponse",
+        "url": "https://www.instagram.com/scoutsemergencyresponse"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@scouts.emergency",
+        "url": "https://www.tiktok.com/@scouts.emergency"
+      },
+      {
+        "name": "YouTube",
+        "handle": "#",
+        "url": "#"
+      }
+    ]
+  },
+  "shop": {
+    "title": "Welcome to the SER Shop",
+    "description": "Support SER through official merchandise and essential safety items.",
+    "items": []
   }
 }

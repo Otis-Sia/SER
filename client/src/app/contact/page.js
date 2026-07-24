@@ -49,7 +49,7 @@ export default async function Contact() {
         </ul>
 
         <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>
-        <SocialIcons osns={siteContent.siteMeta.osns} className="contact-social" showText={true} direction="column" />
+        <SocialIcons osns={siteContent.contact.osns} className="contact-social" showText={true} direction="column" />
       </section>
 
       <section className="contact-cta text-center">

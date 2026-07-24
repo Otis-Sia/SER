@@ -362,6 +362,28 @@ export async function deletePost(id) {
   }
 }
 
+export async function toggleHidePost(id, hidden, email) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Database not initialized");
+
+    const docRef = db.collection("posts").doc(id);
+    const updateData = {
+      hidden: hidden,
+      hiddenByEmail: hidden ? email : null
+    };
+
+    await docRef.update(updateData);
+    
+    revalidatePath("/community");
+    revalidatePath("/blog");
+    return { success: true };
+  } catch (error) {
+    console.error("Error toggling hide post:", error);
+    return { success: false, message: error.message };
+  }
+}
+
 export async function addAdminUser(email, password, role) {
   try {
     const auth = getAdminAuth();
@@ -418,6 +440,22 @@ export async function deleteAdminUser(email, uid) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting admin user:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function flagAdminUser(email, flagged, byEmail) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Firebase Admin not initialized");
+    
+    await db.collection("admin_users").doc(email).update({ 
+      flagged: flagged,
+      flaggedByEmail: flagged ? byEmail : null
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error flagging admin user:", error);
     return { success: false, message: error.message };
   }
 }
@@ -511,3 +549,99 @@ export async function clearMustChangePassword(email, name, username) {
     return { success: false, message: error.message };
   }
 }
+
+// --- Dynamic Collection CRUD Operations ---
+
+async function fetchCollection(collectionName, orderByField = "createdAt", orderDirection = "desc") {
+  try {
+    const db = getAdminDb();
+    if (!db) return [];
+    
+    let snapshot;
+    try {
+      snapshot = await db.collection(collectionName).orderBy(orderByField, orderDirection).get();
+    } catch (e) {
+      // Fallback if index doesn't exist
+      snapshot = await db.collection(collectionName).get();
+    }
+    
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error(`Error fetching ${collectionName}:`, error);
+    return [];
+  }
+}
+
+async function addDocument(collectionName, data) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Firebase Admin not initialized");
+    
+    const docRef = db.collection(collectionName).doc();
+    await docRef.set({ ...data, createdAt: new Date().toISOString() });
+    
+    revalidatePath("/", "layout");
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error(`Error adding to ${collectionName}:`, error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function updateDocument(collectionName, id, data) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Firebase Admin not initialized");
+    
+    await db.collection(collectionName).doc(id).update({
+      ...data,
+      updatedAt: new Date().toISOString()
+    });
+    
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    console.error(`Error updating ${collectionName}/${id}:`, error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function deleteDocument(collectionName, id) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Firebase Admin not initialized");
+    
+    await db.collection(collectionName).doc(id).delete();
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    console.error(`Error deleting ${collectionName}/${id}:`, error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Collection-specific Exports
+export const getProjects = async () => fetchCollection("projects");
+export const addProject = async (data) => addDocument("projects", data);
+export const updateProject = async (id, data) => updateDocument("projects", id, data);
+export const deleteProject = async (id) => deleteDocument("projects", id);
+
+export const getEvents = async () => fetchCollection("events");
+export const addEvent = async (data) => addDocument("events", data);
+export const updateEvent = async (id, data) => updateDocument("events", id, data);
+export const deleteEvent = async (id) => deleteDocument("events", id);
+
+export const getGalleryItems = async () => fetchCollection("gallery");
+export const addGalleryItem = async (data) => addDocument("gallery", data);
+export const updateGalleryItem = async (id, data) => updateDocument("gallery", id, data);
+export const deleteGalleryItem = async (id) => deleteDocument("gallery", id);
+
+export const getFaqs = async () => fetchCollection("faqs", "order", "asc");
+export const addFaq = async (data) => addDocument("faqs", data);
+export const updateFaq = async (id, data) => updateDocument("faqs", id, data);
+export const deleteFaq = async (id) => deleteDocument("faqs", id);
+
+export const getProducts = async () => fetchCollection("products");
+export const addProduct = async (data) => addDocument("products", data);
+export const updateProduct = async (id, data) => updateDocument("products", id, data);
+export const deleteProduct = async (id) => deleteDocument("products", id);

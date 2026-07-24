@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MapPin, Siren } from '../../components/Icons';
-import { getSiteContent } from '../admin/actions';
+import { getSiteContent, getEvents } from '../admin/actions';
 
 export const metadata = {
   title: 'Upcoming Training & Events | Scouts Emergency Response',
@@ -14,19 +14,6 @@ export const metadata = {
     canonical: '/events',
   },
 };
-
-async function getEvents() {
-  try {
-    const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });
-    if (!res.ok) {
-      return [];
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch events:", error);
-    return [];
-  }
-}
 
 export default async function Events() {
   const siteContent = await getSiteContent();
@@ -58,7 +45,7 @@ export default async function Events() {
             <p className="intro-text">No upcoming events at the moment.</p>
           ) : (
             events.map((event) => {
-              const startDate = new Date(event.event_date);
+              const startDate = new Date(event.eventDate || event.event_date || new Date());
               const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Assume 1 hr
               const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
               const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
@@ -68,7 +55,7 @@ export default async function Events() {
                 <div className="product-card" key={event.id}>
                   <div className="product-card-info">
                     <h3>{event.title}</h3>
-                    <p><strong>Date:</strong> {new Date(event.event_date).toLocaleDateString()}</p>
+                    <p><strong>Date:</strong> {startDate.toLocaleDateString()}</p>
                     <p><strong>Venue:</strong> {event.location}</p>
                     <p>{event.description}</p>
                     <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>

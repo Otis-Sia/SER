@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ShieldAlert, FireExtinguisher, HeartPulse, Leaf, Users } from 'lucide-react';
-import { getSiteContent } from '../admin/actions';
+import { getSiteContent, getProjects } from '../admin/actions';
 
 export const metadata = {
   title: 'Our Projects | Scouts Emergency Response',
@@ -17,13 +17,14 @@ export const metadata = {
 
 export default async function Projects() {
   const siteContent = await getSiteContent();
+  const projects = await getProjects();
 
   return (
     <>
       <section className="project-intro page-hero text-center">
-        <h1>{siteContent.projects.title}</h1>
+        <h1>{siteContent.projects?.title || "Our Projects"}</h1>
         <p className="intro-text">
-          {siteContent.projects.description}
+          {siteContent.projects?.description || "Explore community emergency initiatives and programs led by Scouts Emergency Response."}
         </p>
       </section>
 
@@ -31,14 +32,14 @@ export default async function Projects() {
         <h2>Ongoing &amp; Past Projects</h2>
 
         <div className="product-grid">
-          {siteContent.projects.items.map((project, index) => (
-            <div className="product-card" key={index}>
+          {projects.map((project, index) => (
+            <div className="product-card" key={project.id || index}>
               <div className="product-card-info">
                 <h3>{project.title}</h3>
                 <p><strong>Focus:</strong> {project.focus}</p>
                 <p>{project.description}</p>
                 {project.link && (
-                  <Link href={project.link} className="btn">{project.linkText}</Link>
+                  <Link href={project.link} className="btn">{project.linkText || 'Learn More'}</Link>
                 )}
               </div>
             </div>

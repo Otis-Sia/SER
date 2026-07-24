@@ -20,6 +20,8 @@ import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
 import { auth } from "@/lib/firebaseClient";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager } from "./CollectionManagers";
+
 
 function MemberRegistrationsView({ showToast }) {
   const [members, setMembers] = useState([]);
@@ -619,7 +621,11 @@ export default function AdminDashboard({ initialData }) {
       for (let i = 0; i < path.length; i++) {
         current = current[path[i]];
       }
-      current.push(template);
+      const newTemplate = { ...template };
+      if (path[0] === 'gallery' && path[1] === 'items' && typeof newTemplate === 'object') {
+        newTemplate.created_by_email = adminUsername;
+      }
+      current.push(newTemplate);
       return newData;
     });
   };
@@ -632,6 +638,19 @@ export default function AdminDashboard({ initialData }) {
         current = current[path[i]];
       }
       current.splice(index, 1);
+      return newData;
+    });
+  };
+
+  const handleGalleryHide = (path, index, hidden) => {
+    setData((prev) => {
+      const newData = JSON.parse(JSON.stringify(prev));
+      let current = newData;
+      for (let i = 0; i < path.length; i++) {
+        current = current[path[i]];
+      }
+      current[index].hidden = hidden;
+      current[index].hiddenByEmail = hidden ? adminUsername : null;
       return newData;
     });
   };
@@ -767,14 +786,45 @@ export default function AdminDashboard({ initialData }) {
                 ? item.image || item.photo || item.avatar || item.src || item.logo || item.picture
                 : null;
 
+            const isGallery = path[0] === 'gallery' && path[1] === 'items';
+            
             return (
               <div className={styles.nestedGroup} key={index}>
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => handleArrayDelete(path, index)}
-                >
-                  Delete
-                </button>
+                {isGallery ? (
+                  <>
+                    {(!item.created_by_email || item.created_by_email === adminUsername) && (
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleArrayDelete(path, index)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                    {item.created_by_email && item.created_by_email !== adminUsername && (
+                      !item.hidden ? (
+                        <button className={styles.deleteButton} style={{ background: '#ff9800' }} onClick={() => handleGalleryHide(path, index, true)}>
+                          Hide
+                        </button>
+                      ) : (
+                        (item.hiddenByEmail === adminUsername || userRole === "Super Admin") && (
+                          <button className={styles.deleteButton} style={{ background: '#4caf50' }} onClick={() => handleGalleryHide(path, index, false)}>
+                            Unhide
+                          </button>
+                        )
+                      )
+                    )}
+                    {item.hidden && (
+                       <span style={{ color: 'red', marginLeft: '10px', fontSize: '0.85em', fontWeight: 'bold' }}>Hidden</span>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleArrayDelete(path, index)}
+                  >
+                    Delete
+                  </button>
+                )}
 
                 {itemImage && typeof itemImage === "string" && itemImage.trim() !== "" && (
                   <div className={styles.cardHeaderPreview}>
@@ -834,15 +884,15 @@ export default function AdminDashboard({ initialData }) {
   };
 
   // Filter tabs based on user role
-  const allDataTabs = Object.keys(initialData);
+  const allDataTabs = Object.keys(initialData).filter(t => !["projects", "events", "gallery", "faq"].includes(t));
   let tabs = [];
   
   if (userRole === "Super Admin") {
-    tabs = ["registrations", "blogs", "users", ...allDataTabs];
+    tabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", ...allDataTabs];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", ...allDataTabs];
+    tabs = ["registrations", "blogs", "users", "events", "faq", ...allDataTabs.filter(t => ["contact"].includes(t.toLowerCase()))];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", ...allDataTabs.filter(t => t.toLowerCase() === 'events')];
+    tabs = ["registrations", "blogs", "users", "events", "gallery", "projects"];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   }
@@ -973,9 +1023,25 @@ export default function AdminDashboard({ initialData }) {
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
           ) : activeTab === "users" ? (
-            <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} />
+            <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} />
+          ) : activeTab === "projects" ? (
+            <ProjectsManager />
+          ) : activeTab === "events" ? (
+            <EventsManager />
+          ) : activeTab === "gallery" ? (
+            <GalleryManager />
+          ) : activeTab === "faq" ? (
+            <FaqsManager />
+          ) : activeTab === "products" ? (
+            <ProductsManager />
           ) : (
-            renderField(activeTab, data[activeTab], [activeTab])
+            <div>
+              <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '1rem', borderRadius: '6px', marginBottom: '1.5rem', border: '1px solid #ffeeba', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span><strong>Note:</strong> Data in this tab is tied to a local JSON file. Please ensure you are editing this on <strong>localhost</strong> for your changes to persist properly in the codebase.</span>
+              </div>
+              {renderField(activeTab, data[activeTab], [activeTab])}
+            </div>
           )}
         </div>
       </div>

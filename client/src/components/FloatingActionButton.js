@@ -1,11 +1,22 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Mail, UserPlus, HelpCircle, Plus, X } from 'lucide-react';
 
 const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsAdmin(pathname && pathname.startsWith('/admin'));
+  }, [pathname]);
+
+  if (isAdmin) {
+    return null;
+  }
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -35,3 +46,4 @@ const FloatingActionButton = () => {
 };
 
 export default FloatingActionButton;
+

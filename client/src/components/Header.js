@@ -13,7 +13,7 @@ export default function Header({ navigation = [] }) {
   useEffect(() => {
     try {
       const storedTheme = localStorage.getItem("ser-theme");
-      if (storedTheme !== "light") {
+      if (storedTheme === "dark") {
         document.documentElement.classList.add("dark-mode");
         // eslint-disable-next-line
         setIsDarkMode(true);

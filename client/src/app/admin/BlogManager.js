@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from 'next/dynamic';
 import styles from "./admin.module.css";
-import { getAdminPosts, createPost, updatePost, deletePost, uploadImage } from "./actions";
-import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader } from "react-icons/fi";
+import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost } from "./actions";
+import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader, FiEyeOff, FiEye } from "react-icons/fi";
 import 'react-quill-new/dist/quill.snow.css';
 
 const ReactQuill = dynamic(
@@ -70,6 +70,17 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
       loadPosts();
     } else {
       showToast("Error deleting post: " + res.message, "error");
+    }
+  };
+
+  const handleToggleHide = async (id, currentHiddenStatus) => {
+    if (!confirm(`Are you sure you want to ${currentHiddenStatus ? 'hide' : 'unhide'} this post?`)) return;
+    const res = await toggleHidePost(id, currentHiddenStatus, currentUserEmail);
+    if (res.success) {
+      showToast(`Post ${currentHiddenStatus ? 'hidden' : 'unhidden'} successfully`);
+      loadPosts();
+    } else {
+      showToast("Error toggling post visibility: " + res.message, "error");
     }
   };
 
@@ -287,29 +298,60 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
             </tr>
           </thead>
           <tbody>
-            {posts.length === 0 ? (
+            {posts.filter(post => {
+              if (currentUserRole === 'Author') {
+                if (post.hidden && post.created_by_email !== currentUserEmail) return false;
+              }
+              return true;
+            }).length === 0 ? (
               <tr><td colSpan="4" style={{ padding: '12px', textAlign: 'center' }}>No posts found.</td></tr>
-            ) : posts.map(post => (
+            ) : posts.filter(post => {
+              if (currentUserRole === 'Author') {
+                if (post.hidden && post.created_by_email !== currentUserEmail) return false;
+              }
+              return true;
+            }).map(post => (
               <tr key={post.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '12px' }}><strong>{post.title}</strong><br/><small style={{ color: '#666' }}>/{post.slug}</small></td>
                 <td style={{ padding: '12px' }}>
-                  <span style={{ 
-                    padding: '4px 8px', 
-                    borderRadius: '12px', 
-                    fontSize: '0.85em', 
-                    background: post.published ? '#e8f5e9' : '#fff3e0',
-                    color: post.published ? '#2e7d32' : '#e65100'
-                  }}>
-                    {post.published ? 'Published' : 'Draft'}
-                  </span>
+                  {post.hidden ? (
+                    <span style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '12px', 
+                      fontSize: '0.85em', 
+                      background: '#ffebee',
+                      color: '#c62828'
+                    }}>
+                      Hidden
+                    </span>
+                  ) : (
+                    <span style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '12px', 
+                      fontSize: '0.85em', 
+                      background: post.published ? '#e8f5e9' : '#fff3e0',
+                      color: post.published ? '#2e7d32' : '#e65100'
+                    }}>
+                      {post.published ? 'Published' : 'Draft'}
+                    </span>
+                  )}
                 </td>
                 <td style={{ padding: '12px' }}>{new Date(post.created_at).toLocaleDateString()}</td>
                 <td style={{ padding: '12px', textAlign: 'right' }}>
                   {(currentUserRole !== "Author" || post.created_by_email === currentUserEmail) && (
-                    <>
-                      <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
-                      <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
-                    </>
+                    <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
+                  )}
+                  {post.created_by_email === currentUserEmail && (
+                    <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
+                  )}
+                  {["Super Admin", "Admin", "Project Lead"].includes(currentUserRole) && post.created_by_email !== currentUserEmail && (
+                    !post.hidden ? (
+                      <button onClick={() => handleToggleHide(post.id, true)} className={styles.iconBtn} style={{ color: '#ff9800', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }} title="Hide Post"><FiEyeOff size={18} /></button>
+                    ) : (
+                      (post.hiddenByEmail === currentUserEmail || currentUserRole === "Super Admin") && (
+                        <button onClick={() => handleToggleHide(post.id, false)} className={styles.iconBtn} style={{ color: '#4caf50', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }} title="Unhide Post"><FiEye size={18} /></button>
+                      )
+                    )
                   )}
                 </td>
               </tr>

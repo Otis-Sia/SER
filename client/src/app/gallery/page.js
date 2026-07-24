@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getSiteContent } from '../admin/actions';
+import { getSiteContent, getGalleryItems } from '../admin/actions';
 
 export const metadata = {
   title: 'Media Gallery | Scouts Emergency Response',
@@ -16,23 +16,24 @@ export const metadata = {
 
 export default async function Gallery() {
   const siteContent = await getSiteContent();
+  const galleryItems = await getGalleryItems();
   const { gallery } = siteContent;
 
   return (
     <>
       <section className="gallery-intro page-hero text-center">
-        <h1>{gallery.title || 'Our Gallery'}</h1>
+        <h1>{gallery?.title || 'Our Gallery'}</h1>
         <p className="intro-text">
-          {gallery.description || 'A collection of moments from our events, projects, trainings, and community activities.'}
+          {gallery?.description || 'A collection of moments from our events, projects, trainings, and community activities.'}
         </p>
       </section>
 
       <section className="gallery-section">
         <div className="gallery-grid">
-          {gallery.items.map((item, index) => (
-            <div className="gallery-item" key={index}>
-              <a href={item.image} title={item.title}>
-                <img src={item.image} alt={item.alt || item.title || `SER Event photo ${index + 1}`} loading="lazy" />
+          {galleryItems.filter(item => !item.hidden).map((item, index) => (
+            <div className="gallery-item" key={item.id || index}>
+              <a href={item.imageUrl || item.image} title={item.title}>
+                <img src={item.imageUrl || item.image} alt={item.alt || item.title || `SER Event photo ${index + 1}`} loading="lazy" />
                 <div className="overlay">
                   <span className="overlay-title">{item.title}</span>
                   {item.description && (
