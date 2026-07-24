@@ -120,9 +120,9 @@
 
 /* Post view specific styles */
 .postContainer {
-  max-width: 800px;
+  max-width: 65ch;
   margin: 0 auto;
-  padding: 120px 2rem 4rem;
+  padding: 120px 1rem 4rem;
   font-family: var(--font-family);
 }
 
@@ -143,24 +143,26 @@
 
 .postHeader {
   margin-bottom: 3rem;
+  text-align: center;
 }
 
 .postTitleLarge {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: var(--text-color);
   line-height: 1.2;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .postMeta {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   color: var(--text-color);
-  opacity: 0.85;
+  opacity: 0.7;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .postCover {
@@ -174,9 +176,15 @@
 }
 
 .postBody {
-  font-size: 1.15rem;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--text-color);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+.postBody * {
+  max-width: 100%;
 }
 
 .postBody h1, .postBody h2, .postBody h3 {
@@ -251,4 +259,16 @@
   max-width: 100%;
   border-radius: 12px;
   margin: 2rem 0;
+}
+
+/* Responsive Styles for Post View */
+@media (max-width: 768px) {
+  .postContainer {
+    padding: 80px 1rem 3rem;
+  }
+  
+  .postTitleLarge {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
 }

@@ -844,7 +844,7 @@ export default function AdminDashboard({ initialData }) {
   } else if (userRole === "Project Lead") {
     tabs = ["registrations", "blogs", ...allDataTabs.filter(t => t.toLowerCase() === 'events')];
   } else if (userRole === "Author") {
-    tabs = ["blogs"];
+    tabs = ["blogs", "gallery"];
   }
 
   if (!tabs.length && user) tabs = ["blogs"];
