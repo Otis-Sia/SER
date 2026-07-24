@@ -11,7 +11,8 @@ import {
   getAdminRole,
   getAdminUsers,
   addAdminUser,
-  deleteAdminUser
+  deleteAdminUser,
+  getDashboardStats
 } from "./actions";
 import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
@@ -504,6 +505,121 @@ function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
   );
 }
 
+function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
+  const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDashboardStats().then((data) => {
+      setStats(data || {});
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const getTabLabel = (tab) => {
+    if (tab === "registrations") return "Form Responses";
+    if (tab === "blogs") return "Blog Posts";
+    if (tab === "users") return "Users";
+    return tab.charAt(0).toUpperCase() + tab.slice(1);
+  };
+
+  const getTabIcon = (tab) => {
+    if (tab === "registrations") return <FiClipboard />;
+    if (tab === "blogs") return <FiBookOpen />;
+    if (tab === "users") return <FiUsers />;
+    return <FiEye />; // generic icon
+  };
+
+  return (
+    <div style={{ padding: '1rem' }}>
+      <div style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--primary-color, #2563eb)', color: '#fff', borderRadius: '12px' }}>
+        <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.75rem' }}>Welcome back, {userName || 'Admin'}!</h2>
+        <p style={{ margin: 0, opacity: 0.9, fontSize: '1.1rem' }}>
+          Role: <strong style={{ background: 'rgba(255,255,255,0.2)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{userRole}</strong>
+        </p>
+      </div>
+
+      <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Quick Stats</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+        {loading ? (
+          <div style={{ padding: '2rem', textAlign: 'center', gridColumn: '1 / -1' }}><FiLoader className={styles.spinner} style={{ fontSize: '2rem', color: 'var(--primary-color)' }} /></div>
+        ) : (
+          <>
+            {tabs.includes('blogs') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.blogs || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Total Blogs</div>
+              </div>
+            )}
+            {tabs.includes('events') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.events || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Upcoming Events</div>
+              </div>
+            )}
+            {tabs.includes('projects') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.projects || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Active Projects</div>
+              </div>
+            )}
+            {tabs.includes('registrations') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.member_registrations || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Member Registrations</div>
+              </div>
+            )}
+            {tabs.includes('users') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.admin_users || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Admin Users</div>
+              </div>
+            )}
+            {tabs.includes('products') && (
+              <div style={{ padding: '1.5rem', background: '#fff', border: '1px solid #eaeaea', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{stats.products || 0}</div>
+                <div style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>Shop Products</div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Quick Actions</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+        {tabs.filter(t => t !== 'overview').map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.75rem',
+              padding: '1.5rem',
+              background: '#fff',
+              border: '1px solid #eaeaea',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: 'var(--text-primary)',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}
+            onMouseOver={e => Object.assign(e.currentTarget.style, { borderColor: 'var(--primary-color)', transform: 'translateY(-2px)', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' })}
+            onMouseOut={e => Object.assign(e.currentTarget.style, { borderColor: '#eaeaea', transform: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' })}
+          >
+            <div style={{ fontSize: '2rem', color: 'var(--primary-color)' }}>
+              {getTabIcon(tab)}
+            </div>
+            <span style={{ fontWeight: 500 }}>{getTabLabel(tab)}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard({ initialData }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -527,6 +643,11 @@ export default function AdminDashboard({ initialData }) {
         if (currentUser) {
           const userData = await getAdminUserData(currentUser.email).catch(() => null);
           if (userData) {
+            if (userData.flagged) {
+              await signOut(auth);
+              setLoginError("Your account has been restricted. Please contact a Super Admin.");
+              return;
+            }
             setUserRole(userData.role || "Admin");
             setUserUsername(userData.username || "");
             setUserName(userData.name || "");
@@ -561,7 +682,7 @@ export default function AdminDashboard({ initialData }) {
   const adminUsername = user ? user.email : "";
   const isBlogOnlyUser = userRole === "Author";
   const [data, setData] = useState(initialData);
-  const [activeTab, setActiveTab] = useState(Object.keys(initialData)[0]);
+  const [activeTab, setActiveTab] = useState("overview");
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [previewModalUrl, setPreviewModalUrl] = useState(null);
@@ -892,10 +1013,12 @@ export default function AdminDashboard({ initialData }) {
   } else if (userRole === "Admin") {
     tabs = ["registrations", "blogs", "users", "events", "faq", ...allDataTabs.filter(t => ["contact"].includes(t.toLowerCase()))];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", "users", "events", "gallery", "projects"];
+    tabs = ["registrations", "blogs", "users", "events", "gallery", "projects", "products"];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   }
+
+  tabs = ["overview", ...tabs];
 
   if (!tabs.length && user) tabs = ["blogs"];
 
@@ -983,30 +1106,34 @@ export default function AdminDashboard({ initialData }) {
             </button>
           </div>
         )}
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            className={`${styles.navButton} ${activeTab === tab ? styles.active : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
-            : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
-            : tab === "users" ? <><FiUsers style={{ marginRight: '6px' }} /> Users</>
-            : tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+        <div className={styles.tabsWrapper}>
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`${styles.navButton} ${activeTab === tab ? styles.active : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === "overview" ? <><FiEye style={{ marginRight: '6px' }} /> Overview</>
+              : tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
+              : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
+              : tab === "users" ? <><FiUsers style={{ marginRight: '6px' }} /> Users</>
+              : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
 
       </div>
 
       <div className={styles.mainContent}>
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>
-            {activeTab === "registrations" ? "Membership Form Responses" 
+            {activeTab === "overview" ? "Dashboard Overview"
+            : activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
             : activeTab === "users" ? "User Management"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && (
+          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
@@ -1018,7 +1145,9 @@ export default function AdminDashboard({ initialData }) {
         </div>
 
         <div className={styles.formContainer}>
-          {activeTab === "registrations" ? (
+          {activeTab === "overview" ? (
+            <OverviewDashboard userName={userName} userRole={userRole} tabs={tabs} setActiveTab={setActiveTab} />
+          ) : activeTab === "registrations" ? (
             <MemberRegistrationsView showToast={showToast} />
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />

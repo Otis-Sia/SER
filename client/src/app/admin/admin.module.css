@@ -33,6 +33,11 @@
   color: var(--primary-color);
 }
 
+.tabsWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .navButton {
   background: transparent;
   border: none;
@@ -711,10 +716,21 @@
     border-right: none;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .tabsWrapper {
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
     white-space: nowrap;
-    align-items: center;
+    width: 100%;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+  }
+  .tabsWrapper::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for WebKit */
   }
   
   :root.dark-mode .sidebar {

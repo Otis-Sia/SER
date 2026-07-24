@@ -645,3 +645,38 @@ export const getProducts = async () => fetchCollection("products");
 export const addProduct = async (data) => addDocument("products", data);
 export const updateProduct = async (id, data) => updateDocument("products", id, data);
 export const deleteProduct = async (id) => deleteDocument("products", id);
+
+export async function getDashboardStats() {
+  try {
+    const db = getAdminDb();
+    if (!db) return {};
+
+    const collectionsMap = {
+      blogs: "posts",
+      admin_users: "admin_users",
+      events: "events",
+      projects: "projects",
+      member_registrations: "members",
+      products: "products"
+    };
+
+    const stats = {};
+
+    await Promise.all(
+      Object.entries(collectionsMap).map(async ([stateKey, collectionName]) => {
+        try {
+          const snapshot = await db.collection(collectionName).count().get();
+          stats[stateKey] = snapshot.data().count;
+        } catch (e) {
+          // If the collection doesn't exist or error occurs, default to 0
+          stats[stateKey] = 0;
+        }
+      })
+    );
+
+    return stats;
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    return {};
+  }
+}

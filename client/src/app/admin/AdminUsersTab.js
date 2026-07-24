@@ -129,7 +129,8 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Existing Admin Users</h3>
         {loading ? <div style={{ padding: '2rem', textAlign: 'center' }}><FiLoader className={styles.spinner} style={{ fontSize: '2rem' }} /></div> : (
-          <table className={styles.regTable}>
+          <div className={styles.tableWrapper}>
+            <table className={styles.regTable}>
             <thead>
               <tr>
                 <th style={{ textAlign: 'left' }}>Email</th>
@@ -143,10 +144,20 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
                 <tr key={u.id}>
                   <td>
                     {u.email}
-                    {u.flagged && <span style={{ marginLeft: '8px', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px', background: '#fee2e2', color: '#ef4444' }}>Flagged</span>}
+                    {u.mustChangePassword && (
+                      <span style={{ marginLeft: '8px', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px', background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }} title="User must change password on next login">Pwd Reset Pending</span>
+                    )}
+                    {u.flagged && (
+                      <>
+                        <span style={{ marginLeft: '8px', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px', background: '#fee2e2', color: '#ef4444' }}>Flagged</span>
+                        {(currentUserRole === "Super Admin" || currentUserRole === "Project Lead") && u.flaggedByEmail && (
+                          <span style={{ fontSize: '0.75rem', color: '#666', marginLeft: '4px' }} title={`Flagged by ${u.flaggedByEmail}`}>(by {u.flaggedByEmail})</span>
+                        )}
+                      </>
+                    )}
                   </td>
                   <td>
-                    {u.email === currentUserEmail ? (
+                    {u.email === currentUserEmail || currentUserRole !== "Super Admin" ? (
                       <span className={styles.badge}>{u.role}</span>
                     ) : (
                       <select 
@@ -169,19 +180,21 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
                           Reset Password
                         </button>
                         
-                        {(currentUserRole === "Project Lead" || currentUserRole === "Super Admin") ? (
+                        {currentUserRole === "Super Admin" ? (
                           <button onClick={() => handleDeleteUser(u.email, u.uid)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
                             <FiTrash2 /> Delete
                           </button>
                         ) : (
                           !u.flagged ? (
                             <button onClick={() => handleFlagUser(u.email, true)} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                              <FiFlag /> Flag
+                              <FiFlag /> Flag / Restrict
                             </button>
                           ) : (
-                            <button onClick={() => handleFlagUser(u.email, false)} style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                              <FiFlag /> Unflag
-                            </button>
+                            (currentUserRole === "Project Lead" || currentUserRole === "Super Admin") && (
+                              <button onClick={() => handleFlagUser(u.email, false)} style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                                <FiFlag /> Unflag / Unrestrict
+                              </button>
+                            )
                           )
                         )}
                       </div>
@@ -190,7 +203,8 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </div>
