@@ -1,12 +1,18 @@
 import Link from 'next/link';
+import { getSiteContent } from '../../admin/actions';
 
 export const metadata = {
   title: 'Sign Up | Scouts Emergency Response',
 };
 
-export default function Signup() {
+export default async function Signup() {
+  const siteContent = await getSiteContent();
+
   return (
-    <section className="form-container page-hero page-hero--compact">
+    <section 
+      className="form-container page-hero page-hero--compact"
+      style={siteContent.siteMeta?.loginHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.loginHeroBgImage})` } : {}}
+    >
       <h1>Create an Account</h1>
       <p className="text-center">
         Join Scouts Emergency Response and be part of a community ready to serve.

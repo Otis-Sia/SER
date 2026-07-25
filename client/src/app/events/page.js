@@ -21,7 +21,10 @@ export default async function Events() {
 
   return (
     <>
-      <section className="events-intro page-hero text-center">
+      <section 
+        className="events-intro page-hero text-center"
+        style={siteContent.siteMeta?.eventsHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.eventsHeroBgImage})` } : {}}
+      >
         <h1>{siteContent.events.title}</h1>
         <p className="intro-text">
           {siteContent.events.description}

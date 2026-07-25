@@ -10,7 +10,10 @@ export default async function Home() {
   const siteContent = await getSiteContent();
   return (
     <>
-      <section className="hero page-hero">
+      <section 
+        className="hero page-hero" 
+        style={{ '--hero-bg': `url(${siteContent.siteMeta?.homeHeroBgImage || '/assets/images/backgrounds/scouts_hero_bg.jpg'})` }}
+      >
         <h1>{siteContent.home.hero.heading}</h1>
         <p>{siteContent.home.hero.subheading}</p>
         <Link href={siteContent.home.hero.ctaLink} className="btn">{siteContent.home.hero.ctaText}</Link>
@@ -143,73 +146,94 @@ export default async function Home() {
       <section>
         <h2>Impact in Motion</h2>
         <div className="home-highlight">
-          <div className="highlight-card">
-            <span>120+</span>
-            <h3>Community Drills</h3>
-            <p>Hands-on trainings that keep neighborhoods ready for any emergency.</p>
-          </div>
-          <div className="highlight-card">
-            <span>45</span>
-            <h3>Youth-Led Teams</h3>
-            <p>Rapid response groups coordinating relief and safety awareness.</p>
-          </div>
-          <div className="highlight-card">
-            <span>3000+</span>
-            <h3>Lives Reached</h3>
-            <p>Preparedness workshops supporting families across our region.</p>
-          </div>
+          {(siteContent.home.impactInMotion || [
+            {
+              number: "120+",
+              title: "Community Drills",
+              description: "Hands-on trainings that keep neighborhoods ready for any emergency."
+            },
+            {
+              number: "45",
+              title: "Youth-Led Teams",
+              description: "Rapid response groups coordinating relief and safety awareness."
+            },
+            {
+              number: "3000+",
+              title: "Lives Reached",
+              description: "Preparedness workshops supporting families across our region."
+            }
+          ]).map((item, index) => (
+            <div className="highlight-card" key={index}>
+              <span>{item.number}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       <section className="featured-products">
         <h2>Explore Our Organization</h2>
         <div className="product-grid">
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>History of Scouting</h3>
-              <p>Discover the origins and growth of the Scouting movement.</p>
-              <Link href="/about" className="btn">Read More</Link>
+          {(siteContent.home.exploreOrganization || [
+            {
+              title: "History of Scouting",
+              description: "Discover the origins and growth of the Scouting movement.",
+              linkUrl: "/about",
+              linkText: "Read More"
+            },
+            {
+              title: "Scouts & SDGs",
+              description: "How Scouts contribute to global sustainable development.",
+              linkUrl: "/projects",
+              linkText: "See Our Impact"
+            },
+            {
+              title: "Our Leaders",
+              description: "Meet the leadership guiding SER initiatives.",
+              linkUrl: "/about",
+              linkText: "View Leaders"
+            },
+            {
+              title: "Jasiri Rover Scouts",
+              description: "Learn about our active Rover Scout community.",
+              linkUrl: "/community",
+              linkText: "Learn More"
+            }
+          ]).map((item, index) => (
+            <div className="product-card" key={index}>
+              <div className="product-card-info">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <Link href={item.linkUrl} className="btn">{item.linkText}</Link>
+              </div>
             </div>
-          </div>
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Scouts & SDGs</h3>
-              <p>How Scouts contribute to global sustainable development.</p>
-              <Link href="/projects" className="btn">See Our Impact</Link>
-            </div>
-          </div>
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Our Leaders</h3>
-              <p>Meet the leadership guiding SER initiatives.</p>
-              <Link href="/about" className="btn">View Leaders</Link>
-            </div>
-          </div>
-          <div className="product-card">
-            <div className="product-card-info">
-              <h3>Jasiri Rover Scouts</h3>
-              <p>Learn about our active Rover Scout community.</p>
-              <Link href="/community" className="btn">Learn More</Link>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
       <section>
         <h2>Stories on the Move</h2>
         <div className="scroll-gallery">
-          <div className="scroll-tile">
-            <strong>Emergency Prep Hubs</strong>
-            <p>Mobile kits and first aid stations deployed across local events.</p>
-          </div>
-          <div className="scroll-tile">
-            <strong>Volunteer Spotlight</strong>
-            <p>Rover Scouts leading drills, fire safety lessons, and rapid response.</p>
-          </div>
-          <div className="scroll-tile">
-            <strong>Community Partnerships</strong>
-            <p>Collaborations that keep resources and training moving year-round.</p>
-          </div>
+          {(siteContent.home.storiesOnTheMove || [
+            {
+              title: "Emergency Prep Hubs",
+              description: "Mobile kits and first aid stations deployed across local events."
+            },
+            {
+              title: "Volunteer Spotlight",
+              description: "Rover Scouts leading drills, fire safety lessons, and rapid response."
+            },
+            {
+              title: "Community Partnerships",
+              description: "Collaborations that keep resources and training moving year-round."
+            }
+          ]).map((item, index) => (
+            <div className="scroll-tile" key={index}>
+              <strong>{item.title}</strong>
+              <p>{item.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 

@@ -39,6 +39,90 @@ export async function getSiteContent() {
       if (docSnap.exists) {
         const data = docSnap.data();
         if (data._updatedAt) delete data._updatedAt;
+        
+        // Ensure new schema fields exist for the admin dashboard
+        if (data.home && data.home.hero && data.home.hero.bgImage === undefined) {
+          data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
+        }
+
+        if (!data.siteMeta) data.siteMeta = {};
+        const bgDefaults = [
+          "homeHeroBgImage", "aboutHeroBgImage", "communityHeroBgImage", 
+          "contactHeroBgImage", "eventsHeroBgImage", "loginHeroBgImage", 
+          "projectsHeroBgImage", "shopHeroBgImage"
+        ];
+        bgDefaults.forEach(field => {
+          if (data.siteMeta[field] === undefined) {
+            data.siteMeta[field] = "/assets/images/backgrounds/scouts_hero_bg.jpg";
+          }
+        });
+
+        if (data.home && !data.home.impactInMotion) {
+          data.home.impactInMotion = [
+            {
+              number: "120+",
+              title: "Community Drills",
+              description: "Hands-on trainings that keep neighborhoods ready for any emergency."
+            },
+            {
+              number: "45",
+              title: "Youth-Led Teams",
+              description: "Rapid response groups coordinating relief and safety awareness."
+            },
+            {
+              number: "3000+",
+              title: "Lives Reached",
+              description: "Preparedness workshops supporting families across our region."
+            }
+          ];
+        }
+
+        if (data.home && !data.home.exploreOrganization) {
+          data.home.exploreOrganization = [
+            {
+              title: "History of Scouting",
+              description: "Discover the origins and growth of the Scouting movement.",
+              linkText: "Read More",
+              linkUrl: "/about"
+            },
+            {
+              title: "Scouts & SDGs",
+              description: "How Scouts contribute to global sustainable development.",
+              linkText: "See Our Impact",
+              linkUrl: "/projects"
+            },
+            {
+              title: "Our Leaders",
+              description: "Meet the leadership guiding SER initiatives.",
+              linkText: "View Leaders",
+              linkUrl: "/about"
+            },
+            {
+              title: "Jasiri Rover Scouts",
+              description: "Learn about our active Rover Scout community.",
+              linkText: "Learn More",
+              linkUrl: "/community"
+            }
+          ];
+        }
+
+        if (data.home && !data.home.storiesOnTheMove) {
+          data.home.storiesOnTheMove = [
+            {
+              title: "Emergency Prep Hubs",
+              description: "Mobile kits and first aid stations deployed across local events."
+            },
+            {
+              title: "Volunteer Spotlight",
+              description: "Rover Scouts leading drills, fire safety lessons, and rapid response."
+            },
+            {
+              title: "Community Partnerships",
+              description: "Collaborations that keep resources and training moving year-round."
+            }
+          ];
+        }
+        
         return data;
       } else {
         // Seed Firestore if document doesn't exist yet
@@ -541,6 +625,31 @@ export async function deleteAdminUser(email, uid) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting admin user:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateAdminProfile(email, uid, newName, newPassword) {
+  try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+    if (!auth || !db) throw new Error("Firebase Admin not initialized");
+
+    let updatePayload = {};
+    if (newName) updatePayload.displayName = newName;
+    if (newPassword) updatePayload.password = newPassword;
+
+    if (uid && Object.keys(updatePayload).length > 0) {
+      await auth.updateUser(uid, updatePayload);
+    }
+
+    if (newName) {
+      await db.collection("admin_users").doc(email).update({ name: newName });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating admin profile:", error);
     return { success: false, message: error.message };
   }
 }

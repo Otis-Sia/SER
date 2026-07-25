@@ -14,9 +14,11 @@ import {
   deleteAdminUser,
   getDashboardStats,
   flagMemberRegistration,
-  updateMemberRegistration
+  updateMemberRegistration,
+  updateAdminProfile,
+  updateAdminEmail
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2 } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
 import AdminUsersTab from "./AdminUsersTab";
@@ -848,6 +850,67 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
   );
 }
 
+function AdminProfileSettings({ user, userName, showToast }) {
+  const [name, setName] = useState(userName || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [password, setPassword] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      if (email !== user.email) {
+        const res = await updateAdminEmail(user.email, email, user.uid);
+        if (!res.success) {
+          showToast(`Error updating email: ${res.message}`, "error");
+          setIsSaving(false);
+          return;
+        }
+        showToast("Email updated successfully. You will be signed out.", "success");
+        setTimeout(() => {
+          signOut(auth);
+        }, 2000);
+        return;
+      }
+      
+      const res = await updateAdminProfile(user.email, user.uid, name !== userName ? name : null, password || null);
+      if (res.success) {
+        showToast("Profile updated successfully!");
+        setPassword("");
+      } else {
+        showToast(`Error: ${res.message}`, "error");
+      }
+    } catch (err) {
+      showToast("Failed to update profile.", "error");
+    }
+    setIsSaving(false);
+  };
+
+  return (
+    <div style={{ padding: '1rem', maxWidth: '600px' }}>
+      <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#fff', padding: '2rem', borderRadius: '12px', border: '1px solid #eaeaea', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+        <div>
+          <label className={styles.label}>Name</label>
+          <input type="text" value={name} onChange={e => setName(e.target.value)} className={styles.input} />
+        </div>
+        <div>
+          <label className={styles.label}>Email Address</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={styles.input} required />
+          {email !== user.email && <p style={{ fontSize: '0.85rem', color: '#f59e0b', marginTop: '0.5rem', fontWeight: 500 }}>⚠️ Changing your email will sign you out.</p>}
+        </div>
+        <div>
+          <label className={styles.label}>New Password (leave blank to keep current)</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} className={styles.input} minLength={6} placeholder="••••••••" />
+        </div>
+        <button type="submit" className={styles.saveButton} disabled={isSaving} style={{ marginTop: '0.5rem', alignSelf: 'flex-start', padding: '0.75rem 2rem' }}>
+          {isSaving ? "Saving..." : "Update Profile"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 export default function AdminDashboard({ initialData }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -1246,7 +1309,7 @@ export default function AdminDashboard({ initialData }) {
     tabs = ["blogs", "gallery"];
   }
 
-  tabs = ["overview", ...tabs];
+  tabs = ["overview", ...tabs, "settings"];
 
   if (!tabs.length && user) tabs = ["blogs"];
 
@@ -1345,6 +1408,7 @@ export default function AdminDashboard({ initialData }) {
               : tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
               : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
               : tab === "users" ? <><FiUsers style={{ marginRight: '6px' }} /> Users</>
+              : tab === "settings" ? <><FiSettings style={{ marginRight: '6px' }} /> Account Settings</>
               : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
@@ -1359,9 +1423,10 @@ export default function AdminDashboard({ initialData }) {
             : activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
             : activeTab === "users" ? "User Management"
+            : activeTab === "settings" ? "Personal Account Settings"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && (
+          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && activeTab !== "settings" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
@@ -1391,6 +1456,8 @@ export default function AdminDashboard({ initialData }) {
             <FaqsManager />
           ) : activeTab === "products" ? (
             <ProductsManager />
+          ) : activeTab === "settings" ? (
+            <AdminProfileSettings user={user} userName={userName} showToast={showToast} />
           ) : (
             <div>
               <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '1rem', borderRadius: '6px', marginBottom: '1.5rem', border: '1px solid #ffeeba', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import SocialIcons from '../../components/SocialIcons';
 import ContactForm from '../../components/ContactForm';
-import { getSiteContent } from '../admin/actions';
-
+import { getSiteContent, getFaqs } from '../admin/actions';
+import JsonLd from '../../components/JsonLd';
 
 export const metadata = {
   title: 'Contact Us | Scouts Emergency Response',
@@ -19,9 +19,28 @@ export const metadata = {
 
 export default async function Contact() {
   const siteContent = await getSiteContent();
+  const faqs = await getFaqs();
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
-      <section className="contact-intro page-hero">
+      <JsonLd data={faqSchema} />
+      <section 
+        className="contact-intro page-hero"
+        style={siteContent.siteMeta?.contactHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.contactHeroBgImage})` } : {}}
+      >
         <h1>{siteContent.contact.title}</h1>
         <p>{siteContent.contact.description}</p>
       </section>
@@ -50,6 +69,16 @@ export default async function Contact() {
 
         <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>
         <SocialIcons osns={siteContent.contact.osns} className="contact-social" showText={true} direction="column" />
+      </section>
+
+      <section className="faq-content intro-text" id="faq">
+        <h2 className="text-center" style={{ marginBottom: '2rem' }}>Frequently Asked Questions</h2>
+        {faqs.map((item, index) => (
+          <article className="faq-item" key={item.id || index}>
+            <h3>{item.question}</h3>
+            <p>{item.answer}</p>
+          </article>
+        ))}
       </section>
 
       <section className="contact-cta text-center">

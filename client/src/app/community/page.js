@@ -3,6 +3,7 @@ import Link from 'next/link';
 import CommunityClient from './CommunityClient';
 
 import { getAdminDb } from "@/lib/firebaseAdmin";
+import { getSiteContent } from '../admin/actions';
 
 async function getPosts() {
   try {
@@ -47,10 +48,14 @@ export const metadata = {
 
 export default async function Community() {
   const posts = await getPosts();
+  const siteContent = await getSiteContent();
 
   return (
     <>
-      <section className="community-intro page-hero">
+      <section 
+        className="community-intro page-hero"
+        style={siteContent.siteMeta?.communityHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.communityHeroBgImage})` } : {}}
+      >
         <h1>Join the SER Community</h1>
         <p>
           The SER Community brings together Scouts, volunteers, responders, and partners who share a passion for service, preparedness, and saving lives. This is where experiences are shared, ideas grow, and impact begins.

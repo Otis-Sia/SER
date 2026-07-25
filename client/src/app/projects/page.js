@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ShieldAlert, FireExtinguisher, HeartPulse, Leaf, Users } from 'lucide-react';
-import { getSiteContent, getProjects } from '../admin/actions';
+import { getSiteContent, getProjects, getGalleryItems } from '../admin/actions';
 
 export const metadata = {
   title: 'Our Projects | Scouts Emergency Response',
@@ -18,10 +18,14 @@ export const metadata = {
 export default async function Projects() {
   const siteContent = await getSiteContent();
   const projects = await getProjects();
+  const galleryItems = await getGalleryItems();
 
   return (
     <>
-      <section className="project-intro page-hero text-center">
+      <section 
+        className="project-intro page-hero text-center"
+        style={siteContent.siteMeta?.projectsHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.projectsHeroBgImage})` } : {}}
+      >
         <h1>{siteContent.projects?.title || "Our Projects"}</h1>
         <p className="intro-text">
           {siteContent.projects?.description || "Explore community emergency initiatives and programs led by Scouts Emergency Response."}
@@ -42,6 +46,30 @@ export default async function Projects() {
                   <Link href={project.link} className="btn">{project.linkText || 'Learn More'}</Link>
                 )}
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="gallery-section" style={{ marginTop: '4rem' }} id="gallery">
+        <h2 className="text-center" style={{ marginBottom: '2rem' }}>Project Gallery</h2>
+        <div className="gallery-grid">
+          {galleryItems.filter(item => !item.hidden).map((item, index) => (
+            <div className="gallery-item" key={item.id || index}>
+              <a href={item.imageUrl || item.image} title={item.title}>
+                <img src={item.imageUrl || item.image} alt={item.alt || item.title || `SER Event photo ${index + 1}`} loading="lazy" />
+                <div className="overlay">
+                  <span className="overlay-title">{item.title}</span>
+                  {item.description && (
+                    <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
+                      {item.description}
+                    </p>
+                  )}
+                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
+                    View Image
+                  </span>
+                </div>
+              </a>
             </div>
           ))}
         </div>

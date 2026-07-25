@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getProducts } from '../admin/actions';
+import { getProducts, getSiteContent } from '../admin/actions';
 
 export const metadata = {
   title: 'Official Shop & Gear | Scouts Emergency Response',
@@ -16,11 +16,15 @@ export const metadata = {
 
 export default async function Shop() {
   const products = await getProducts();
+  const siteContent = await getSiteContent();
   const featuredProducts = products.filter(p => p.featured);
 
   return (
     <>
-      <section className="shop-hero page-hero">
+      <section 
+        className="shop-hero page-hero"
+        style={siteContent.siteMeta?.shopHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.shopHeroBgImage})` } : {}}
+      >
         <h1>Welcome to the SER Shop</h1>
         <p>Support SER through official merchandise and essential safety items.</p>
         <Link href="/shop" className="btn">Shop Now</Link>

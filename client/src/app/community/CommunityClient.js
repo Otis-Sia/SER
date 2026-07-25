@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { FiCalendar, FiArrowRight } from "react-icons/fi";
 import blogStyles from "../blog/blog.module.css";
+import JoinForm from './JoinForm';
 
 export default function CommunityClient({ posts }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -16,14 +17,21 @@ export default function CommunityClient({ posts }) {
           className={activeTab === 'overview' ? 'btn btn-accent' : 'btn'}
           style={{ cursor: 'pointer' }}
         >
-          Community Overview
+          Overview
         </button>
         <button 
           onClick={() => setActiveTab('blog')} 
           className={activeTab === 'blog' ? 'btn btn-accent' : 'btn'}
           style={{ cursor: 'pointer' }}
         >
-          Blog Posts
+          Updates
+        </button>
+        <button 
+          onClick={() => setActiveTab('join')} 
+          className={activeTab === 'join' ? 'btn btn-accent' : 'btn'}
+          style={{ cursor: 'pointer' }}
+        >
+          Join SER
         </button>
       </div>
 
@@ -69,7 +77,7 @@ export default function CommunityClient({ posts }) {
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/projects" className="btn">Explore Projects</Link>
               <Link href="/contact" className="btn">Get in Touch</Link>
-              <Link href="/login/signup" className="btn btn-accent">Register</Link>
+              <button onClick={() => setActiveTab('join')} className="btn btn-accent">Register</button>
             </div>
           </section>
         </>
@@ -103,6 +111,37 @@ export default function CommunityClient({ posts }) {
             )}
           </div>
         </section>
+      )}
+
+      {activeTab === 'join' && (
+        <>
+          <section className="join-form-section" id="join" style={{ paddingTop: '1rem' }}>
+            <div className="container">
+              <JoinForm />
+            </div>
+          </section>
+
+          <section className="join-info text-center" style={{ marginTop: '4rem' }}>
+            <h2>What Happens Next?</h2>
+            <div className="join-steps">
+              <div className="join-step">
+                <span className="join-step-number">1</span>
+                <h3>Apply</h3>
+                <p>Fill in the registration form above with your details.</p>
+              </div>
+              <div className="join-step">
+                <span className="join-step-number">2</span>
+                <h3>Review</h3>
+                <p>Our team reviews your application and verifies your details.</p>
+              </div>
+              <div className="join-step">
+                <span className="join-step-number">3</span>
+                <h3>Welcome</h3>
+                <p>You&apos;ll be welcomed into SER and connected with your crew.</p>
+              </div>
+            </div>
+          </section>
+        </>
       )}
     </>
   );

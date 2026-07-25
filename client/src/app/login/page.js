@@ -1,12 +1,18 @@
 import Link from 'next/link';
+import { getSiteContent } from '../admin/actions';
 
 export const metadata = {
   title: 'Sign In | Scouts Emergency Response',
 };
 
-export default function Login() {
+export default async function Login() {
+  const siteContent = await getSiteContent();
+
   return (
-    <section className="form-container page-hero page-hero--compact">
+    <section 
+      className="form-container page-hero page-hero--compact"
+      style={siteContent.siteMeta?.loginHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.loginHeroBgImage})` } : {}}
+    >
       <h1>Sign In</h1>
       <p className="text-center">
         Welcome back. Sign in to access SER resources and updates.

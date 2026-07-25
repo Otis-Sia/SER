@@ -21,7 +21,10 @@ export default async function About() {
 
   return (
     <>
-      <section className="about-intro page-hero">
+      <section 
+        className="about-intro page-hero"
+        style={siteContent.siteMeta?.aboutHeroBgImage ? { '--hero-bg': `url(${siteContent.siteMeta.aboutHeroBgImage})` } : {}}
+      >
         <h1>{siteContent.about.title}</h1>
         <p>{siteContent.about.mission}</p>
         {siteContent.about.quote && (
@@ -87,7 +90,15 @@ export default async function About() {
         <div className="team-grid">
           {siteContent.about.team.map((member, idx) => (
             <article className="team-card" key={idx}>
-              <img src={member.image} alt={member.name} />
+              {member.image ? (
+                <img src={member.image} alt={member.name} />
+              ) : (
+                <div style={{ height: '120px', width: '120px', borderRadius: '50%', backgroundColor: 'var(--surface-color)', border: '2px dashed var(--primary-color)', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '2rem', color: 'var(--primary-color)' }}>
+                    {member.name ? member.name.charAt(0) : '?'}
+                  </span>
+                </div>
+              )}
               <h4>{member.role}</h4>
               {member.name !== member.role && <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8 }}>{member.name}</p>}
             </article>

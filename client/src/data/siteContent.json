@@ -2,7 +2,15 @@
   "siteMeta": {
     "title": "Scouts Emergency Response",
     "description": "Compassion in Action - Scouts Emergency Response",
-    "contactEmail": "hello@example.com"
+    "contactEmail": "info@scoutsemergencyresponse.org",
+    "homeHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "communityHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "projectsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg"
   },
   "navigation": [
     {
@@ -26,18 +34,6 @@
       "href": "/community"
     },
     {
-      "label": "Gallery",
-      "href": "/gallery"
-    },
-    {
-      "label": "FAQ",
-      "href": "/faq"
-    },
-    {
-      "label": "Join",
-      "href": "/join"
-    },
-    {
       "label": "Contact",
       "href": "/contact"
     }
@@ -50,7 +46,8 @@
       "heading": "Scouts Emergency Response",
       "subheading": "Compassion in Action",
       "ctaText": "Learn More",
-      "ctaLink": "/about"
+      "ctaLink": "/about",
+      "bgImage": "/assets/images/home/volunteer-outreach.svg"
     },
     "features": [
       {
@@ -106,6 +103,63 @@
         "title": "Volunteer Outreach",
         "description": "Growing our network of compassionate responders."
       }
+    ],
+    "impactInMotion": [
+      {
+        "number": "120+",
+        "title": "Community Drills",
+        "description": "Hands-on trainings that keep neighborhoods ready for any emergency."
+      },
+      {
+        "number": "45",
+        "title": "Youth-Led Teams",
+        "description": "Rapid response groups coordinating relief and safety awareness."
+      },
+      {
+        "number": "3000+",
+        "title": "Lives Reached",
+        "description": "Preparedness workshops supporting families across our region."
+      }
+    ],
+    "exploreOrganization": [
+      {
+        "title": "History of Scouting",
+        "description": "Discover the origins and growth of the Scouting movement.",
+        "linkText": "Read More",
+        "linkUrl": "/about"
+      },
+      {
+        "title": "Scouts & SDGs",
+        "description": "How Scouts contribute to global sustainable development.",
+        "linkText": "See Our Impact",
+        "linkUrl": "/projects"
+      },
+      {
+        "title": "Our Leaders",
+        "description": "Meet the leadership guiding SER initiatives.",
+        "linkText": "View Leaders",
+        "linkUrl": "/about"
+      },
+      {
+        "title": "Jasiri Rover Scouts",
+        "description": "Learn about our active Rover Scout community.",
+        "linkText": "Learn More",
+        "linkUrl": "/community"
+      }
+    ],
+    "storiesOnTheMove": [
+      {
+        "title": "Emergency Prep Hubs",
+        "description": "Mobile kits and first aid stations deployed across local events."
+      },
+      {
+        "title": "Volunteer Spotlight",
+        "description": "Rover Scouts leading drills, fire safety lessons, and rapid response."
+      },
+      {
+        "title": "Community Partnerships",
+        "description": "Collaborations that keep resources and training moving year-round."
+      }
     ]
   },
   "about": {
@@ -117,39 +171,44 @@
     "objective": "To increase awareness among young people and communities on emergency preparedness",
     "team": [
       {
-        "name": "Team Lead",
+        "name": "Jemimah Mwaura",
         "role": "Team Lead",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Lead Trainer",
         "role": "Lead Trainer",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Programs Lead",
         "role": "Programs Lead",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Volunteer Coordinator",
         "role": "Volunteer Coordinator",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Finance Officer",
         "role": "Finance Officer",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Secretary",
         "role": "Secretary",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
         "name": "Media & Communication",
         "role": "Media & Communication",
-        "image": "https://via.placeholder.com/160"
+        "image": "/assets/images/home/volunteer-outreach.svg"
+      },
+      {
+        "name": "Elvis Sia",
+        "role": "Tech Lead",
+        "image": "/assets/images/home/volunteer-outreach.svg"
       }
     ]
   },
@@ -276,7 +335,7 @@
   "contact": {
     "title": "Contact Us",
     "description": "Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.",
-    "email": "scoutsemergencyresponse@gmail.com",
+    "email": "info@scoutsemergencyresponse.org",
     "phone": "0742435314",
     "phoneInternational": "+254 742 435 314",
     "whatsappLink": "https://wa.me/254742435314",

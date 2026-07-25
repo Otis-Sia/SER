@@ -344,18 +344,9 @@ main section.page-hero {
   padding: 3rem 2.5rem;
   border-radius: calc(var(--border-radius) + 4px);
   background-color: var(--white-color);
-  background-image:
-    url("/assets/images/backgrounds/hero-1.svg"),
-    url("/assets/images/backgrounds/hero-2.svg"),
-    url("/assets/images/backgrounds/hero-3.svg");
-  background-size:
-    cover,
-    60% 60%,
-    45% 45%;
-  background-position:
-    center,
-    15% 20%,
-    85% 70%;
+  background-image: var(--hero-bg, url("/assets/images/backgrounds/scouts_hero_bg.jpg"));
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   box-shadow: 0 16px 30px rgba(10, 60, 50, 0.18);
 }
@@ -366,8 +357,8 @@ main section.page-hero::after {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(255, 255, 255, 0.92),
-    rgba(255, 255, 255, 0.82)
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.70)
   );
   z-index: 0;
 }

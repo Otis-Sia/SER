@@ -27,7 +27,6 @@ export default function Footer({ osns = [] }) {
               <li><Link href="/about">About</Link></li>
               <li><Link href="/projects">Projects</Link></li>
               <li><Link href="/events">Events</Link></li>
-              <li><Link href="/gallery">Gallery</Link></li>
             </ul>
           </div>
 
