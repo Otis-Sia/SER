@@ -50,10 +50,10 @@ export async function generateMetadata() {
       type: 'website',
       images: [
         {
-          url: '/icon.png',
-          width: 800,
-          height: 800,
-          alt: 'Scouts Emergency Response Logo',
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Scouts Emergency Response — Compassion in Action',
         },
       ],
     },
@@ -61,7 +61,7 @@ export async function generateMetadata() {
       card: 'summary_large_image',
       title: title,
       description: description,
-      images: ['/icon.png'],
+      images: ['/og-image.jpg'],
     },
     robots: {
       index: true,

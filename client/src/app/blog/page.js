@@ -15,8 +15,16 @@ async function getPosts() {
 }
 
 export const metadata = {
-  title: "Blog | SER",
-  description: "Read the latest stories and updates from our community.",
+  title: "Blog & Updates | Scouts Emergency Response",
+  description: "Read the latest stories, training recaps, and emergency preparedness updates from the Scouts Emergency Response community.",
+  openGraph: {
+    title: "Blog & Updates | Scouts Emergency Response",
+    description: "Read the latest stories, training recaps, and emergency preparedness updates from the SER community.",
+    url: "/blog",
+  },
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
 export default async function BlogPage() {

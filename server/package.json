@@ -2,6 +2,7 @@
     "name": "ser-server",
     "type": "module",
     "scripts": {
+        "build": "echo 'No build required'",
         "dev": "node --watch src/app.js",
         "start": "node src/app.js",
         "migrate": "node src/scripts/migrate.js",

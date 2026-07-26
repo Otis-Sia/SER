@@ -4,6 +4,14 @@ import UpdateDetailsClient from './UpdateDetailsClient';
 export const metadata = {
   title: 'Update Your Details | Scouts Emergency Response',
   description: 'Update your existing member registration details for Scouts Emergency Response.',
+  openGraph: {
+    title: 'Update Your Details | Scouts Emergency Response',
+    description: 'Update your existing member registration details for Scouts Emergency Response.',
+    url: '/update-details',
+  },
+  alternates: {
+    canonical: '/update-details',
+  },
 };
 
 export default async function UpdateDetailsPage() {

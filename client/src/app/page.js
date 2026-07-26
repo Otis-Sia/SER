@@ -6,6 +6,19 @@ import TiktokEmbed from '../components/TiktokEmbed';
 import FacebookEmbed from '../components/FacebookEmbed';
 import { getSiteContent } from './admin/actions';
 
+export const metadata = {
+  title: 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment',
+  description: 'Scouts Emergency Response (SER) is a youth-centered initiative equipping young people across Kenya with first aid, emergency preparedness, and disaster response skills.',
+  openGraph: {
+    title: 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment',
+    description: 'Equipping young people across Kenya with first aid, emergency preparedness, and disaster response skills.',
+    url: '/',
+  },
+  alternates: {
+    canonical: '/',
+  },
+};
+
 async function fetchRecentEvents() {
   try {
     const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });

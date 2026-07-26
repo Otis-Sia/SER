@@ -39,9 +39,28 @@ export async function generateMetadata({ params }) {
   const post = await getPostBySlug(slug);
   if (!post) return { title: "Post Not Found | SER" };
   
+  const description = post.body_md ? post.body_md.substring(0, 155).replace(/[#*_\n]/g, '') + "..." : "Read this article on the Scouts Emergency Response blog.";
+
   return {
-    title: `${post.title} | SER Blog`,
-    description: post.body_md ? post.body_md.substring(0, 150) + "..." : "",
+    title: `${post.title} | Scouts Emergency Response Blog`,
+    description: description,
+    openGraph: {
+      title: post.title,
+      description: description,
+      url: `/blog/${post.slug}`,
+      type: 'article',
+      ...(post.cover_url && {
+        images: [
+          {
+            url: post.cover_url,
+            alt: post.title,
+          },
+        ],
+      }),
+    },
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
   };
 }
 
