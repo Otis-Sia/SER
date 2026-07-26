@@ -29,6 +29,7 @@ async function fetchRecentEvents() {
     const allEvents = await res.json();
     return allEvents.slice(0, 3);
   } catch (error) {
+    if (error.digest === 'DYNAMIC_SERVER_USAGE') throw error;
     console.error("Failed to fetch events from Node API:", error);
     return [];
   }

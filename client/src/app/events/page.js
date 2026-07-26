@@ -24,6 +24,7 @@ async function fetchGoogleEvents() {
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
+    if (error.digest === 'DYNAMIC_SERVER_USAGE') throw error;
     console.error("Failed to fetch events from Node API:", error);
     return [];
   }
