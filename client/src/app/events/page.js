@@ -18,8 +18,9 @@ export const metadata = {
 
 async function fetchGoogleEvents() {
   try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000';
     // Call our Node.js backend which syncs with Google Calendar!
-    const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/api/events`, { cache: 'no-store' });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
