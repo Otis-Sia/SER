@@ -1,0 +1,18 @@
+{
+  "name": "scouts-emergency-response-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=ser-server\" \"npm run dev --workspace=ser-client\"",
+    "start": "concurrently \"npm run start --workspace=ser-server\" \"npm run start --workspace=ser-client\"",
+    "build": "npm run build --workspace=ser-client",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

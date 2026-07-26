@@ -8,21 +8,37 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Service Account credentials file
-const KEYFILEPATH = path.join(__dirname, "../../../credentials.json"); // project root: SER/credentials.json
-const SCOPES = ["https://www.googleapis.com/auth/calendar"];
+// 1. Initialize authentication
+const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
+let auth;
+if (process.env.GOOGLE_CREDENTIALS) {
+  // For Production (Vercel): Use Environment Variable
+  try {
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: SCOPES,
+    });
+  } catch (error) {
+    console.error("Failed to parse GOOGLE_CREDENTIALS env var:", error);
+  }
+} 
+
+if (!auth) {
+  // For Local Development: Use credentials.json file
+  const KEYFILEPATH = path.join(__dirname, '../../../credentials.json');
+  auth = new google.auth.GoogleAuth({
+    keyFile: KEYFILEPATH,
+    scopes: SCOPES,
+  });
+}
 const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
 const TIMEZONE = "Africa/Nairobi";
 
 let calendar;
 
 try {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: KEYFILEPATH,
-    scopes: SCOPES,
-  });
-
   calendar = google.calendar({ version: "v3", auth });
   console.log("Google Calendar (Service Account) initialized.");
 } catch (error) {
