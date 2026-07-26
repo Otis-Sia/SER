@@ -4,46 +4,81 @@ import { useState } from 'react';
 import { Shield, CheckCircle, AlertTriangle, MessageSquare } from '../../components/Icons';
 import { FaWhatsapp } from "react-icons/fa";
 import { FiCheckCircle, FiInfo, FiClipboard, FiCheck, FiEdit2, FiArrowLeft, FiArrowRight } from "react-icons/fi";
-import { submitMemberRegistration } from '../admin/actions';
+import { submitMemberRegistration, updateMemberRegistration, checkDuplicateMember } from '../admin/actions';
+import { KENYA_COUNTIES } from '../../lib/kenyaCounties';
+import { Country, City } from 'country-state-city';
+import SearchableSelect from '../../components/SearchableSelect';
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'N/A (Don\'t know)'];
+const ID_TYPES = ['National ID', 'Passport', 'Alien ID', 'Military ID', 'Refugee ID', 'N/A'];
 
-const KENYA_COUNTIES = [
-  'Mombasa', 'Kwale', 'Kilifi', 'Tana River', 'Lamu', 'Taita-Taveta', 'Garissa', 'Wajir', 'Mandera',
-  'Marsabit', 'Isiolo', 'Meru', 'Tharaka-Nithi', 'Embu', 'Kitui', 'Machakos', 'Makueni', 'Nyandarua',
-  'Nyeri', 'Kirinyaga', 'Murang\'a', 'Kiambu', 'Turkana', 'West Pokot', 'Samburu', 'Trans-Nzoia',
-  'Uasin Gishu', 'Elgeyo-Marakwet', 'Nandi', 'Baringo', 'Laikipia', 'Nakuru', 'Narok', 'Kajiado',
-  'Kericho', 'Bomet', 'Kakamega', 'Vihiga', 'Bungoma', 'Busia', 'Siaya', 'Kisumu', 'Homa Bay',
-  'Migori', 'Kisii', 'Nyamira', 'Nairobi'
-];
+const allCountriesRaw = Country.getAllCountries();
+const ALL_COUNTRIES = allCountriesRaw.map(c => ({
+  value: c.name,
+  label: (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <img 
+        src={`https://flagcdn.com/w20/${c.isoCode.toLowerCase()}.png`} 
+        srcSet={`https://flagcdn.com/w40/${c.isoCode.toLowerCase()}.png 2x`}
+        width="20" 
+        alt={c.isoCode} 
+        style={{ borderRadius: '2px' }}
+      />
+      {c.name}
+    </div>
+  ),
+  textLabel: c.name,
+  isoCode: c.isoCode,
+  phonecode: c.phonecode
+}));
 
-export default function JoinForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    county: '',
-    subCounty: '',
-    otherAddress: '',
-    phone: '',
-    idNumber: '',
-    dob: '',
-    gender: 'Male',
-    bloodType: 'N/A (Don\'t know)',
-    nextOfKinName: '',
-    nextOfKinPhone: '',
-    communityPreparedness: '',
-    calendarRecommendations: '',
-    memberGoals: '',
-    isScout: 'Yes',
-    crewDetails: '',
-    educationLevel: '',
-    trainings: [],
-    certifications: '',
-    availability: 'Very available',
-    willingToParticipate: 'Yes',
-    whyJoin: '',
-    hopeToContribute: '',
-    declaration: false,
+export default function JoinForm({ initialData = null, isUpdateMode = false }) {
+  const [formData, setFormData] = useState(() => {
+    const defaults = {
+      name: '',
+      email: '',
+      nationality: 'Kenya',
+      idType: 'National ID',
+      addressCountry: 'Kenya',
+      city: '',
+      county: '',
+      subCounty: '',
+      otherAddressCountry: 'Kenya',
+      otherCity: '',
+      otherCounty: '',
+      otherSubCounty: '',
+      phone: '',
+      idNumber: '',
+      dob: '',
+      gender: 'Male',
+      bloodType: 'N/A (Don\'t know)',
+      nextOfKinName: '',
+      nextOfKinPhone: '',
+      communityPreparedness: '',
+      calendarRecommendations: '',
+      memberGoals: '',
+      isScout: 'Yes',
+      crewDetails: '',
+      educationLevel: '',
+      trainings: [],
+      certifications: '',
+      availability: 'Very available',
+      willingToParticipate: 'Yes',
+      whyJoin: '',
+      hopeToContribute: '',
+      declaration: false,
+    };
+    if (initialData) {
+      const merged = { ...defaults, ...initialData };
+      if (typeof merged.trainings === 'string') {
+        merged.trainings = merged.trainings.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      if (!Array.isArray(merged.trainings)) {
+        merged.trainings = [];
+      }
+      return merged;
+    }
+    return defaults;
   });
 
   // Workflow steps: 'fill' | 'proofread' | 'whatsapp' | 'success'
@@ -51,7 +86,14 @@ export default function JoinForm() {
   const [waChoice, setWaChoice] = useState(null); // null | 'no'
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [errorMessage, setErrorMessage] = useState('');
+  const [duplicateError, setDuplicateError] = useState(null);
   const [submittedData, setSubmittedData] = useState(null);
+
+  const primaryCountryIso = allCountriesRaw.find(c => c.name === formData.addressCountry)?.isoCode;
+  const primaryCities = primaryCountryIso ? City.getCitiesOfCountry(primaryCountryIso).map(c => ({ value: c.name, label: c.name })) : [];
+  
+  const otherCountryIso = allCountriesRaw.find(c => c.name === formData.otherAddressCountry)?.isoCode;
+  const otherCities = otherCountryIso ? City.getCitiesOfCountry(otherCountryIso).map(c => ({ value: c.name, label: c.name })) : [];
 
   // Validate Sections 1-7
   const isForm1To7Filled =
@@ -60,9 +102,9 @@ export default function JoinForm() {
     formData.phone.trim() !== '' &&
     formData.idNumber.trim() !== '' &&
     formData.dob.trim() !== '' &&
-    formData.county.trim() !== '' &&
-    formData.subCounty.trim() !== '' &&
-    formData.otherAddress.trim() !== '' &&
+    (formData.addressCountry === 'Kenya' 
+      ? (formData.county.trim() !== '' && formData.subCounty.trim() !== '') 
+      : formData.city.trim() !== '') &&
     formData.nextOfKinName.trim() !== '' &&
     formData.nextOfKinPhone.trim() !== '' &&
     formData.educationLevel.trim() !== '' &&
@@ -76,11 +118,53 @@ export default function JoinForm() {
     formData.memberGoals.trim() !== '';
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    
+    if (['phone', 'nextOfKinPhone'].includes(name)) {
+      value = value.replace(/[^\d+]/g, '');
+    }
+
+    if (name === 'idNumber') {
+      const nat = formData.nationality || 'Kenya';
+      const type = formData.idType || 'National ID';
+      if (nat === 'Kenya' && type === 'National ID') {
+        value = value.replace(/\D/g, '');
+      }
+    }
+
     if (type === 'checkbox') {
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => {
+        const next = { ...prev, [name]: value };
+        
+        if (name === 'nationality') {
+          const country = allCountriesRaw.find(c => c.name === value);
+          if (country && !next.phone.startsWith(`+${country.phonecode}`)) {
+            next.phone = `+${country.phonecode} `;
+          }
+        }
+        if (name === 'idType') {
+          next.idNumber = value === 'N/A' ? '0000' : '';
+        }
+        if (name === 'addressCountry') {
+          next.county = '';
+          next.subCounty = '';
+          next.city = '';
+        }
+        if (name === 'otherAddressCountry') {
+          next.otherCounty = '';
+          next.otherSubCounty = '';
+          next.otherCity = '';
+        }
+        if (name === 'county') {
+          next.subCounty = '';
+        }
+        if (name === 'otherCounty') {
+          next.otherSubCounty = '';
+        }
+        return next;
+      });
     }
   };
 
@@ -142,7 +226,21 @@ export default function JoinForm() {
     };
 
     try {
-      const result = await submitMemberRegistration(payload);
+      let result;
+      if (isUpdateMode && initialData?.id) {
+        result = await updateMemberRegistration(initialData.id, payload);
+      } else {
+        const dupCheck = await checkDuplicateMember(payload.email, payload.phone, payload.nationality, payload.idType, payload.idNumber);
+        if (dupCheck.duplicate) {
+          setDuplicateError({
+            field: dupCheck.field,
+            message: dupCheck.message
+          });
+          throw new Error(dupCheck.message);
+        }
+        result = await submitMemberRegistration(payload);
+      }
+      
       if (!result.success) {
         throw new Error(result.message || 'Something went wrong. Please try again.');
       }
@@ -150,6 +248,7 @@ export default function JoinForm() {
       setSubmittedData(result.data || payload);
       setStatus('success');
       setStep('success');
+      setDuplicateError(null);
       window.scrollTo({ top: 300, behavior: 'smooth' });
     } catch (err) {
       setErrorMessage(err.message);
@@ -159,6 +258,7 @@ export default function JoinForm() {
 
   const handleReset = () => {
     setStatus('idle');
+    setDuplicateError(null);
     setStep('fill');
     setWaChoice(null);
     setSubmittedData(null);
@@ -199,7 +299,7 @@ export default function JoinForm() {
         <span className="join-form-icon" style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px' }}>
           <Shield size={32} />
         </span>
-        <h2>SER Volunteer Registration Form</h2>
+        <h2>{isUpdateMode ? 'Update Your SER Volunteer Details' : 'SER Volunteer Registration Form'}</h2>
         <p style={{ marginTop: '0.5rem', lineHeight: '1.6' }}>
           Scouts Emergency Response is a youth initiative that equips young people and communities with essential first aid and emergency response skills.
         </p>
@@ -211,9 +311,9 @@ export default function JoinForm() {
           <div className="join-success-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: '#10b981' }}>
             <CheckCircle size={56} />
           </div>
-          <h3>Application Submitted Successfully!</h3>
+          <h3>{isUpdateMode ? 'Details Updated Successfully!' : 'Application Submitted Successfully!'}</h3>
           <p style={{ maxWidth: '600px', margin: '0 auto 1.25rem', lineHeight: '1.6' }}>
-            Thank you for registering with Scouts Emergency Response (SER). Your information has been securely recorded. Our leadership team will review your application and contact you soon.
+            {isUpdateMode ? 'Thank you for keeping your profile up to date.' : 'Thank you for registering with Scouts Emergency Response (SER). Your information has been securely recorded. Our leadership team will review your application and contact you soon.'}
           </p>
           
           <div style={{
@@ -325,12 +425,42 @@ export default function JoinForm() {
 
           {/* Error Banner */}
           {status === 'error' && (
-            <div className="join-error" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-              <span style={{ display: 'flex', color: '#ef4444', flexShrink: 0 }}>
-                <AlertTriangle size={20} />
-              </span>{' '}
-              {errorMessage}
-            </div>
+            duplicateError ? (
+              <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', color: '#78350f', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'left' }}>
+                <h4 style={{ margin: '0 0 0.5rem 0', color: '#b45309', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={22} /> Existing Record Found
+                </h4>
+                <p style={{ margin: '0 0 1rem 0', fontSize: '0.92rem', lineHeight: '1.5' }}>
+                  {duplicateError.message} You are not allowed to create a new membership record. Please verify or update your existing details.
+                </p>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <a 
+                    href="/update-details" 
+                    className="btn" 
+                    style={{ background: '#b45309', color: '#fff', textDecoration: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Verify &amp; Update Details
+                  </a>
+                  <a 
+                    href="/contact" 
+                    className="btn" 
+                    style={{ background: '#6b7280', color: '#fff', textDecoration: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Contact Support
+                  </a>
+                </div>
+                <p style={{ margin: '1rem 0 0 0', fontSize: '0.85rem', color: '#92400e' }}>
+                  If you are unable to verify, update, or join the platform, please reach out to our support team for assistance.
+                </p>
+              </div>
+            ) : (
+              <div className="join-error" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+                <span style={{ display: 'flex', color: '#ef4444', flexShrink: 0 }}>
+                  <AlertTriangle size={20} />
+                </span>{' '}
+                {errorMessage}
+              </div>
+            )
           )}
 
           <button
@@ -366,8 +496,9 @@ export default function JoinForm() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', fontSize: '0.9rem' }}>
                   <div><strong>Full Name:</strong> <div>{formData.name}</div></div>
                   <div><strong>Email Address:</strong> <div>{formData.email}</div></div>
+                  <div><strong>Nationality:</strong> <div>{formData.nationality}</div></div>
                   <div><strong>Phone Number:</strong> <div>{formData.phone}</div></div>
-                  <div><strong>National ID No:</strong> <div>{formData.idNumber}</div></div>
+                  <div><strong>{formData.idType}:</strong> <div>{formData.idNumber}</div></div>
                   <div><strong>Date of Birth:</strong> <div>{formData.dob}</div></div>
                   <div><strong>Gender:</strong> <div>{formData.gender}</div></div>
                   <div><strong>Blood Type:</strong> <div>{formData.bloodType}</div></div>
@@ -378,9 +509,25 @@ export default function JoinForm() {
               <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--primary-color)' }}>2. Address &amp; Residence</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', fontSize: '0.9rem' }}>
-                  <div><strong>County:</strong> <div>{formData.county}</div></div>
-                  <div><strong>Sub-County:</strong> <div>{formData.subCounty}</div></div>
-                  <div><strong>Other Address:</strong> <div>{formData.otherAddress}</div></div>
+                  <div><strong>Country:</strong> <div>{formData.addressCountry}</div></div>
+                  {formData.addressCountry === 'Kenya' ? (
+                    <>
+                      <div><strong>County:</strong> <div>{formData.county}</div></div>
+                      <div><strong>Sub-County:</strong> <div>{formData.subCounty}</div></div>
+                    </>
+                  ) : (
+                    <div><strong>City/Town:</strong> <div>{formData.city}</div></div>
+                  )}
+                  
+                  <div><strong>Other Country:</strong> <div>{formData.otherAddressCountry}</div></div>
+                  {formData.otherAddressCountry === 'Kenya' ? (
+                    <>
+                      <div><strong>Other County:</strong> <div>{formData.otherCounty || '—'}</div></div>
+                      <div><strong>Other Sub-County:</strong> <div>{formData.otherSubCounty || '—'}</div></div>
+                    </>
+                  ) : (
+                    <div><strong>Other City/Town:</strong> <div>{formData.otherCity || '—'}</div></div>
+                  )}
                 </div>
               </div>
 
@@ -407,7 +554,7 @@ export default function JoinForm() {
               <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--primary-color)' }}>5. Experience &amp; Training</h4>
                 <div style={{ fontSize: '0.9rem' }}>
-                  <div><strong>Trainings / Experience:</strong> <div>{formData.trainings.join(', ')}</div></div>
+                  <div><strong>Trainings / Experience:</strong> <div>{Array.isArray(formData.trainings) ? formData.trainings.join(', ') : formData.trainings}</div></div>
                   <div style={{ marginTop: '0.5rem' }}><strong>Certifications:</strong> <div>{formData.certifications}</div></div>
                 </div>
               </div>
@@ -501,6 +648,19 @@ export default function JoinForm() {
 
             <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
               <div className="join-field">
+                <label>
+                  Nationality <span className="required-star">*</span>
+                </label>
+                <SearchableSelect
+                  id="nationality"
+                  name="nationality"
+                  value={formData.nationality}
+                  onChange={handleChange}
+                  options={ALL_COUNTRIES}
+                  placeholder="Select nationality"
+                />
+              </div>
+              <div className="join-field">
                 <label htmlFor="phone">
                   Phone Number <span className="required-star">*</span>
                 </label>
@@ -513,12 +673,30 @@ export default function JoinForm() {
                   onChange={handleChange}
                   required
                 />
-                <span className="join-field-hint">(Begin with 07 or 01, Not +254)</span>
+                <span className="join-field-hint">(Include country code, e.g. +25412345678 or +25472345678)</span>
               </div>
+            </div>
 
+            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+              <div className="join-field">
+                <label htmlFor="idType">
+                  Identity Type <span className="required-star">*</span>
+                </label>
+                <select
+                  id="idType"
+                  name="idType"
+                  value={formData.idType}
+                  onChange={handleChange}
+                  required
+                >
+                  {ID_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
               <div className="join-field">
                 <label htmlFor="idNumber">
-                  National Identification Number (ID No.) <span className="required-star">*</span>
+                  {formData.idType} Number <span className="required-star">*</span>
                 </label>
                 <input
                   type="text"
@@ -529,6 +707,7 @@ export default function JoinForm() {
                   onChange={handleChange}
                   required
                 />
+                <span className="join-field-hint">If you do not have an ID number, please enter "0000"</span>
               </div>
             </div>
 
@@ -538,15 +717,14 @@ export default function JoinForm() {
                   Date of Birth <span className="required-star">*</span>
                 </label>
                 <input
-                  type="text"
+                  type="date"
                   id="dob"
                   name="dob"
-                  placeholder="DD/MM/YYYY"
                   value={formData.dob}
                   onChange={handleChange}
                   required
                 />
-                <span className="join-field-hint">Format: DD/MM/YYYY</span>
+                <span className="join-field-hint">Select your date of birth</span>
               </div>
 
               <div className="join-field">
@@ -593,58 +771,159 @@ export default function JoinForm() {
             <legend>2. Address &amp; Residence</legend>
 
             <div className="join-row join-row--2" style={{ marginBottom: '1rem' }}>
-              <div className="join-field">
-                <label htmlFor="county">
-                  County <span className="required-star">*</span>
+              <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                <label>
+                  Country <span className="required-star">*</span>
                 </label>
-                <select
-                  id="county"
-                  name="county"
-                  value={formData.county}
+                <SearchableSelect
+                  id="addressCountry"
+                  name="addressCountry"
+                  value={formData.addressCountry}
                   onChange={handleChange}
-                  required
-                >
-                  <option value="" disabled>Select your county</option>
-                  {KENYA_COUNTIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-                <span className="join-field-hint">Select your current residential county.</span>
-              </div>
-
-              <div className="join-field">
-                <label htmlFor="subCounty">
-                  Sub-County <span className="required-star">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="subCounty"
-                  name="subCounty"
-                  placeholder="e.g. Thika West or Embakasi"
-                  value={formData.subCounty}
-                  onChange={handleChange}
-                  required
+                  options={ALL_COUNTRIES}
+                  placeholder="Select country"
                 />
-                <span className="join-field-hint">Enter your specific sub-county or area.</span>
               </div>
             </div>
 
-            <div className="join-field">
-              <label htmlFor="otherAddress">
-                Other Address (optional) - Sub-county and County <span className="required-star">*</span>
-              </label>
-              <input
-                type="text"
-                id="otherAddress"
-                name="otherAddress"
-                placeholder="e.g. school address, relative’s address, or N/A"
-                value={formData.otherAddress}
-                onChange={handleChange}
-                required
-              />
-              <span className="join-field-hint">Indicate N/A if you have none</span>
+            <div className="join-row join-row--2" style={{ marginBottom: '1rem' }}>
+              {formData.addressCountry === 'Kenya' ? (
+                <>
+                  <div className="join-field">
+                    <label htmlFor="county">
+                      County <span className="required-star">*</span>
+                    </label>
+                    <select
+                      id="county"
+                      name="county"
+                      value={formData.county}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="" disabled>Select your county</option>
+                      {KENYA_COUNTIES.map((c) => (
+                        <option key={c.name} value={c.name}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="join-field-hint">Select your current residential county.</span>
+                  </div>
+
+                  <div className="join-field">
+                    <label htmlFor="subCounty">
+                      Sub-County <span className="required-star">*</span>
+                    </label>
+                    <select
+                      id="subCounty"
+                      name="subCounty"
+                      value={formData.subCounty}
+                      onChange={handleChange}
+                      required
+                      disabled={!formData.county}
+                    >
+                      <option value="" disabled>Select your sub-county</option>
+                      {(KENYA_COUNTIES.find(c => c.name === formData.county)?.sub_counties || []).map((sc) => (
+                        <option key={sc} value={sc}>
+                          {sc}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="join-field-hint">Select your specific sub-county or area.</span>
+                  </div>
+                </>
+              ) : (
+                <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>
+                    City / Town <span className="required-star">*</span>
+                  </label>
+                  <SearchableSelect
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    options={primaryCities}
+                    placeholder="Search city..."
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+              <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                <label>
+                  Other Address - Country (optional)
+                </label>
+                <SearchableSelect
+                  id="otherAddressCountry"
+                  name="otherAddressCountry"
+                  value={formData.otherAddressCountry}
+                  onChange={handleChange}
+                  options={ALL_COUNTRIES}
+                  placeholder="Select country"
+                />
+              </div>
+            </div>
+
+            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+              {formData.otherAddressCountry === 'Kenya' ? (
+                <>
+                  <div className="join-field">
+                    <label htmlFor="otherCounty">
+                      Other Address - County (optional)
+                    </label>
+                    <select
+                      id="otherCounty"
+                      name="otherCounty"
+                      value={formData.otherCounty}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select county (if applicable)</option>
+                      {KENYA_COUNTIES.map((c) => (
+                        <option key={c.name} value={c.name}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="join-field-hint">e.g. school or relative's county</span>
+                  </div>
+
+                  <div className="join-field">
+                    <label htmlFor="otherSubCounty">
+                      Other Address - Sub-County (optional)
+                    </label>
+                    <select
+                      id="otherSubCounty"
+                      name="otherSubCounty"
+                      value={formData.otherSubCounty}
+                      onChange={handleChange}
+                      disabled={!formData.otherCounty}
+                    >
+                      <option value="">Select sub-county</option>
+                      {(KENYA_COUNTIES.find(c => c.name === formData.otherCounty)?.sub_counties || []).map((sc) => (
+                        <option key={sc} value={sc}>
+                          {sc}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="join-field-hint">Select specific sub-county or area</span>
+                  </div>
+                </>
+              ) : (
+                <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>
+                    Other Address - City / Town (optional)
+                  </label>
+                  <SearchableSelect
+                    id="otherCity"
+                    name="otherCity"
+                    value={formData.otherCity}
+                    onChange={handleChange}
+                    options={otherCities}
+                    placeholder="Search city..."
+                  />
+                </div>
+              )}
             </div>
           </fieldset>
 
@@ -945,12 +1224,42 @@ export default function JoinForm() {
 
           {/* Error Banner */}
           {status === 'error' && (
-            <div className="join-error" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-              <span style={{ display: 'flex', color: '#ef4444', flexShrink: 0 }}>
-                <AlertTriangle size={20} />
-              </span>{' '}
-              {errorMessage}
-            </div>
+            duplicateError ? (
+              <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', color: '#78350f', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'left' }}>
+                <h4 style={{ margin: '0 0 0.5rem 0', color: '#b45309', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={22} /> Existing Record Found
+                </h4>
+                <p style={{ margin: '0 0 1rem 0', fontSize: '0.92rem', lineHeight: '1.5' }}>
+                  {duplicateError.message} You are not allowed to create a new membership record. Please verify or update your existing details.
+                </p>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <a 
+                    href="/update-details" 
+                    className="btn" 
+                    style={{ background: '#b45309', color: '#fff', textDecoration: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Verify &amp; Update Details
+                  </a>
+                  <a 
+                    href="/contact" 
+                    className="btn" 
+                    style={{ background: '#6b7280', color: '#fff', textDecoration: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Contact Support
+                  </a>
+                </div>
+                <p style={{ margin: '1rem 0 0 0', fontSize: '0.85rem', color: '#92400e' }}>
+                  If you are unable to verify, update, or join the platform, please reach out to our support team for assistance.
+                </p>
+              </div>
+            ) : (
+              <div className="join-error" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+                <span style={{ display: 'flex', color: '#ef4444', flexShrink: 0 }}>
+                  <AlertTriangle size={20} />
+                </span>{' '}
+                {errorMessage}
+              </div>
+            )
           )}
 
           {/* Proceed to Proofread Button */}

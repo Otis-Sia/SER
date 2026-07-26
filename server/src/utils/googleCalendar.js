@@ -1,44 +1,62 @@
 import { google } from "googleapis";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-let oauth2Client;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Service Account credentials file
+const KEYFILEPATH = path.join(__dirname, "../../../credentials.json"); // project root: SER/credentials.json
+const SCOPES = ["https://www.googleapis.com/auth/calendar"];
+
+const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
+const TIMEZONE = "Africa/Nairobi";
+
 let calendar;
 
 try {
-  oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    "http://localhost:4000" // redirect URI
-  );
+  const auth = new google.auth.GoogleAuth({
+    keyFile: KEYFILEPATH,
+    scopes: SCOPES,
+  });
 
-  if (process.env.GOOGLE_REFRESH_TOKEN) {
-    oauth2Client.setCredentials({
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-    });
-  }
-
-  calendar = google.calendar({ version: "v3", auth: oauth2Client });
+  calendar = google.calendar({ version: "v3", auth });
+  console.log("Google Calendar (Service Account) initialized.");
 } catch (error) {
-  console.warn("Failed to initialize Google Calendar client. Check credentials.");
+  console.warn("Failed to initialize Google Calendar client:", error.message);
 }
-
-const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
 
 export const getCalendarEvents = async () => {
   if (!calendar) return [];
   try {
-    const res = await calendar.events.list({
+    const authClient = await calendar.context._options.auth.getClient();
+    const cal = google.calendar({ version: "v3", auth: authClient });
+
+    const response = await cal.events.list({
       calendarId,
       timeMin: new Date().toISOString(),
+      timeZone: TIMEZONE,
       maxResults: 50,
       singleEvents: true,
       orderBy: "startTime",
     });
-    return res.data.items || [];
+
+    const events = response.data.items || [];
+
+    return events.map((event) => ({
+      id: event.id,
+      google_event_id: event.id,
+      title: event.summary || "Untitled Event",
+      event_date: event.start.dateTime || event.start.date,
+      location: event.location || "",
+      description: event.description || "",
+      meetLink: event.hangoutLink || null,
+    }));
   } catch (err) {
-    console.error("Error fetching Google Calendar events:", err);
+    console.error("Error fetching Google Calendar events:", err.message);
     return [];
   }
 };
@@ -46,27 +64,34 @@ export const getCalendarEvents = async () => {
 export const createCalendarEvent = async (eventDetails) => {
   if (!calendar) return null;
   try {
+    const authClient = await calendar.context._options.auth.getClient();
+    const cal = google.calendar({ version: "v3", auth: authClient });
+
+    const startTime = new Date(eventDetails.event_date);
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Default 1 hour
+
     const event = {
       summary: eventDetails.title,
       location: eventDetails.location,
       description: eventDetails.description,
       start: {
-        dateTime: new Date(eventDetails.event_date).toISOString(),
-        timeZone: "UTC",
+        dateTime: startTime.toISOString(),
+        timeZone: TIMEZONE,
       },
       end: {
-        dateTime: new Date(new Date(eventDetails.event_date).getTime() + 60 * 60 * 1000).toISOString(),
-        timeZone: "UTC",
+        dateTime: endTime.toISOString(),
+        timeZone: TIMEZONE,
       },
     };
 
-    const res = await calendar.events.insert({
+    const res = await cal.events.insert({
       calendarId,
       resource: event,
     });
+
     return res.data;
   } catch (err) {
-    console.error("Error creating Google Calendar event:", err);
+    console.error("Error creating Google Calendar event:", err.message);
     return null;
   }
 };

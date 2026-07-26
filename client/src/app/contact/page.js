@@ -57,6 +57,12 @@ export default async function Contact() {
             <strong>Email:</strong>{' '}
             <a href={`mailto:${siteContent.contact.email}`}>{siteContent.contact.email}</a>
           </li>
+          {siteContent.contact.adminEmail && (
+            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <strong>Admin Email:</strong>{' '}
+              <a href={`mailto:${siteContent.contact.adminEmail}`}>{siteContent.contact.adminEmail}</a>
+            </li>
+          )}
           <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
             <strong>Phone:</strong>{' '}
             <a href={`tel:${siteContent.contact.phone}`}>{siteContent.contact.phone}</a> (Local) / <a href={`tel:${siteContent.contact.phoneInternational}`}>{siteContent.contact.phoneInternational}</a> (International)

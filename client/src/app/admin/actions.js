@@ -123,6 +123,10 @@ export async function getSiteContent() {
           ];
         }
         
+        if (data.contact && data.contact.adminEmail === undefined) {
+          data.contact.adminEmail = "admin@seresponse.org";
+        }
+
         return data;
       } else {
         // Seed Firestore if document doesn't exist yet
@@ -306,6 +310,47 @@ export async function submitMemberRegistration(formData) {
     return { success: true, data: memberData };
   } catch (error) {
     console.error("Error submitting member registration:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function findMemberRegistration(idNumber, contactStr, nationality, idType) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "Database not initialized" };
+
+    if (!idNumber || !contactStr) {
+      return { success: false, message: "Missing search criteria" };
+    }
+
+    // Query for the ID number
+    const snapshot = await db.collection("members").where("idNumber", "==", String(idNumber)).get();
+    if (snapshot.empty) return { success: false, message: "No match found" };
+
+    let matchedDoc = null;
+    const searchContact = String(contactStr).toLowerCase().trim();
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const emailMatch = data.email && data.email.toLowerCase().trim() === searchContact;
+      const phoneMatch = data.phone && data.phone.replace(/\s+/g, '') === searchContact.replace(/\s+/g, '');
+      const waMatch = data.whatsapp && data.whatsapp.replace(/\s+/g, '') === searchContact.replace(/\s+/g, '');
+
+      const nationalityMatch = !nationality || !data.nationality || data.nationality === nationality;
+      const idTypeMatch = !idType || !data.idType || data.idType === idType;
+
+      if ((emailMatch || phoneMatch || waMatch) && nationalityMatch && idTypeMatch) {
+        matchedDoc = { id: doc.id, ...data };
+      }
+    });
+
+    if (matchedDoc) {
+      return { success: true, data: matchedDoc };
+    } else {
+      return { success: false, message: "No match found" };
+    }
+  } catch (error) {
+    console.error("Error finding member registration:", error);
     return { success: false, message: error.message };
   }
 }
@@ -944,5 +989,47 @@ export async function getDashboardStats() {
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
     return {};
+  }
+}
+
+export async function checkDuplicateMember(email, phone, nationality, idType, idNumber) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "Database not initialized" };
+
+    if (email) {
+      const emailSnap = await db.collection("members").where("email", "==", email.toLowerCase().trim()).limit(1).get();
+      if (!emailSnap.empty) {
+        return { duplicate: true, field: "Email Address", message: "A member with this email address already exists." };
+      }
+    }
+
+    if (phone) {
+      const cleanPhone = phone.replace(/[^\d+]/g, '');
+      const phoneSnap = await db.collection("members").where("phone", "==", cleanPhone).limit(1).get();
+      if (!phoneSnap.empty) {
+        return { duplicate: true, field: "Phone Number", message: "A member with this phone number already exists." };
+      }
+      const whatsappSnap = await db.collection("members").where("whatsapp", "==", cleanPhone).limit(1).get();
+      if (!whatsappSnap.empty) {
+        return { duplicate: true, field: "Phone Number", message: "A member with this phone number already exists." };
+      }
+    }
+
+    if (idNumber && idNumber !== "0000" && idType && idType !== "N/A" && nationality) {
+      const snap = await db.collection("members")
+        .where("idNumber", "==", String(idNumber))
+        .where("idType", "==", idType)
+        .where("nationality", "==", nationality)
+        .limit(1).get();
+      if (!snap.empty) {
+        return { duplicate: true, field: "Identity Details", message: "A member with these identity details (Nationality, ID Type, and ID Number) already exists." };
+      }
+    }
+
+    return { duplicate: false };
+  } catch (error) {
+    console.error("Error checking duplicate member:", error);
+    return { success: false, message: error.message };
   }
 }

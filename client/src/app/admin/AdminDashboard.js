@@ -101,15 +101,22 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
       firstName: member.firstName || "",
       lastName: member.lastName || "",
       email: member.email || "",
+      nationality: member.nationality || "Kenya",
+      idType: member.idType || "National ID",
       phone: member.phone || member.whatsapp || "",
       idNumber: member.idNumber || "",
+      addressCountry: member.addressCountry || "Kenya",
+      city: member.city || "",
       county: member.county || member.currentAddress || "",
       subCounty: member.subCounty || "",
       crew: member.crew || member.crewDetails || "",
       bloodType: member.bloodType || "",
       gender: member.gender || "",
       currentAddress: member.currentAddress || "",
-      otherAddress: member.otherAddress || "",
+      otherAddressCountry: member.otherAddressCountry || "Kenya",
+      otherCity: member.otherCity || "",
+      otherCounty: member.otherCounty || "",
+      otherSubCounty: member.otherSubCounty || "",
       nextOfKinName: member.nextOfKinName || "",
       nextOfKinPhone: member.nextOfKinPhone || "",
       isScout: member.isScout || "",
@@ -147,8 +154,8 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
     if (filteredMembers.length === 0) return alert("No data to export!");
 
     const headers = [
-      "Full Name", "Email", "Phone", "ID Number", "Date of Birth", "Gender",
-      "Blood Type", "Current Address", "Other Address", "Next of Kin Name",
+      "Full Name", "Email", "Nationality", "Phone", "ID Type", "ID Number", "Date of Birth", "Gender",
+      "Blood Type", "Country", "County", "Sub-County", "City", "Other Country", "Other County", "Other Sub-County", "Other City", "Current Address", "Next of Kin Name",
       "Next of Kin Phone", "Is Scout", "Crew Details", "Education Level",
       "Trainings", "Certifications", "Community Preparedness", "Availability",
       "Willing To Participate", "Why Join", "Hope To Contribute", "2026 Calendar Recommendations",
@@ -158,13 +165,22 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
     const rows = filteredMembers.map((m) => [
       `"${(m.name || `${m.firstName || ''} ${m.lastName || ''}`).replace(/"/g, '""')}"`,
       `"${(m.email || "").replace(/"/g, '""')}"`,
+      `"${(m.nationality || "Kenya").replace(/"/g, '""')}"`,
       `"${(m.phone || m.whatsapp || "").replace(/"/g, '""')}"`,
+      `"${(m.idType || "National ID").replace(/"/g, '""')}"`,
       `"${(m.idNumber || "").replace(/"/g, '""')}"`,
       `"${(m.dob || "").replace(/"/g, '""')}"`,
       `"${(m.gender || "").replace(/"/g, '""')}"`,
       `"${(m.bloodType || "").replace(/"/g, '""')}"`,
-      `"${(m.currentAddress || m.county || "").replace(/"/g, '""')}"`,
-      `"${(m.otherAddress || "").replace(/"/g, '""')}"`,
+      `"${(m.addressCountry || "Kenya").replace(/"/g, '""')}"`,
+      `"${(m.county || "").replace(/"/g, '""')}"`,
+      `"${(m.subCounty || "").replace(/"/g, '""')}"`,
+      `"${(m.city || "").replace(/"/g, '""')}"`,
+      `"${(m.otherAddressCountry || "Kenya").replace(/"/g, '""')}"`,
+      `"${(m.otherCounty || "").replace(/"/g, '""')}"`,
+      `"${(m.otherSubCounty || "").replace(/"/g, '""')}"`,
+      `"${(m.otherCity || "").replace(/"/g, '""')}"`,
+      `"${(m.currentAddress || "").replace(/"/g, '""')}"`,
       `"${(m.nextOfKinName || "").replace(/"/g, '""')}"`,
       `"${(m.nextOfKinPhone || "").replace(/"/g, '""')}"`,
       `"${(m.isScout || "").replace(/"/g, '""')}"`,
@@ -443,8 +459,12 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
                     <input className={styles.input} type="text" value={editFormData.currentAddress} onChange={e => setEditFormData({...editFormData, currentAddress: e.target.value})} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Other Address</label>
-                    <input className={styles.input} type="text" value={editFormData.otherAddress} onChange={e => setEditFormData({...editFormData, otherAddress: e.target.value})} />
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Other County</label>
+                    <input className={styles.input} type="text" value={editFormData.otherCounty} onChange={e => setEditFormData({...editFormData, otherCounty: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Other Sub-County</label>
+                    <input className={styles.input} type="text" value={editFormData.otherSubCounty} onChange={e => setEditFormData({...editFormData, otherSubCounty: e.target.value})} />
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>Next of Kin Name</label>
@@ -518,8 +538,9 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                   <div><strong>Full Name:</strong> <div>{selectedMemberModal.name || `${selectedMemberModal.firstName || ''} ${selectedMemberModal.lastName || ''}`}</div></div>
                   <div><strong>Email Address:</strong> <div>{selectedMemberModal.email || '—'}</div></div>
+                  <div><strong>Nationality:</strong> <div>{selectedMemberModal.nationality || 'Kenya'}</div></div>
                   <div><strong>Phone Number:</strong> <div>{selectedMemberModal.phone || selectedMemberModal.whatsapp || '—'}</div></div>
-                  <div><strong>National ID No:</strong> <div>{selectedMemberModal.idNumber || '—'}</div></div>
+                  <div><strong>{selectedMemberModal.idType || 'National ID'}:</strong> <div>{selectedMemberModal.idNumber || '—'}</div></div>
                   <div><strong>Date of Birth:</strong> <div>{selectedMemberModal.dob || '—'}</div></div>
                   <div><strong>Gender:</strong> <div>{selectedMemberModal.gender || '—'}</div></div>
                   <div><strong>Blood Type:</strong> <div>{selectedMemberModal.bloodType || '—'}</div></div>
@@ -530,8 +551,24 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
               <div className={styles.section} style={{ marginBottom: 0, padding: '1.25rem' }}>
                 <h3 className={styles.sectionTitle} style={{ marginTop: 0 }}>2. Address &amp; Residence</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-                  <div><strong>Current Residence:</strong> <div>{selectedMemberModal.currentAddress || selectedMemberModal.county || '—'}</div></div>
-                  <div><strong>Other Address:</strong> <div>{selectedMemberModal.otherAddress || '—'}</div></div>
+                  <div><strong>Country:</strong> <div>{selectedMemberModal.addressCountry || 'Kenya'}</div></div>
+                  {selectedMemberModal.addressCountry === 'Kenya' || !selectedMemberModal.addressCountry ? (
+                    <>
+                      <div><strong>Current Residence (County):</strong> <div>{selectedMemberModal.currentAddress || selectedMemberModal.county || '—'}</div></div>
+                      <div><strong>Sub-County:</strong> <div>{selectedMemberModal.subCounty || '—'}</div></div>
+                    </>
+                  ) : (
+                    <div><strong>City/Town:</strong> <div>{selectedMemberModal.city || '—'}</div></div>
+                  )}
+                  <div><strong>Other Country:</strong> <div>{selectedMemberModal.otherAddressCountry || 'Kenya'}</div></div>
+                  {selectedMemberModal.otherAddressCountry === 'Kenya' || !selectedMemberModal.otherAddressCountry ? (
+                    <>
+                      <div><strong>Other County:</strong> <div>{selectedMemberModal.otherCounty || '—'}</div></div>
+                      <div><strong>Other Sub-County:</strong> <div>{selectedMemberModal.otherSubCounty || '—'}</div></div>
+                    </>
+                  ) : (
+                    <div><strong>Other City/Town:</strong> <div>{selectedMemberModal.otherCity || '—'}</div></div>
+                  )}
                 </div>
               </div>
 

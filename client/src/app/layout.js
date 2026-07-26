@@ -104,6 +104,21 @@ export default async function RootLayout({ children }) {
       <head>
         <meta name="google-site-verification" content="G9LZrVdjCKWCmmaGjO-XgPSIXGyNXh-G72vRLJGrfm4" />
         <JsonLd data={organizationSchema} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDark) {
+                    document.documentElement.classList.add('dark-mode');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning>
         <Header navigation={siteContent.navigation} />
