@@ -41,10 +41,14 @@ app.use("/api/upload", uploadRouter);
 const port = Number(process.env.PORT || 0);
 const host = process.env.HOST || undefined;
 
-const server = app.listen(port, host, () => {
-  const address = server.address();
-  const actualPort = typeof address === "string" ? address : address?.port;
-  const actualHost = typeof address === "string" ? "local" : address?.address;
-  const hostLabel = actualHost && actualHost !== "::" ? actualHost : "0.0.0.0";
-  console.log(`SER API running on ${hostLabel}:${actualPort}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  const server = app.listen(port, host, () => {
+    const address = server.address();
+    const actualPort = typeof address === "string" ? address : address?.port;
+    const actualHost = typeof address === "string" ? "local" : address?.address;
+    const hostLabel = actualHost && actualHost !== "::" ? actualHost : "0.0.0.0";
+    console.log(`SER API running on ${hostLabel}:${actualPort}`);
+  });
+}
+
+export default app;

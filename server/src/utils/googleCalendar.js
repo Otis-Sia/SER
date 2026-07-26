@@ -51,6 +51,7 @@ export const getCalendarEvents = async () => {
       google_event_id: event.id,
       title: event.summary || "Untitled Event",
       event_date: event.start.dateTime || event.start.date,
+      end_date: event.end.dateTime || event.end.date,
       location: event.location || "",
       description: event.description || "",
       meetLink: event.hangoutLink || null,

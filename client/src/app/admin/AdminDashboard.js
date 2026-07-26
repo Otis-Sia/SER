@@ -1344,6 +1344,8 @@ export default function AdminDashboard({ initialData }) {
     tabs = ["registrations", "blogs", "users", "events", "gallery", "projects", "products"];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
+  } else if (userRole === "Communication") {
+    tabs = [...allDataTabs.filter(t => ["contact", "social", "socials", "socialmedia", "footer", "homepage"].includes(t.toLowerCase()))];
   }
 
   tabs = ["overview", ...tabs, "settings"];

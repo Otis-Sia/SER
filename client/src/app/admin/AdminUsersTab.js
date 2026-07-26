@@ -144,6 +144,7 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
                 <option value="Super Admin">Super Admin</option>
                 <option value="Admin">Admin</option>
                 <option value="Project Lead">Project Lead</option>
+                <option value="Communication">Communication</option>
                 <option value="Author">Author</option>
               </select>
             </div>
@@ -196,6 +197,7 @@ export default function AdminUsersTab({ showToast, currentUserEmail, currentUser
                         <option value="Super Admin">Super Admin</option>
                         <option value="Admin">Admin</option>
                         <option value="Project Lead">Project Lead</option>
+                        <option value="Communication">Communication</option>
                         <option value="Author">Author</option>
                       </select>
                     )}

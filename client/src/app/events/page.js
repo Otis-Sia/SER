@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { MapPin, Siren } from '../../components/Icons';
-import { getSiteContent, getEvents } from '../admin/actions';
+import { getSiteContent } from '../admin/actions';
+import EventCard from '../../components/EventCard';
 
 export const metadata = {
   title: 'Upcoming Training & Events | Scouts Emergency Response',
@@ -15,9 +16,21 @@ export const metadata = {
   },
 };
 
+async function fetchGoogleEvents() {
+  try {
+    // Call our Node.js backend which syncs with Google Calendar!
+    const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch events from Node API:", error);
+    return [];
+  }
+}
+
 export default async function Events() {
   const siteContent = await getSiteContent();
-  const events = await getEvents();
+  const events = await fetchGoogleEvents();
 
   return (
     <>
@@ -48,27 +61,33 @@ export default async function Events() {
             <p className="intro-text">No upcoming events at the moment.</p>
           ) : (
             events.map((event) => {
-              const startDate = new Date(event.eventDate || event.event_date || new Date());
-              const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Assume 1 hr
+              const startDate = new Date(event.event_date || event.eventDate || new Date());
+              const endDate = event.end_date 
+                ? new Date(event.end_date) 
+                : new Date(startDate.getTime() + 60 * 60 * 1000); // Fallback to 1 hr
+
               const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
               const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
               const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
 
+              // Calculate duration in hours
+              const durationHrs = Math.round((endDate - startDate) / (1000 * 60 * 60) * 10) / 10;
+              const durationStr = durationHrs > 0 ? ` (${durationHrs} hour${durationHrs === 1 ? '' : 's'})` : '';
+
+              const now = new Date();
+              const isLive = now >= startDate && now <= endDate;
+
               return (
-                <div className="product-card" key={event.id}>
-                  <div className="product-card-info">
-                    <h3>{event.title}</h3>
-                    <p><strong>Date:</strong> {startDate.toLocaleDateString()}</p>
-                    <p><strong>Venue:</strong> {event.location}</p>
-                    <p>{event.description}</p>
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                      <Link className="btn" href="/contact">Ask to Join</Link>
-                      <a className="btn btn-accent" href={googleCalUrl} target="_blank" rel="noopener noreferrer">
-                        Add to Calendar
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                <EventCard 
+                  key={event.id}
+                  event={event}
+                  isLive={isLive}
+                  startDateStr={startDate.toLocaleDateString()}
+                  startTimeStr={startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  endTimeStr={endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  durationStr={durationStr}
+                  googleCalUrl={googleCalUrl}
+                />
               );
             })
           )}

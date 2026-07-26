@@ -10,15 +10,8 @@ router.get("/", async (_req, res) => {
   try {
     const googleEvents = await getCalendarEvents();
     if (googleEvents && googleEvents.length > 0) {
-      const formattedEvents = googleEvents.map(event => ({
-        id: event.id, // using google event id as id for frontend keys
-        google_event_id: event.id,
-        title: event.summary,
-        event_date: event.start.dateTime || event.start.date,
-        location: event.location || "",
-        description: event.description || "",
-      })).sort((a, b) => new Date(b.event_date) - new Date(a.event_date));
-      return res.json(formattedEvents);
+      const sortedEvents = googleEvents.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+      return res.json(sortedEvents);
     }
   } catch (error) {
     console.error("Failed to fetch from Google Calendar, falling back to local DB", error);

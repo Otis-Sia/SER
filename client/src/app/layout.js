@@ -50,7 +50,7 @@ export async function generateMetadata() {
       type: 'website',
       images: [
         {
-          url: '/icon.svg',
+          url: '/icon.png',
           width: 800,
           height: 800,
           alt: 'Scouts Emergency Response Logo',
@@ -61,7 +61,7 @@ export async function generateMetadata() {
       card: 'summary_large_image',
       title: title,
       description: description,
-      images: ['/icon.svg'],
+      images: ['/icon.png'],
     },
     robots: {
       index: true,
@@ -75,8 +75,8 @@ export async function generateMetadata() {
       },
     },
     icons: {
-      icon: '/icon.svg',
-      apple: '/icon.svg',
+      icon: '/icon.png',
+      apple: '/icon.png',
     },
   };
 }
@@ -90,7 +90,7 @@ export default async function RootLayout({ children }) {
     name: 'Scouts Emergency Response',
     alternateName: 'SER',
     url: baseUrl,
-    logo: `${baseUrl}/icon.svg`,
+    logo: `${baseUrl}/icon.png`,
     description: siteContent.siteMeta?.description || 'Empowering youth with emergency preparedness, first aid training, and community disaster response skills.',
     address: {
       '@type': 'PostalAddress',
@@ -100,7 +100,7 @@ export default async function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="G9LZrVdjCKWCmmaGjO-XgPSIXGyNXh-G72vRLJGrfm4" />
         <JsonLd data={organizationSchema} />
@@ -109,9 +109,8 @@ export default async function RootLayout({ children }) {
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
+                  var theme = localStorage.getItem('ser-theme');
+                  if (theme === 'dark') {
                     document.documentElement.classList.add('dark-mode');
                   }
                 } catch (e) {}
