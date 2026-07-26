@@ -205,10 +205,10 @@ export default async function Home() {
                     <div className="event-card-header">
                       <h3 className="event-card-title">{event.title}</h3>
                       <div className="event-card-meta">
-                        <strong>Date:</strong> <span>{startDate.toLocaleDateString()}</span>
+                        <strong>Date:</strong> <span>{startDate.toLocaleDateString(undefined, { timeZone: 'Africa/Nairobi' })}</span>
                       </div>
                       <div className="event-card-meta">
-                        <strong>Time:</strong> <span>{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{durationStr}</span>
+                        <strong>Time:</strong> <span>{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })} - {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })}{durationStr}</span>
                       </div>
                       {event.location && (
                         <div className="event-card-meta">

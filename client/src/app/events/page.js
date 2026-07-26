@@ -84,9 +84,9 @@ export default async function Events() {
                   key={event.id}
                   event={event}
                   isLive={isLive}
-                  startDateStr={startDate.toLocaleDateString()}
-                  startTimeStr={startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  endTimeStr={endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  startDateStr={startDate.toLocaleDateString(undefined, { timeZone: 'Africa/Nairobi' })}
+                  startTimeStr={startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })}
+                  endTimeStr={endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })}
                   durationStr={durationStr}
                   googleCalUrl={googleCalUrl}
                 />
