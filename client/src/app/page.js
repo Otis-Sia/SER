@@ -19,9 +19,12 @@ export const metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 async function fetchRecentEvents() {
   try {
-    const res = await fetch('http://127.0.0.1:4000/api/events', { cache: 'no-store' });
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000';
+    const res = await fetch(`${API_BASE}/api/events`, { cache: 'no-store' });
     if (!res.ok) return [];
     const allEvents = await res.json();
     return allEvents.slice(0, 3);
