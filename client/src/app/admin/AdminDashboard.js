@@ -18,7 +18,7 @@ import {
   updateAdminProfile,
   updateAdminEmail
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
 import AdminUsersTab from "./AdminUsersTab";
@@ -26,6 +26,7 @@ import ChangePasswordScreen from "./ChangePasswordScreen";
 import { auth } from "@/lib/firebaseClient";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager } from "./CollectionManagers";
+import UserManual from "./UserManual";
 
 const KENYA_COUNTIES = [
   'Mombasa', 'Kwale', 'Kilifi', 'Tana River', 'Lamu', 'Taita-Taveta', 'Garissa', 'Wajir', 'Mandera',
@@ -1336,19 +1337,21 @@ export default function AdminDashboard({ initialData }) {
   const allDataTabs = Object.keys(initialData).filter(t => !["projects", "events", "gallery", "faq"].includes(t));
   let tabs = [];
   
+  const nonJsonTabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products"];
+
   if (userRole === "Super Admin") {
-    tabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", ...allDataTabs];
+    tabs = [...nonJsonTabs, ...allDataTabs];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery", ...allDataTabs.filter(t => ["contact"].includes(t.toLowerCase()))];
+    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery", ...allDataTabs.filter(t => ["contact", "communications"].includes(t.toLowerCase()))];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", "users", "events", "gallery", "projects", "products"];
+    tabs = [...nonJsonTabs];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
-    tabs = [...allDataTabs.filter(t => ["contact", "social", "socials", "socialmedia", "footer", "homepage"].includes(t.toLowerCase()))];
+    tabs = ["blogs", "gallery", ...allDataTabs.filter(t => ["contact", "home", "social", "socials", "socialmedia", "footer", "homepage", "communications"].includes(t.toLowerCase()))];
   }
 
-  tabs = ["overview", ...tabs, "settings"];
+  tabs = ["overview", ...tabs, "manual", "settings"];
 
   if (!tabs.length && user) tabs = ["blogs"];
 
@@ -1447,6 +1450,7 @@ export default function AdminDashboard({ initialData }) {
               : tab === "registrations" ? <><FiClipboard style={{ marginRight: '6px' }} /> Form Responses</> 
               : tab === "blogs" ? <><FiBookOpen style={{ marginRight: '6px' }} /> Blog Posts</>
               : tab === "users" ? <><FiUsers style={{ marginRight: '6px' }} /> Users</>
+              : tab === "manual" ? <><FiHelpCircle style={{ marginRight: '6px' }} /> User Manual</>
               : tab === "settings" ? <><FiSettings style={{ marginRight: '6px' }} /> Account Settings</>
               : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -1462,10 +1466,11 @@ export default function AdminDashboard({ initialData }) {
             : activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
             : activeTab === "users" ? "User Management"
+            : activeTab === "manual" ? "User Manual"
             : activeTab === "settings" ? "Personal Account Settings"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && activeTab !== "settings" && (
+          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && activeTab !== "manual" && activeTab !== "settings" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
@@ -1495,6 +1500,8 @@ export default function AdminDashboard({ initialData }) {
             <FaqsManager />
           ) : activeTab === "products" ? (
             <ProductsManager />
+          ) : activeTab === "manual" ? (
+            <UserManual userRole={userRole} />
           ) : activeTab === "settings" ? (
             <AdminProfileSettings user={user} userName={userName} showToast={showToast} />
           ) : (

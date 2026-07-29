@@ -251,9 +251,9 @@ export default async function Home() {
       <section className="socials-section">
         <h2>Latest from our Socials</h2>
         <div className="socials-grid">
-          <InstagramEmbed url={siteContent.home.featuredInstagramPost} />
-          <TiktokEmbed url={siteContent.home.featuredTiktokPost} />
-          <FacebookEmbed url={siteContent.home.featuredFacebookPost} />
+          <InstagramEmbed url={siteContent.communications?.featuredInstagramPost || siteContent.home.featuredInstagramPost} />
+          <TiktokEmbed url={siteContent.communications?.featuredTiktokPost || siteContent.home.featuredTiktokPost} />
+          <FacebookEmbed url={siteContent.communications?.featuredFacebookPost || siteContent.home.featuredFacebookPost} />
         </div>
       </section>
 

@@ -122,6 +122,14 @@ export async function getSiteContent() {
             }
           ];
         }
+
+        if (!data.communications) {
+          data.communications = {
+            featuredInstagramPost: data.home?.featuredInstagramPost || "https://www.instagram.com/p/DFBC6L6A7q0/",
+            featuredTiktokPost: data.home?.featuredTiktokPost || "https://www.tiktok.com/@scoutsemergencyresponse/video/7462018872016227589",
+            featuredFacebookPost: data.home?.featuredFacebookPost || "https://www.facebook.com/61556534734628/posts/122115167094218042/"
+          };
+        }
         
         if (data.contact && data.contact.adminEmail === undefined) {
           data.contact.adminEmail = "admin@seresponse.org";
