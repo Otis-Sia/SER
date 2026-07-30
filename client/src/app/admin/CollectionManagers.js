@@ -8,7 +8,9 @@ import {
   getEvents, addEvent, updateEvent, deleteEvent,
   getGalleryItems, addGalleryItem, updateGalleryItem, deleteGalleryItem,
   getFaqs, addFaq, updateFaq, deleteFaq,
-  getProducts, addProduct, updateProduct, deleteProduct
+  getProducts, addProduct, updateProduct, deleteProduct,
+  getContacts, addContact, updateContact, deleteContact,
+  getSocialMedia, addSocialMedia, updateSocialMedia, deleteSocialMedia
 } from "./actions";
 
 // Generic Collection Manager Component
@@ -249,3 +251,57 @@ export const EventsManager = () => <CollectionManager title="Events" fetchAction
 export const GalleryManager = () => <CollectionManager title="Gallery Items" fetchAction={getGalleryItems} addAction={addGalleryItem} updateAction={updateGalleryItem} deleteAction={deleteGalleryItem} defaultItem={{ title: '', imageUrl: '', alt: '', description: '' }} renderFields={renderGalleryFields} />;
 export const FaqsManager = () => <CollectionManager title="FAQs" fetchAction={getFaqs} addAction={addFaq} updateAction={updateFaq} deleteAction={deleteFaq} defaultItem={{ question: '', answer: '', order: 0 }} renderFields={renderFaqFields} />;
 export const ProductsManager = () => <CollectionManager title="Products" fetchAction={getProducts} addAction={addProduct} updateAction={updateProduct} deleteAction={deleteProduct} defaultItem={{ name: '', priceKes: 0, imageUrl: '', description: '', featured: false }} renderFields={renderProductFields} />;
+
+const renderContactFields = (data, onChange, readOnly = false) => {
+  if (readOnly) return (
+    <>
+      <h4>{data.type}</h4>
+      <p><strong>Value:</strong> {data.value}</p>
+      <p><small>Order: {data.order}</small></p>
+    </>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <select className={styles.input} name="type" value={data.type || ''} onChange={onChange}>
+        <option value="">Select Type</option>
+        <option value="Email">Email</option>
+        <option value="Phone">Phone</option>
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Physical Address">Physical Address</option>
+      </select>
+      <input className={styles.input} name="value" value={data.value || ''} onChange={onChange} placeholder="Contact Value (e.g., +254...)" />
+      <input type="number" className={styles.input} name="order" value={data.order || 0} onChange={onChange} placeholder="Sort Order" />
+    </div>
+  );
+};
+
+const renderSocialFields = (data, onChange, readOnly = false) => {
+  if (readOnly) return (
+    <>
+      <h4>{data.platform}</h4>
+      <p><strong>URL/Embed:</strong> {data.url}</p>
+      <p><small>Type: {data.type}</small></p>
+    </>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <select className={styles.input} name="platform" value={data.platform || ''} onChange={onChange}>
+        <option value="">Select Platform</option>
+        <option value="Instagram">Instagram</option>
+        <option value="Facebook">Facebook</option>
+        <option value="TikTok">TikTok</option>
+        <option value="Twitter/X">Twitter/X</option>
+        <option value="LinkedIn">LinkedIn</option>
+      </select>
+      <select className={styles.input} name="type" value={data.type || ''} onChange={onChange}>
+        <option value="">Select Link Type</option>
+        <option value="Profile Link">Profile Link</option>
+        <option value="Embedded Post">Embedded Post</option>
+      </select>
+      <input className={styles.input} name="url" value={data.url || ''} onChange={onChange} placeholder="URL or Post Link" />
+    </div>
+  );
+};
+
+export const ContactsManager = () => <CollectionManager title="Contact Info" fetchAction={getContacts} addAction={addContact} updateAction={updateContact} deleteAction={deleteContact} defaultItem={{ type: '', value: '', order: 0 }} renderFields={renderContactFields} />;
+export const SocialsManager = () => <CollectionManager title="Social Media" fetchAction={getSocialMedia} addAction={addSocialMedia} updateAction={updateSocialMedia} deleteAction={deleteSocialMedia} defaultItem={{ platform: '', type: '', url: '' }} renderFields={renderSocialFields} />;

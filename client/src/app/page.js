@@ -4,7 +4,7 @@ import InteractiveInfiniteScroll from '../components/InteractiveInfiniteScroll';
 import InstagramEmbed from '../components/InstagramEmbed';
 import TiktokEmbed from '../components/TiktokEmbed';
 import FacebookEmbed from '../components/FacebookEmbed';
-import { getSiteContent } from './admin/actions';
+import { getSiteContent, getSocialMedia } from './admin/actions';
 
 export const metadata = {
   title: 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment',
@@ -38,6 +38,13 @@ async function fetchRecentEvents() {
 export default async function Home() {
   const siteContent = await getSiteContent();
   const recentEvents = await fetchRecentEvents();
+  const socialMedia = await getSocialMedia();
+
+  // Helper to find specific embedded posts
+  const getEmbed = (platformName, defaultUrl) => {
+    const post = socialMedia.find(s => s.platform === platformName && s.type === "Embedded Post");
+    return post ? post.url : defaultUrl;
+  };
 
   return (
     <>
@@ -251,9 +258,9 @@ export default async function Home() {
       <section className="socials-section">
         <h2>Latest from our Socials</h2>
         <div className="socials-grid">
-          <InstagramEmbed url={siteContent.communications?.featuredInstagramPost || siteContent.home.featuredInstagramPost} />
-          <TiktokEmbed url={siteContent.communications?.featuredTiktokPost || siteContent.home.featuredTiktokPost} />
-          <FacebookEmbed url={siteContent.communications?.featuredFacebookPost || siteContent.home.featuredFacebookPost} />
+          <InstagramEmbed url={getEmbed("Instagram", siteContent.home.featuredInstagramPost)} />
+          <TiktokEmbed url={getEmbed("TikTok", siteContent.home.featuredTiktokPost)} />
+          <FacebookEmbed url={getEmbed("Facebook", siteContent.home.featuredFacebookPost)} />
         </div>
       </section>
 

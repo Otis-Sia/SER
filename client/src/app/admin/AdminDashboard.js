@@ -18,14 +18,14 @@ import {
   updateAdminProfile,
   updateAdminEmail
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle, FiSun, FiMoon, FiUser, FiChevronDown } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
 import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
 import { auth } from "@/lib/firebaseClient";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager } from "./CollectionManagers";
+import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager, ContactsManager, SocialsManager } from "./CollectionManagers";
 import UserManual from "./UserManual";
 
 const KENYA_COUNTIES = [
@@ -778,10 +778,28 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDashboardStats().then((data) => {
-      setStats(data || {});
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    let isMounted = true;
+    const fetchStats = async () => {
+      try {
+        const data = await getDashboardStats();
+        if (isMounted) {
+          setStats(data || {});
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchStats();
+    
+    // Auto-update stats every 15 seconds
+    const intervalId = setInterval(fetchStats, 15000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   const getTabLabel = (tab) => {
@@ -889,6 +907,7 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
 }
 
 function AdminProfileSettings({ user, userName, showToast }) {
+  if (!user) return null;
   const [name, setName] = useState(userName || "");
   const [email, setEmail] = useState(user?.email || "");
   const [password, setPassword] = useState("");
@@ -927,7 +946,7 @@ function AdminProfileSettings({ user, userName, showToast }) {
 
   return (
     <div style={{ padding: '1rem', maxWidth: '600px' }}>
-      <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#fff', padding: '2rem', borderRadius: '12px', border: '1px solid #eaeaea', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+      <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: 'var(--white-color)', padding: '2rem', borderRadius: '12px', border: '1px solid var(--border-color, #eaeaea)', boxShadow: 'var(--box-shadow)' }}>
         <div>
           <label className={styles.label}>Name</label>
           <input type="text" value={name} onChange={e => setName(e.target.value)} className={styles.input} />
@@ -935,7 +954,7 @@ function AdminProfileSettings({ user, userName, showToast }) {
         <div>
           <label className={styles.label}>Email Address</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={styles.input} required />
-          {email !== user.email && <p style={{ fontSize: '0.85rem', color: '#f59e0b', marginTop: '0.5rem', fontWeight: 500 }}>⚠️ Changing your email will sign you out.</p>}
+          {email !== user?.email && <p style={{ fontSize: '0.85rem', color: '#f59e0b', marginTop: '0.5rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}><FiAlertTriangle size={16} /> Changing your email will sign you out.</p>}
         </div>
         <div>
           <label className={styles.label}>New Password (leave blank to keep current)</label>
@@ -959,6 +978,40 @@ export default function AdminDashboard({ initialData }) {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedTheme = localStorage.getItem("ser-theme");
+      if (storedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        setIsDarkMode(true);
+      } else {
+        document.documentElement.classList.remove("dark-mode");
+        setIsDarkMode(false);
+      }
+    } catch (e) {
+      console.warn("localStorage is not accessible");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    try {
+      if (isDarkMode) {
+        root.classList.remove('dark-mode');
+        localStorage.setItem('ser-theme', 'light');
+        setIsDarkMode(false);
+      } else {
+        root.classList.add('dark-mode');
+        localStorage.setItem('ser-theme', 'dark');
+        setIsDarkMode(true);
+      }
+    } catch (e) {
+      console.warn("localStorage is not accessible");
+      setIsDarkMode(!isDarkMode);
+    }
+  };
 
   useEffect(() => {
     // Safety timeout: Never keep the user on infinite loading spinner for more than 4 seconds
@@ -1242,7 +1295,7 @@ export default function AdminDashboard({ initialData }) {
               <div className={styles.nestedGroup} key={index}>
                 {isGallery ? (
                   <>
-                    {(!item.created_by_email || item.created_by_email === adminUsername) && (
+                    {(userRole === "Super Admin" || userRole === "Project Lead") && (
                       <button
                         className={styles.deleteButton}
                         onClick={() => handleArrayDelete(path, index)}
@@ -1250,30 +1303,32 @@ export default function AdminDashboard({ initialData }) {
                         Delete
                       </button>
                     )}
-                    {item.created_by_email && item.created_by_email !== adminUsername && (
-                      !item.hidden ? (
-                        <button className={styles.deleteButton} style={{ background: '#ff9800' }} onClick={() => handleGalleryHide(path, index, true)}>
-                          Hide
+                    {!item.hidden ? (
+                      <button className={styles.deleteButton} style={{ background: '#ff9800' }} onClick={() => handleGalleryHide(path, index, true)}>
+                        Hide
+                      </button>
+                    ) : (
+                      (item.hiddenByEmail === adminUsername || userRole === "Super Admin" || userRole === "Project Lead") && (
+                        <button className={styles.deleteButton} style={{ background: '#4caf50' }} onClick={() => handleGalleryHide(path, index, false)}>
+                          Unhide
                         </button>
-                      ) : (
-                        (item.hiddenByEmail === adminUsername || userRole === "Super Admin") && (
-                          <button className={styles.deleteButton} style={{ background: '#4caf50' }} onClick={() => handleGalleryHide(path, index, false)}>
-                            Unhide
-                          </button>
-                        )
                       )
                     )}
                     {item.hidden && (
-                       <span style={{ color: 'red', marginLeft: '10px', fontSize: '0.85em', fontWeight: 'bold' }}>Hidden</span>
+                       <span style={{ color: 'red', marginLeft: '10px', fontSize: '0.85em', fontWeight: 'bold' }}>
+                         Hidden {item.hiddenByEmail ? `(by ${item.hiddenByEmail})` : ''}
+                       </span>
                     )}
                   </>
                 ) : (
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleArrayDelete(path, index)}
-                  >
-                    Delete
-                  </button>
+                  (userRole === "Super Admin" || userRole === "Project Lead") && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleArrayDelete(path, index)}
+                    >
+                      Delete
+                    </button>
+                  )
                 )}
 
                 {itemImage && typeof itemImage === "string" && itemImage.trim() !== "" && (
@@ -1337,18 +1392,18 @@ export default function AdminDashboard({ initialData }) {
   const allDataTabs = Object.keys(initialData).filter(t => !["projects", "events", "gallery", "faq"].includes(t));
   let tabs = [];
   
-  const nonJsonTabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products"];
+  const nonJsonTabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", "contacts", "socials"];
 
   if (userRole === "Super Admin") {
     tabs = [...nonJsonTabs, ...allDataTabs];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery", ...allDataTabs.filter(t => ["contact", "communications"].includes(t.toLowerCase()))];
+    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery"];
   } else if (userRole === "Project Lead") {
-    tabs = [...nonJsonTabs];
+    tabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "products"];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
-    tabs = ["blogs", "gallery", ...allDataTabs.filter(t => ["contact", "home", "social", "socials", "socialmedia", "footer", "homepage", "communications"].includes(t.toLowerCase()))];
+    tabs = ["contacts", "socials"];
   }
 
   tabs = ["overview", ...tabs, "manual", "settings"];
@@ -1369,41 +1424,69 @@ export default function AdminDashboard({ initialData }) {
         <div style={{
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(10px)',
+          backgroundColor: 'var(--background-color, #f8fafc)',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: 'column',
+          overflowY: 'auto',
           zIndex: 9999
         }}>
+          {/* Top side: Login form */}
           <div style={{
-            background: 'var(--card-bg, #fff)',
-            padding: '2.5rem',
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            width: '90%',
-            maxWidth: '400px',
+            width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1.5rem',
-            color: 'var(--text-primary, #000)'
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '4rem 2rem 2rem 2rem',
+            backgroundColor: 'var(--white-color, #ffffff)',
+            boxShadow: '0 4px 25px rgba(0,0,0,0.05)',
+            position: 'relative',
+            zIndex: 2,
+            minHeight: '100vh'
           }}>
-            <div style={{ textAlign: 'center' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Admin Access</h2>
-              <p style={{ color: 'var(--text-secondary, #666)' }}>Sign in to manage the dashboard</p>
+            <div style={{
+              width: '100%',
+              maxWidth: '450px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              color: 'var(--text-color, #000)'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Admin Access</h2>
+                <p style={{ color: 'var(--text-secondary, #666)' }}>Sign in to manage the dashboard</p>
+              </div>
+              {loginError && <div style={{ color: '#ef4444', background: '#fef2f2', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem' }}>{loginError}</div>}
+              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email Address</label>
+                  <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color, #ccc)', background: 'var(--background-color, #fff)', color: 'var(--text-color, #000)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Password</label>
+                  <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color, #ccc)', background: 'var(--background-color, #fff)', color: 'var(--text-color, #000)' }} />
+                </div>
+                <button type="submit" style={{ width: '100%', padding: '0.875rem', background: 'var(--primary-color, #2563eb)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '0.5rem' }}>Sign In</button>
+              </form>
             </div>
-            {loginError && <div style={{ color: '#ef4444', background: '#fef2f2', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem' }}>{loginError}</div>}
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email Address</label>
-                <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', background: 'var(--bg-primary, #fff)', color: 'var(--text-primary, #000)' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Password</label>
-                <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', background: 'var(--bg-primary, #fff)', color: 'var(--text-primary, #000)' }} />
-              </div>
-              <button type="submit" style={{ width: '100%', padding: '0.875rem', background: 'var(--primary-color, #2563eb)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '0.5rem' }}>Sign In</button>
-            </form>
+            
+            <div style={{ marginTop: 'auto', paddingTop: '4rem', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-color, #666)', fontSize: '0.95rem', marginBottom: '0.5rem', fontWeight: 500 }}>Need help? Scroll down for the Guest User Manual</p>
+              <div style={{ fontSize: '2rem', animation: 'bounce 2s infinite', display: 'flex', justifyContent: 'center' }}><FiChevronDown size={32} /></div>
+            </div>
+          </div>
+
+          {/* Bottom side: User Manual */}
+          <div style={{
+            flex: '1',
+            padding: '4rem 2rem',
+            backgroundColor: 'var(--background-color, #f8fafc)',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+              <UserManual userRole="Guest" />
+            </div>
           </div>
         </div>
       )}
@@ -1424,7 +1507,7 @@ export default function AdminDashboard({ initialData }) {
               alignItems: 'center',
               gap: '0.4rem',
             }}>
-              <span style={{ fontSize: '1rem' }}>👤</span>
+              <span style={{ fontSize: '1rem', display: 'flex' }}><FiUser size={16} /></span>
               <span>{adminUsername}</span>
               <span style={{ marginLeft: 'auto', opacity: 0.75, fontWeight: 400 }}>
                 {userRole || 'Unknown Role'}
@@ -1436,6 +1519,17 @@ export default function AdminDashboard({ initialData }) {
               style={{ color: '#ef4444', padding: '0.4rem 0.75rem', minHeight: 'auto' }}
             >
               <FiLogOut style={{ marginRight: '6px' }} /> Logout
+            </button>
+            <button
+              className={styles.navButton}
+              onClick={toggleTheme}
+              style={{ padding: '0.4rem 0.75rem', minHeight: 'auto', display: 'flex', alignItems: 'center' }}
+            >
+              {isDarkMode ? (
+                <><FiSun style={{ marginRight: '6px' }} /> Light Mode</>
+              ) : (
+                <><FiMoon style={{ marginRight: '6px' }} /> Dark Mode</>
+              )}
             </button>
           </div>
         )}
@@ -1500,6 +1594,10 @@ export default function AdminDashboard({ initialData }) {
             <FaqsManager />
           ) : activeTab === "products" ? (
             <ProductsManager />
+          ) : activeTab === "contacts" ? (
+            <ContactsManager />
+          ) : activeTab === "socials" ? (
+            <SocialsManager />
           ) : activeTab === "manual" ? (
             <UserManual userRole={userRole} />
           ) : activeTab === "settings" ? (

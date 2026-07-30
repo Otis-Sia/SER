@@ -4,7 +4,7 @@ import ClientLogic from "../components/ClientLogic";
 import FloatingActionButton from "../components/FloatingActionButton";
 import JsonLd from "../components/JsonLd";
 import "./globals.css";
-import { getSiteContent } from "./admin/actions";
+import { getSiteContent, getSocialMedia } from "./admin/actions";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org';
 
@@ -83,6 +83,15 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const siteContent = await getSiteContent();
+  const socials = await getSocialMedia();
+
+  const osns = socials
+    .filter(s => s.type === 'Profile Link')
+    .map(s => ({
+      name: s.platform,
+      url: s.url,
+      handle: s.url.replace(/^https?:\/\/(www\.)?[^/]+\//, '')
+    }));
 
   const organizationSchema = {
     '@context': 'https://schema.org',
@@ -96,7 +105,7 @@ export default async function RootLayout({ children }) {
       '@type': 'PostalAddress',
       addressCountry: 'KE',
     },
-    sameAs: (siteContent.contact?.osns || []).map((social) => social.link).filter(Boolean),
+    sameAs: osns.map((social) => social.url).filter(Boolean),
   };
 
   return (
@@ -122,7 +131,7 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <Header navigation={siteContent.navigation} />
         <main>{children}</main>
-        <Footer osns={siteContent.contact?.osns} />
+        <Footer osns={osns} />
         <FloatingActionButton />
         <ClientLogic />
       </body>

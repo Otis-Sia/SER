@@ -72,7 +72,9 @@ SER has **five** distinct roles, each with different levels of access:
 | **Public Visitor** | ❌ | ❌ | Read only | Read only | ❌ |
 | **Registered User** | ✅ | ❌ | Read only | Read only | ❌ |
 | **Author** | ✅ | ✅ (Blog only) | ✅ Create / Edit / Delete | ❌ | ❌ |
-| **Project Lead** | ✅ | ✅ (Blog only) | ✅ Create / Edit / Delete | ❌ | ❌ |
+| **Communication** | ✅ | ✅ (Socials & Contacts) | ❌ | ✅ Manage (No delete) | ❌ |
+| **Admin** | ✅ | ✅ (Limited) | ✅ Create / Edit | ✅ Limited CRUD (No delete) | ❌ |
+| **Project Lead** | ✅ | ✅ (Most tabs) | ✅ Create / Edit / Delete | ✅ Full CRUD | ✅ Flag/Hide only |
 | **Super Admin** | ✅ | ✅ Full access | ✅ Create / Edit / Delete | ✅ Full CRUD | ✅ Full CRUD |
 
 ### Role Hierarchy
@@ -110,8 +112,10 @@ SER has **five** distinct roles, each with different levels of access:
 - **Public Visitor**: Anyone on the internet. Can browse all public pages, read blog posts, view events, gallery, and products. Can submit the Contact form and the Join/Membership application form.
 - **Registered User**: Has created an account via the Sign Up page. Can log in but has no admin dashboard access. This role is intended for future community features.
 - **Author**: A Firestore-managed role assigned by a Super Admin. Can log into the admin dashboard and manage **blog posts only** — create, edit, publish/unpublish, and delete articles.
-- **Project Lead**: A Firestore-managed role assigned by a Super Admin. Has the same blog post management capabilities as Author. May also oversee project-related content.
-- **Super Admin**: Full control over the entire platform. Can manage all content collections, all blog posts, all members, and all admin users including creating new users and assigning roles.
+- **Communication**: A Firestore-managed role assigned by a Super Admin. Manages everything social media and Contacts (via the dedicated Contacts and Social Media tabs). Can only hide/flag items (cannot delete).
+- **Admin**: Has limited access to manage forms, events, FAQ, and Gallery. Cannot delete content, can only hide/flag.
+- **Project Lead**: A Firestore-managed role assigned by a Super Admin. Has broad management access across the platform. Can delete content including blog posts and gallery pictures.
+- **Super Admin**: Full control over the entire platform. Can manage all content collections, all blog posts, all members, and all admin users including creating new users and assigning roles. Can delete any content.
 
 ---
 
@@ -427,7 +431,7 @@ Super Admins have **complete control** over the entire SER platform. This is the
 | Tab | Description |
 |-----|-------------|
 | **Site Content** | Manage hero section, about text, features, social media posts, partners, and all static content |
-| **Blog** | Full blog post management (same as Author) |
+| **Communication** | Manage the organization's public contact information and social media links. |
 | **Events** | Create, edit, and delete events (syncs with Google Calendar) |
 | **Gallery** | Upload and manage gallery images with categories |
 | **Projects** | Add and manage organization projects |

@@ -103,16 +103,16 @@ async function migrate() {
   try {
     console.log("Running migrations...");
     await client.query(schema);
-    console.log("✅ All tables created (or already exist).");
+    console.log("[SUCCESS] All tables created (or already exist).");
 
     // List all tables to confirm
     const { rows } = await client.query(`
       SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;
     `);
-    console.log("\n📋 Tables in database:");
+    console.log("\n[INFO] Tables in database:");
     rows.forEach((r) => console.log("  •", r.tablename));
   } catch (err) {
-    console.error("❌ Migration failed:", err.message);
+    console.error("[ERROR] Migration failed:", err.message);
     process.exit(1);
   } finally {
     client.release();

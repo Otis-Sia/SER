@@ -74,8 +74,8 @@ function Callout({ type = "info", children }) {
 
 function PermBadge({ allowed }) {
   return allowed
-    ? <span style={{ color: '#16a34a', fontWeight: 600 }}>✅ Yes</span>
-    : <span style={{ color: '#dc2626', fontWeight: 600 }}>❌ No</span>;
+    ? <span style={{ color: '#16a34a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><FiCheck size={16} /> Yes</span>
+    : <span style={{ color: '#dc2626', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><FiX size={16} /> No</span>;
 }
 
 function Table({ headers, rows }) {
@@ -119,6 +119,24 @@ function StepList({ steps }) {
         <li key={i} style={{ lineHeight: 1.6 }}>{s}</li>
       ))}
     </ol>
+  );
+}
+
+function GuestManual() {
+  return (
+    <Section title="How to Access the Dashboard" icon={<FiInfo />}>
+      <p>
+        If you are an administrator, project lead, author, or have another assigned role within the SER platform, you must sign in to access your dashboard.
+      </p>
+      <StepList steps={[
+        'Enter your registered Email Address in the form above.',
+        'Enter your Password.',
+        'Click the "Sign In" button.',
+      ]} />
+      <Callout type="info">
+        If you do not have an account or forgot your password, please contact the Super Admin for assistance.
+      </Callout>
+    </Section>
   );
 }
 
@@ -226,11 +244,11 @@ function SuperAdminManual() {
         <Table
           headers={["Role", "Dashboard Access"]}
           rows={[
-            ["Super Admin", "Full access to all tabs and features"],
+            ["Super Admin", "Full access to all tabs and features (including JSON site content)"],
             ["Project Lead", "Form Responses, Blog, Users, Events, Gallery, Projects, Products"],
-            ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery, Contact"],
+            ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery"],
+            ["Communication", "Contacts, Social Media"],
             ["Author", "Blog Posts, Gallery"],
-            ["Communication", "Site Content tabs (Contact, Home, Social, Footer)"],
           ]}
         />
 
@@ -287,8 +305,8 @@ function SuperAdminManual() {
         <Table
           headers={["Field", "Required", "Description"]}
           rows={[
-            ["Name", "✅", "Product name"],
-            ["Price (KES)", "✅", "Price in Kenyan Shillings (must be ≥ 0)"],
+            ["Name", <><FiCheck size={14} style={{ color: '#16a34a' }} /></>, "Product name"],
+            ["Price (KES)", <><FiCheck size={14} style={{ color: '#16a34a' }} /></>, "Price in Kenyan Shillings (must be ≥ 0)"],
             ["Image", "Optional", "Product image (uploaded via S3/Cloudinary)"],
             ["Description", "Optional", "Product description"],
             ["Featured", "Optional", "Toggle to show on the public shop page"],
@@ -409,11 +427,11 @@ function ProjectLeadManual() {
         ]} />
       </Section>
 
-      <Section title="Managing Gallery" defaultOpen={false}>
+      <Section title="Managing Gallery & Site Content" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li>Upload images with Title, Image, Category, and Featured toggle.</li>
-          <li>You can <strong>delete</strong> images you uploaded yourself.</li>
-          <li>You can <strong>hide</strong> images uploaded by others (removes from public site but keeps in database).</li>
+          <li><strong>Note on Deletion:</strong> Only Super Admins and Project Leads can delete items (like pictures) permanently.</li>
+          <li>Other roles like Communication or Admin can only <strong>hide</strong> or <strong>flag</strong> images, which removes them from the public site but keeps them in the database.</li>
         </ul>
       </Section>
 
@@ -430,8 +448,8 @@ function ProjectLeadManual() {
         <Table
           headers={["Field", "Required", "Description"]}
           rows={[
-            ["Name", "✅", "Product name"],
-            ["Price (KES)", "✅", "Price in Kenyan Shillings (must be ≥ 0)"],
+            ["Name", <><FiCheck size={14} style={{ color: '#16a34a' }} /></>, "Product name"],
+            ["Price (KES)", <><FiCheck size={14} style={{ color: '#16a34a' }} /></>, "Price in Kenyan Shillings (must be ≥ 0)"],
             ["Image", "Optional", "Product image"],
             ["Description", "Optional", "Product description"],
             ["Featured", "Optional", "Toggle to show on the public shop page"],
@@ -450,10 +468,10 @@ function ProjectLeadManual() {
 
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li>❌ Edit site content (hero section, about page text, social links, etc.) — Super Admin only.</li>
-          <li>❌ Manage FAQs — Super Admin only.</li>
-          <li>❌ Edit member application details — Super Admin only.</li>
-          <li>❌ Assign the Super Admin role — Super Admin only.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit site content (hero section, about page text, social links, etc.) — Super Admin only.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage FAQs — Super Admin only.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit member application details — Super Admin only.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Assign the Super Admin role — Super Admin only.</li>
         </ul>
       </Section>
     </>
@@ -554,11 +572,11 @@ function AuthorManual() {
 
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li>❌ View or manage member form responses.</li>
-          <li>❌ Create, edit, or delete admin users.</li>
-          <li>❌ Manage events, projects, products, or FAQs.</li>
-          <li>❌ Edit site content (hero section, about page, social links, etc.).</li>
-          <li>❌ Change other users' roles or passwords.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> View or manage member form responses.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create, edit, or delete admin users.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage events, projects, products, or FAQs.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit site content (hero section, about page, social links, etc.).</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Change other users' roles or passwords.</li>
         </ul>
         <Callout type="info">If you need access to other sections, contact a Super Admin to upgrade your role.</Callout>
       </Section>
@@ -640,10 +658,10 @@ function AdminRoleManual() {
 
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li>❌ Manage projects or products.</li>
-          <li>❌ Edit full site content (hero, about, partners, etc.) — only contact section.</li>
-          <li>❌ Create or delete admin users.</li>
-          <li>❌ Delete or edit member applications.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage projects or products.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit full site content (hero, about, partners, etc.) — only contact section.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or delete admin users.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Delete or edit member applications.</li>
         </ul>
       </Section>
     </>
@@ -695,9 +713,9 @@ function CommunicationManual() {
 
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li>❌ Create or manage blog posts, events, gallery, projects, products, or FAQs.</li>
-          <li>❌ View member form responses.</li>
-          <li>❌ Create or manage admin users.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or manage blog posts, events, gallery, projects, products, or FAQs.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> View member form responses.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or manage admin users.</li>
         </ul>
         <Callout type="info">If you need broader access, contact a Super Admin to change your role.</Callout>
       </Section>
@@ -740,8 +758,8 @@ function CommonSections() {
       <Section title="Need Help?" defaultOpen={false}>
         <p>If you encounter issues not covered here, contact your Super Admin or reach out:</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li><strong>Email:</strong> scoutsemergencyresponse@gmail.com</li>
-          <li><strong>WhatsApp:</strong> +254 742 435 314</li>
+          <li><strong>Email:</strong> <a href="mailto:admin@Seresponse.org" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>admin@Seresponse.org</a></li>
+          <li><strong>WhatsApp:</strong> <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>+254 742 435 314</a>, <a href="https://wa.me/254718612549" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>+254 718 612 549</a></li>
         </ul>
       </Section>
     </>
@@ -775,6 +793,7 @@ export default function UserManual({ userRole }) {
       </div>
 
       {/* Role-specific content */}
+      {roleLabel === "Guest" && <GuestManual />}
       {roleLabel === "Super Admin" && <SuperAdminManual />}
       {roleLabel === "Project Lead" && <ProjectLeadManual />}
       {roleLabel === "Author" && <AuthorManual />}
@@ -782,7 +801,7 @@ export default function UserManual({ userRole }) {
       {roleLabel === "Communication" && <CommunicationManual />}
 
       {/* Fallback for unknown roles */}
-      {!["Super Admin", "Project Lead", "Author", "Admin", "Communication"].includes(roleLabel) && (
+      {!["Super Admin", "Project Lead", "Author", "Admin", "Communication", "Guest"].includes(roleLabel) && (
         <Section title={`Your Role — ${roleLabel}`} icon={<FiBookOpen />}>
           <p>Your role-specific manual is not yet available. Please contact a Super Admin for guidance on your permissions and responsibilities.</p>
         </Section>

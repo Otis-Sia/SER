@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import SocialIcons from '../../components/SocialIcons';
 import ContactForm from '../../components/ContactForm';
-import { getSiteContent, getFaqs } from '../admin/actions';
+import { getSiteContent, getFaqs, getContacts, getSocialMedia } from '../admin/actions';
 import JsonLd from '../../components/JsonLd';
 
 export const metadata = {
@@ -20,6 +20,22 @@ export const metadata = {
 export default async function Contact() {
   const siteContent = await getSiteContent();
   const faqs = await getFaqs();
+  const contacts = await getContacts();
+  const socials = await getSocialMedia();
+
+  const emails = contacts.filter(c => c.type === 'Email');
+  const phones = contacts.filter(c => c.type === 'Phone');
+  const whatsapps = contacts.filter(c => c.type === 'WhatsApp');
+  const addresses = contacts.filter(c => c.type === 'Physical Address');
+
+  // Convert new socials structure to legacy osns structure for SocialIcons
+  const osns = socials
+    .filter(s => s.type === 'Profile Link')
+    .map(s => ({
+      name: s.platform,
+      url: s.url,
+      handle: s.url.replace(/^https?:\/\/(www\.)?[^/]+\//, '') // simple handle extraction
+    }));
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -53,28 +69,33 @@ export default async function Contact() {
       <section className="contact-info">
         <h2>Other Ways to Reach Us</h2>
         <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
-          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-            <strong>Email:</strong>{' '}
-            <a href={`mailto:${siteContent.contact.email}`}>{siteContent.contact.email}</a>
-          </li>
-          {siteContent.contact.adminEmail && (
-            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-              <strong>Admin Email:</strong>{' '}
-              <a href={`mailto:${siteContent.contact.adminEmail}`}>{siteContent.contact.adminEmail}</a>
+          {emails.map((email, idx) => (
+            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <strong>Email:</strong>{' '}
+              <a href={`mailto:${email.value}`}>{email.value}</a>
             </li>
-          )}
-          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-            <strong>Phone:</strong>{' '}
-            <a href={`tel:${siteContent.contact.phone}`}>{siteContent.contact.phone}</a> (Local) / <a href={`tel:${siteContent.contact.phoneInternational}`}>{siteContent.contact.phoneInternational}</a> (International)
-          </li>
-          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-            <strong>WhatsApp:</strong>{' '}
-            <a href={siteContent.contact.whatsappLink} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
-          </li>
+          ))}
+          {phones.map((phone, idx) => (
+            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <strong>Phone:</strong>{' '}
+              <a href={`tel:${phone.value}`}>{phone.value}</a>
+            </li>
+          ))}
+          {whatsapps.map((wa, idx) => (
+            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <strong>WhatsApp:</strong>{' '}
+              <a href={wa.value} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+            </li>
+          ))}
+          {addresses.map((address, idx) => (
+            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <strong>Location:</strong> {address.value}
+            </li>
+          ))}
         </ul>
 
         <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>
-        <SocialIcons osns={siteContent.contact.osns} className="contact-social" showText={true} direction="column" />
+        <SocialIcons osns={osns} className="contact-social" showText={true} direction="column" />
       </section>
 
       <section className="faq-content intro-text" id="faq">

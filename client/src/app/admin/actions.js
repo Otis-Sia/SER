@@ -1041,3 +1041,125 @@ export async function checkDuplicateMember(email, phone, nationality, idType, id
     return { success: false, message: error.message };
   }
 }
+// NEW CRUD for Contacts and Socials
+
+export async function getContacts() {
+  try {
+    const db = getAdminDb();
+    if (!db) return [];
+    const snapshot = await db.collection("contacts").orderBy("order", "asc").get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+    return [];
+  }
+}
+
+export async function addContact(data) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    // Auto-set created_at
+    const contactData = {
+      ...data,
+      created_at: new Date().toISOString()
+    };
+    
+    const docRef = await db.collection("contacts").add(contactData);
+    revalidatePath("/", "layout");
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateContact(id, data) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    // Prevent id from being written into document fields
+    const updateData = { ...data };
+    delete updateData.id;
+
+    await db.collection("contacts").doc(id).update(updateData);
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deleteContact(id) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    await db.collection("contacts").doc(id).delete();
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+// Social Media CRUD
+export async function getSocialMedia() {
+  try {
+    const db = getAdminDb();
+    if (!db) return [];
+    const snapshot = await db.collection("social_media").orderBy("platform", "asc").get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching social media:", error);
+    return [];
+  }
+}
+
+export async function addSocialMedia(data) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    const socialData = {
+      ...data,
+      created_at: new Date().toISOString()
+    };
+    
+    const docRef = await db.collection("social_media").add(socialData);
+    revalidatePath("/", "layout");
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateSocialMedia(id, data) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    const updateData = { ...data };
+    delete updateData.id;
+
+    await db.collection("social_media").doc(id).update(updateData);
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deleteSocialMedia(id) {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, message: "DB not initialized" };
+    
+    await db.collection("social_media").doc(id).delete();
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
