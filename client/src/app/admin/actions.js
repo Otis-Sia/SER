@@ -984,8 +984,8 @@ export async function getDashboardStats() {
     await Promise.all(
       Object.entries(collectionsMap).map(async ([stateKey, collectionName]) => {
         try {
-          const snapshot = await db.collection(collectionName).count().get();
-          stats[stateKey] = snapshot.data().count;
+          const snapshot = await db.collection(collectionName).select().get();
+          stats[stateKey] = snapshot.size;
         } catch (e) {
           // If the collection doesn't exist or error occurs, default to 0
           stats[stateKey] = 0;
