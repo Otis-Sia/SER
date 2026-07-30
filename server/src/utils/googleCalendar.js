@@ -62,16 +62,32 @@ export const getCalendarEvents = async () => {
 
     const events = response.data.items || [];
 
-    return events.map((event) => ({
-      id: event.id,
-      google_event_id: event.id,
-      title: event.summary || "Untitled Event",
-      event_date: event.start.dateTime || event.start.date,
-      end_date: event.end.dateTime || event.end.date,
-      location: event.location || "",
-      description: event.description || "",
-      meetLink: event.hangoutLink || null,
-    }));
+    return events.map((event) => {
+      let imageUrl = null;
+      let cleanDescription = event.description || "";
+      
+      if (cleanDescription) {
+        const imageRegex = /<a[^>]*href=["']?(https?:\/\/[^\s"'<>]+?\.(?:jpg|jpeg|gif|png|webp))["']?[^>]*>.*?<\/a>|(https?:\/\/[^\s"'<>]+?\.(?:jpg|jpeg|gif|png|webp))/i;
+        const match = cleanDescription.match(imageRegex);
+        if (match) {
+          imageUrl = match[1] || match[2];
+          cleanDescription = cleanDescription.replace(match[0], "").trim();
+          cleanDescription = cleanDescription.replace(/^(?:<br\s*\/?>\s*)+|(?:<br\s*\/?>\s*)+$/gi, '');
+        }
+      }
+
+      return {
+        id: event.id,
+        google_event_id: event.id,
+        title: event.summary || "Untitled Event",
+        event_date: event.start.dateTime || event.start.date,
+        end_date: event.end.dateTime || event.end.date,
+        location: event.location || "",
+        description: cleanDescription,
+        meetLink: event.hangoutLink || null,
+        imageUrl: imageUrl,
+      };
+    });
   } catch (err) {
     console.error("Error fetching Google Calendar events:", err.message);
     return [];
