@@ -81,32 +81,52 @@ export default async function About() {
         </ul>
       </section>
 
-      <section className="about-team">
-        <h2>Our Team</h2>
-        <p>
-          SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts. Each team member brings a mix of scouting experience, emergency readiness training, and a shared commitment to serve during crises.
-        </p>
-        <h3>Meet the Team</h3>
-        <div className="team-grid">
-          {siteContent.about.team.map((member, idx) => (
-            <article className="team-card" key={idx}>
-              {member.image ? (
-                <img src={member.image} alt={member.name} />
-              ) : (
-                <div style={{ height: '120px', width: '120px', borderRadius: '50%', backgroundColor: 'var(--surface-color)', border: '2px dashed var(--primary-color)', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '2rem', color: 'var(--primary-color)' }}>
-                    {member.name ? member.name.charAt(0) : '?'}
-                  </span>
-                </div>
-              )}
-              <h4>{member.role}</h4>
-              {member.name !== member.role && <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8 }}>{member.name}</p>}
-            </article>
-          ))}
+      <section className="py-24 px-4 md:px-10 bg-surface dark:bg-background border-t border-outline-variant/20">
+        <div className="max-w-container-max mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl">
+              <span className="text-secondary font-label-bold uppercase tracking-widest text-sm mb-2 block">Our Leaders</span>
+              <h2 className="text-primary dark:text-inverse-primary font-display-md md:font-display-lg mb-4">Meet the Team</h2>
+              <p className="text-on-surface-variant text-body-lg">
+                SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts.
+              </p>
+            </div>
+            <Link href="/community#join" className="text-secondary font-bold flex items-center gap-1 hover:text-secondary-fixed transition-colors whitespace-nowrap mb-2">
+              Join the Team <span className="material-symbols-outlined">arrow_forward</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {siteContent.about.team.map((member, idx) => {
+              const isFilled = member.name && member.name.trim() !== '' && member.name !== member.role;
+              
+              if (isFilled) {
+                return (
+                  <div key={idx} className="flex flex-col">
+                    <div className="w-full aspect-[3/4] bg-surface-container mb-4 relative overflow-hidden shadow-sm">
+                      {member.image ? (
+                        <img src={member.image} alt={member.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-surface-container">
+                          <span className="text-4xl text-primary opacity-20 font-bold">{member.name.charAt(0)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="text-xl font-bold text-on-background m-0 tracking-tight">{member.name}</h4>
+                    <p className="text-sm font-label-bold text-secondary m-0 mt-1">{member.role}</p>
+                  </div>
+                );
+              } else {
+                return (
+                  <Link href="/community#join" key={idx} className="w-full aspect-[3/4] border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary transition-colors group shadow-sm bg-surface hover:bg-secondary/5">
+                    <span className="material-symbols-outlined text-5xl mb-3 opacity-40 group-hover:opacity-100 transition-opacity text-secondary">person_add</span>
+                    <span className="text-sm font-medium">{member.role || 'Open Role'}</span>
+                  </Link>
+                );
+              }
+            })}
+          </div>
         </div>
-        <p>
-          Your role could be next, and we’ll help shape the title together based on your strengths and the needs of the mission.
-        </p>
       </section>
 
       <section className="about-socials text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem 0' }}>
