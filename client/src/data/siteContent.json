@@ -43,6 +43,9 @@
     }
   ],
   "home": {
+    "featuredInstagramPost": "https://www.instagram.com/p/DKoekfRteyB/",
+    "featuredTiktokPost": "https://www.tiktok.com/@scouts.emergency/photo/7662099423526259989",
+    "featuredFacebookPost": "https://www.facebook.com/permalink.php?story_fbid=pfbid0sYnPqYXhYotNwsVtABWAb8yhhJK26DY5rPFgBohFz2oxBowqfQMSJZebpBeoQHNml&id=61556534734628",
     "hero": {
       "heading": "Scouts Emergency Response",
       "subheading": "Compassion in Action",
@@ -177,9 +180,9 @@
         "image": "/assets/images/home/volunteer-outreach.svg"
       },
       {
-        "name": "Lead Trainer",
-        "role": "Lead Trainer",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Eric Njoroge",
+        "role": "National Volunteer Coordinator",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-b47c3467-8240-4af1-bf27-cb7a7c57ea72.jpeg"
       },
       {
         "name": "Programs Lead",
@@ -299,7 +302,13 @@
         "alt": "dd",
         "description": "dwdcsa"
       }
-    ]
+    ],
+    "socialEmbeds": {
+      "facebook": "https://facebook.com/example",
+      "instagram": "https://instagram.com/example",
+      "tiktok": "https://tiktok.com/@example",
+      "youtube": "https://youtube.com/c/example"
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions (FAQs)",
@@ -327,9 +336,45 @@
       }
     ]
   },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.",
+    "email": "info@scoutsemergencyresponse.org",
+    "phone": "0742435314",
+    "phoneInternational": "+254 742 435 314",
+    "whatsappLink": "https://wa.me/254742435314",
+    "osns": [
+      {
+        "name": "Facebook",
+        "handle": "Scouts Emergency Response",
+        "url": "https://www.facebook.com/profile.php?id=61556534734628"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@scoutsemergencyresponse",
+        "url": "https://www.instagram.com/scoutsemergencyresponse"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@scouts.emergency",
+        "url": "https://www.tiktok.com/@scouts.emergency"
+      },
+      {
+        "name": "YouTube",
+        "handle": "#",
+        "url": "#"
+      }
+    ],
+    "adminEmail": "admin@seresponse.org"
+  },
   "shop": {
     "title": "Welcome to the SER Shop",
     "description": "Support SER through official merchandise and essential safety items.",
     "items": []
+  },
+  "communications": {
+    "featuredInstagramPost": "https://www.instagram.com/p/DKoekfRteyB/",
+    "featuredTiktokPost": "https://www.tiktok.com/@scouts.emergency/photo/7662099423526259989",
+    "featuredFacebookPost": "https://www.facebook.com/permalink.php?story_fbid=pfbid0sYnPqYXhYotNwsVtABWAb8yhhJK26DY5rPFgBohFz2oxBowqfQMSJZebpBeoQHNml&id=61556534734628"
   }
 }

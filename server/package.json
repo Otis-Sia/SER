@@ -1,6 +1,9 @@
 {
     "name": "ser-server",
     "type": "module",
+    "engines": {
+        "node": ">=24.0.0"
+    },
     "scripts": {
         "build": "echo 'No build required'",
         "dev": "node --watch src/app.js",
