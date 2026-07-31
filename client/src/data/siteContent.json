@@ -188,6 +188,26 @@
         "name": "Elvis Sia",
         "role": "Tech Lead",
         "image": "/assets/images/home/volunteer-outreach.svg"
+      },
+      {
+        "name": "tempsdd",
+        "role": "temps",
+        "image": "/assets/images/home/volunteer-outreach.svg"
+      },
+      {
+        "name": "fdd",
+        "role": "Tempd",
+        "image": "/assets/images/home/volunteer-outreach.svg"
+      },
+      {
+        "name": "Tempgew",
+        "role": "Tempvrsdf",
+        "image": "/assets/images/home/volunteer-outreach.svg"
+      },
+      {
+        "name": "Temo",
+        "role": "Temp",
+        "image": "/assets/images/home/volunteer-outreach.svg"
       }
     ]
   },
