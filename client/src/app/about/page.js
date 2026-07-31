@@ -96,18 +96,18 @@ export default async function About() {
             </Link>
           </div>
 
-          <div className="gap-8 lg:gap-12" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
             {siteContent.about.team.map((member, idx) => {
               const isFilled = member.name && member.name.trim() !== '' && member.name !== member.role;
               
               if (isFilled) {
                 return (
                   <div key={idx} className="flex flex-col w-full mx-auto lg:mx-0" style={{ maxWidth: '280px' }}>
-                    <div className="w-full relative overflow-hidden rounded-xl bg-surface-container mb-4 shadow-sm" style={{ paddingBottom: '133.33%' }}>
+                    <div className="w-full bg-surface-container mb-4 shadow-sm" style={{ borderRadius: '6px', position: 'relative', overflow: 'hidden', paddingBottom: '133.33%' }}>
                       {member.image ? (
-                        <img src={member.image} alt={member.name} className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                        <img src={member.image} alt={member.name} className="grayscale hover:grayscale-0 transition-all duration-500" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-surface-container">
+                        <div className="bg-surface-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span className="text-4xl text-primary opacity-20 font-bold">{member.name.charAt(0)}</span>
                         </div>
                       )}
@@ -118,13 +118,11 @@ export default async function About() {
                 );
               } else {
                 return (
-                  <Link href="/community#join" key={idx} className="w-full mx-auto lg:mx-0 border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary transition-colors group shadow-sm bg-surface hover:bg-secondary/5 rounded-2xl" style={{ maxWidth: '280px' }}>
-                    <div className="w-full relative flex flex-col items-center justify-center" style={{ paddingBottom: '133.33%' }}>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                  <Link href="/community#join" key={idx} className="w-full mx-auto lg:mx-0 border-2 border-dashed border-outline-variant/30 text-on-surface-variant hover:border-secondary hover:text-secondary transition-colors group shadow-sm bg-surface hover:bg-secondary/5" style={{ borderRadius: '6px', maxWidth: '280px', position: 'relative', display: 'block', paddingBottom: '133.33%' }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '1rem' }}>
                         <span className="material-symbols-outlined text-5xl mb-3 opacity-40 group-hover:opacity-100 transition-opacity text-secondary">person_add</span>
                         <span className="text-sm font-medium">{member.role || 'Open Role'}</span>
                       </div>
-                    </div>
                   </Link>
                 );
               }
