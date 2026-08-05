@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { getSiteContent } from '../admin/actions';
+import { ArrowRight, UserPlus } from 'lucide-react';
 
 export const metadata = {
   title: 'About Us | Scouts Emergency Response',
@@ -92,7 +93,7 @@ export default async function About() {
               </p>
             </div>
             <Link href="/community#join" className="text-secondary font-bold flex items-center gap-1 hover:text-secondary-fixed transition-colors whitespace-nowrap mb-2">
-              Join the Team <span className="material-symbols-outlined">arrow_forward</span>
+              Join the Team <ArrowRight size={20} />
             </Link>
           </div>
 
@@ -120,7 +121,7 @@ export default async function About() {
                 return (
                   <Link href="/community#join" key={idx} className="w-full mx-auto lg:mx-0 border-2 border-dashed border-outline-variant/30 text-on-surface-variant hover:border-secondary hover:text-secondary transition-colors group shadow-sm bg-surface hover:bg-secondary/5" style={{ borderRadius: '6px', maxWidth: '280px', position: 'relative', display: 'block', paddingBottom: '133.33%' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '1rem' }}>
-                        <span className="material-symbols-outlined text-5xl mb-3 opacity-40 group-hover:opacity-100 transition-opacity text-secondary">person_add</span>
+                        <UserPlus size={48} className="mb-3 opacity-40 group-hover:opacity-100 transition-opacity text-secondary" />
                         <span className="text-sm font-medium">{member.role || 'Open Role'}</span>
                       </div>
                   </Link>

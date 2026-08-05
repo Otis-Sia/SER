@@ -3,13 +3,13 @@
     "title": "Scouts Emergency Response",
     "description": "Compassion in Action - Scouts Emergency Response",
     "contactEmail": "info@scoutsemergencyresponse.org",
-    "homeHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-dde9494f-44e8-43e6-97ab-1b692dbd9b53.jpg",
     "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "communityHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "projectsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "projectsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
     "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg"
   },
   "navigation": [
