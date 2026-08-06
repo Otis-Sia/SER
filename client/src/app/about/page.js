@@ -98,7 +98,14 @@ export default async function About() {
           </div>
 
           <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
-            {siteContent.about.team.map((member, idx) => {
+            {siteContent.about.team
+              .slice()
+              .sort((a, b) => {
+                const posA = a.position !== undefined && a.position !== "" ? Number(a.position) : 999;
+                const posB = b.position !== undefined && b.position !== "" ? Number(b.position) : 999;
+                return posA - posB;
+              })
+              .map((member, idx) => {
               const isFilled = member.name && member.name.trim() !== '' && member.name !== member.role;
               
               if (isFilled) {

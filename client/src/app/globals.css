@@ -357,9 +357,11 @@ main section.page-hero::after {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(255, 255, 255, 0.85),
-    rgba(255, 255, 255, 0.70)
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.25)
   );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 0;
 }
 
@@ -367,9 +369,11 @@ body.dark-mode main section.page-hero::after,
 :root.dark-mode main section.page-hero::after {
   background: linear-gradient(
     120deg,
-    rgba(10, 15, 13, 0.78),
-    rgba(10, 15, 13, 0.6)
+    rgba(10, 15, 13, 0.85),
+    rgba(10, 15, 13, 0.50)
   );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 main section.page-hero > * {

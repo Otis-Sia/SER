@@ -45,6 +45,14 @@ export async function getSiteContent() {
           data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
         }
 
+        if (data.about && Array.isArray(data.about.team)) {
+          data.about.team.forEach((member, idx) => {
+            if (member.position === undefined) {
+              member.position = (idx + 1).toString();
+            }
+          });
+        }
+
         if (!data.siteMeta) data.siteMeta = {};
         const bgDefaults = [
           "homeHeroBgImage", "aboutHeroBgImage", "communityHeroBgImage", 

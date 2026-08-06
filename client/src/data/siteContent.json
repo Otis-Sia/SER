@@ -177,37 +177,50 @@
       {
         "name": "Jemimah Mwaura",
         "role": "Team Lead",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "1"
       },
       {
         "name": "Eric Njoroge",
         "role": "National Volunteer Coordinator",
-        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-b47c3467-8240-4af1-bf27-cb7a7c57ea72.jpeg"
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-b47c3467-8240-4af1-bf27-cb7a7c57ea72.jpeg",
+        "position": "5"
       },
       {
-        "name": "Elvis Sia",
-        "role": "Tech Lead",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Waheho Gachanja",
+        "role": "Lead Trainor",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "2"
       },
       {
-        "name": "tempsdd",
-        "role": "temps",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Raymond Simiyu",
+        "role": "Program's Lead",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "3"
       },
       {
-        "name": "fdd",
-        "role": "Tempd",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "David Nduhiu",
+        "role": "Media and Communications",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "8"
       },
       {
-        "name": "Tempgew",
-        "role": "Tempvrsdf",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Alicia Kinyua",
+        "role": "Operations Coordinator",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "6"
       },
       {
-        "name": "Temo",
-        "role": "Temp",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Wesley Waweru",
+        "role": "Finance Officer and Administrative",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "4"
+      },
+      {
+        "name": "Elvis Sia ",
+        "role": "Technology and Digital Systems",
+        "image": "/assets/images/home/volunteer-outreach.svg",
+        "position": "7"
       }
     ]
   },
