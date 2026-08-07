@@ -5,7 +5,7 @@
     "contactEmail": "info@scoutsemergencyresponse.org",
     "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-03148c21-6662-417f-97c9-f65b5ac72350.png",
     "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "communityHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-375befff-9a31-4b91-97d0-0439eb446f32.jpg",
     "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
@@ -201,7 +201,7 @@
       {
         "name": "David Nduhiu",
         "role": "Media and Communications",
-        "image": "/assets/images/home/volunteer-outreach.svg",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-5cf1250b-a304-4dd7-b40e-4c1c0b8b967f.jpg",
         "position": "8"
       },
       {
