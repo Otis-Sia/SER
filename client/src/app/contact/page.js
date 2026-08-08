@@ -21,21 +21,14 @@ export default async function Contact() {
   const siteContent = await getSiteContent();
   const faqs = await getFaqs();
   const contacts = await getContacts();
-  const socials = await getSocialMedia();
-
+  
   const emails = contacts.filter(c => c.type === 'Email');
   const phones = contacts.filter(c => c.type === 'Phone');
   const whatsapps = contacts.filter(c => c.type === 'WhatsApp');
   const addresses = contacts.filter(c => c.type === 'Physical Address');
 
-  // Convert new socials structure to legacy osns structure for SocialIcons
-  const osns = socials
-    .filter(s => s.type === 'Profile Link')
-    .map(s => ({
-      name: s.platform,
-      url: s.url,
-      handle: s.url.replace(/^https?:\/\/(www\.)?[^/]+\//, '') // simple handle extraction
-    }));
+  // Read social profiles from siteMeta
+  const osns = siteContent.siteMeta?.socialProfiles || [];
 
   const faqSchema = {
     '@context': 'https://schema.org',

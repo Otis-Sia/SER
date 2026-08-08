@@ -3,6 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
+import { cache } from "react";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import jwt from "jsonwebtoken";
@@ -29,146 +30,149 @@ import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
 // Define the path to the content JSON file
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
 
-export async function getSiteContent() {
+export const getSiteContent = cache(async () => {
+  let data = {};
+  
+  // 1. Read local JSON for the bulk of the content
+  try {
+    const fileContents = await fs.readFile(contentFilePath, "utf8");
+    data = JSON.parse(fileContents);
+  } catch (error) {
+    console.error("Error reading siteContent.json:", error);
+    // If it fails, data is just an empty object
+  }
+
+  // 2. Fetch communications (embeds) from Firestore DB
   try {
     const db = getAdminDb();
     if (db) {
       const docRef = db.collection("site_content").doc("main");
       const docSnap = await docRef.get();
-
       if (docSnap.exists) {
-        const data = docSnap.data();
-        if (data._updatedAt) delete data._updatedAt;
-        
-        // Ensure new schema fields exist for the admin dashboard
-        if (data.home && data.home.hero && data.home.hero.bgImage === undefined) {
-          data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
+        const dbData = docSnap.data();
+        if (dbData.communications) {
+          data.communications = dbData.communications;
         }
-
-        if (data.about && Array.isArray(data.about.team)) {
-          data.about.team.forEach((member, idx) => {
-            if (member.position === undefined) {
-              member.position = (idx + 1).toString();
-            }
-          });
-        }
-
-        if (!data.siteMeta) data.siteMeta = {};
-        const bgDefaults = [
-          "homeHeroBgImage", "aboutHeroBgImage", "communityHeroBgImage", 
-          "contactHeroBgImage", "eventsHeroBgImage", "loginHeroBgImage", 
-          "projectsHeroBgImage", "shopHeroBgImage"
-        ];
-        bgDefaults.forEach(field => {
-          if (data.siteMeta[field] === undefined) {
-            data.siteMeta[field] = "/assets/images/backgrounds/scouts_hero_bg.jpg";
-          }
-        });
-
-        if (data.home && !data.home.impactInMotion) {
-          data.home.impactInMotion = [
-            {
-              number: "120+",
-              title: "Community Drills",
-              description: "Hands-on trainings that keep neighborhoods ready for any emergency."
-            },
-            {
-              number: "45",
-              title: "Youth-Led Teams",
-              description: "Rapid response groups coordinating relief and safety awareness."
-            },
-            {
-              number: "3000+",
-              title: "Lives Reached",
-              description: "Preparedness workshops supporting families across our region."
-            }
-          ];
-        }
-
-        if (data.home && !data.home.exploreOrganization) {
-          data.home.exploreOrganization = [
-            {
-              title: "History of Scouting",
-              description: "Discover the origins and growth of the Scouting movement.",
-              linkText: "Read More",
-              linkUrl: "/about"
-            },
-            {
-              title: "Scouts & SDGs",
-              description: "How Scouts contribute to global sustainable development.",
-              linkText: "See Our Impact",
-              linkUrl: "/projects"
-            },
-            {
-              title: "Our Leaders",
-              description: "Meet the leadership guiding SER initiatives.",
-              linkText: "View Leaders",
-              linkUrl: "/about"
-            },
-            {
-              title: "Jasiri Rover Scouts",
-              description: "Learn about our active Rover Scout community.",
-              linkText: "Learn More",
-              linkUrl: "/community"
-            }
-          ];
-        }
-
-        if (data.home && !data.home.storiesOnTheMove) {
-          data.home.storiesOnTheMove = [
-            {
-              title: "Emergency Prep Hubs",
-              description: "Mobile kits and first aid stations deployed across local events."
-            },
-            {
-              title: "Volunteer Spotlight",
-              description: "Rover Scouts leading drills, fire safety lessons, and rapid response."
-            },
-            {
-              title: "Community Partnerships",
-              description: "Collaborations that keep resources and training moving year-round."
-            }
-          ];
-        }
-
-        if (!data.communications) {
-          data.communications = {
-            featuredInstagramPost: data.home?.featuredInstagramPost || "https://www.instagram.com/p/DFBC6L6A7q0/",
-            featuredTiktokPost: data.home?.featuredTiktokPost || "https://www.tiktok.com/@scoutsemergencyresponse/video/7462018872016227589",
-            featuredFacebookPost: data.home?.featuredFacebookPost || "https://www.facebook.com/61556534734628/posts/122115167094218042/"
-          };
-        }
-        
-        if (data.contact && data.contact.adminEmail === undefined) {
-          data.contact.adminEmail = "admin@seresponse.org";
-        }
-
-        return data;
-      } else {
-        // Seed Firestore if document doesn't exist yet
-        const fileContents = await fs.readFile(contentFilePath, "utf8");
-        const jsonContent = JSON.parse(fileContents);
-        await docRef.set({
-          ...jsonContent,
-          _updatedAt: new Date().toISOString(),
-        });
-        console.log("Seeded Firestore site_content/main document from local JSON.");
-        return jsonContent;
       }
     }
   } catch (error) {
-    console.error("Firestore read warning (falling back to JSON):", error.message);
+    console.error("Firestore read warning (falling back to JSON communications):", error.message);
   }
 
-  // Local JSON fallback
-  try {
-    const fileContents = await fs.readFile(contentFilePath, "utf8");
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error("Error reading site content:", error);
-    throw new Error("Failed to read site content");
+  if (data._updatedAt) delete data._updatedAt;
+  
+  // Ensure new schema fields exist for the admin dashboard
+  if (data.home && data.home.hero && data.home.hero.bgImage === undefined) {
+    data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
   }
-}
+
+  if (data.about && Array.isArray(data.about.team)) {
+    data.about.team.forEach((member, idx) => {
+      if (member.position === undefined) {
+        member.position = (idx + 1).toString();
+      }
+    });
+  }
+
+  if (!data.siteMeta) data.siteMeta = {};
+
+  // MIGRATION: Move data.contact.osns (social profiles) into data.siteMeta.socialProfiles
+  if (data.contact && data.contact.osns) {
+    data.siteMeta.socialProfiles = data.contact.osns;
+    delete data.contact.osns;
+  }
+
+  const bgDefaults = [
+    "homeHeroBgImage", "aboutHeroBgImage", "communityHeroBgImage", 
+    "contactHeroBgImage", "eventsHeroBgImage", "loginHeroBgImage", 
+    "projectsHeroBgImage", "shopHeroBgImage"
+  ];
+  bgDefaults.forEach(field => {
+    if (data.siteMeta[field] === undefined) {
+      data.siteMeta[field] = "/assets/images/backgrounds/scouts_hero_bg.jpg";
+    }
+  });
+
+  if (data.home && !data.home.impactInMotion) {
+    data.home.impactInMotion = [
+      {
+        number: "120+",
+        title: "Community Drills",
+        description: "Hands-on trainings that keep neighborhoods ready for any emergency."
+      },
+      {
+        number: "45",
+        title: "Youth-Led Teams",
+        description: "Rapid response groups coordinating relief and safety awareness."
+      },
+      {
+        number: "3000+",
+        title: "Lives Reached",
+        description: "Preparedness workshops supporting families across our region."
+      }
+    ];
+  }
+
+  if (data.home && !data.home.exploreOrganization) {
+    data.home.exploreOrganization = [
+      {
+        title: "History of Scouting",
+        description: "Discover the origins and growth of the Scouting movement.",
+        linkText: "Read More",
+        linkUrl: "/about"
+      },
+      {
+        title: "Scouts & SDGs",
+        description: "How Scouts contribute to global sustainable development.",
+        linkText: "See Our Impact",
+        linkUrl: "/projects"
+      },
+      {
+        title: "Our Leaders",
+        description: "Meet the leadership guiding SER initiatives.",
+        linkText: "View Leaders",
+        linkUrl: "/about"
+      },
+      {
+        title: "Jasiri Rover Scouts",
+        description: "Learn about our active Rover Scout community.",
+        linkText: "Learn More",
+        linkUrl: "/community"
+      }
+    ];
+  }
+
+  if (data.home && !data.home.storiesOnTheMove) {
+    data.home.storiesOnTheMove = [
+      {
+        title: "Emergency Prep Hubs",
+        description: "Mobile kits and first aid stations deployed across local events."
+      },
+      {
+        title: "Volunteer Spotlight",
+        description: "Rover Scouts leading drills, fire safety lessons, and rapid response."
+      },
+      {
+        title: "Community Partnerships",
+        description: "Collaborations that keep resources and training moving year-round."
+      }
+    ];
+  }
+
+  if (!data.communications) {
+    data.communications = {
+      featuredInstagramPost: data.home?.featuredInstagramPost || "https://www.instagram.com/p/DFBC6L6A7q0/",
+      featuredTiktokPost: data.home?.featuredTiktokPost || "https://www.tiktok.com/@scoutsemergencyresponse/video/7462018872016227589",
+      featuredFacebookPost: data.home?.featuredFacebookPost || "https://www.facebook.com/61556534734628/posts/122115167094218042/"
+    };
+  }
+  
+  if (data.contact && data.contact.adminEmail === undefined) {
+    data.contact.adminEmail = "admin@seresponse.org";
+  }
+
+  return data;
+});
 
 export async function updateSiteContent(newData) {
   try {
@@ -182,14 +186,17 @@ export async function updateSiteContent(newData) {
     if (db) {
       const docRef = db.collection("site_content").doc("main");
       await docRef.set({
-        ...newData,
+        communications: newData.communications || {},
         _updatedAt: new Date().toISOString(),
-      });
-      console.log("Successfully updated Firestore site_content/main document.");
+      }, { merge: true });
+      console.log("Successfully updated Firestore site_content/main document with communications.");
     }
 
-    // Backup write to local file
-    await fs.writeFile(contentFilePath, JSON.stringify(newData, null, 2), "utf8");
+    // Save everything except communications to local JSON
+    const localData = { ...newData };
+    delete localData.communications;
+
+    await fs.writeFile(contentFilePath, JSON.stringify(localData, null, 2), "utf8");
     revalidatePath("/", "layout");
 
     // Delete orphaned S3 images after successful update
@@ -1113,7 +1120,7 @@ export async function deleteContact(id) {
 }
 
 // Social Media CRUD
-export async function getSocialMedia() {
+export const getSocialMedia = cache(async () => {
   try {
     const db = getAdminDb();
     if (!db) return [];
@@ -1123,7 +1130,7 @@ export async function getSocialMedia() {
     console.error("Error fetching social media:", error);
     return [];
   }
-}
+});
 
 export async function addSocialMedia(data) {
   try {

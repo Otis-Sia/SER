@@ -1072,6 +1072,25 @@ export default function AdminDashboard({ initialData }) {
   useEffect(() => {
     if (isBlogOnlyUser) {
       setActiveTab("blogs");
+    } else if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const hash = window.location.hash;
+      const validTabs = ["overview", "registrations", "blogs", "users", "manual", "settings"];
+      
+      let targetTab = null;
+      if (tabParam && validTabs.includes(tabParam)) {
+        targetTab = tabParam;
+      } else if (hash) {
+        const hashTab = hash.substring(1);
+        if (validTabs.includes(hashTab)) {
+          targetTab = hashTab;
+        }
+      }
+      
+      if (targetTab) {
+        setActiveTab(targetTab);
+      }
     }
   }, [isBlogOnlyUser]);
 
