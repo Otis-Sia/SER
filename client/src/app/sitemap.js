@@ -1,3 +1,5 @@
+import { getSiteContent } from './admin/actions';
+
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org';
   const currentDate = new Date().toISOString();
@@ -58,6 +60,25 @@ export default async function sitemap() {
       priority: 0.4,
     },
   ];
+
+  // Dynamically add team member profile URLs
+  try {
+    const siteContent = await getSiteContent();
+    const team = siteContent.about?.team || [];
+    for (const member of team) {
+      if (member.name && member.name.trim() !== '' && member.name !== member.role) {
+        const slug = member.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        routes.push({
+          url: `${baseUrl}/about/${slug}`,
+          lastModified: currentDate,
+          changeFrequency: 'monthly',
+          priority: 0.6,
+        });
+      }
+    }
+  } catch (error) {
+    // Team data fetch failed — continue with static routes only
+  }
 
   // Dynamically add blog post URLs
   try {

@@ -109,8 +109,9 @@ export default async function About() {
               const isFilled = member.name && member.name.trim() !== '' && member.name !== member.role;
               
               if (isFilled) {
+                const memberSlug = member.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 return (
-                  <div key={idx} className="flex flex-col w-full mx-auto lg:mx-0" style={{ maxWidth: '280px' }}>
+                  <Link key={idx} href={`/about/${memberSlug}`} className="flex flex-col w-full mx-auto lg:mx-0" style={{ maxWidth: '280px', textDecoration: 'none', color: 'inherit' }}>
                     <div className="w-full bg-surface-container mb-4 shadow-sm" style={{ borderRadius: '6px', position: 'relative', overflow: 'hidden', paddingBottom: '133.33%' }}>
                       {member.image ? (
                         <img src={member.image} alt={member.name} className="grayscale hover:grayscale-0 transition-all duration-500" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -122,7 +123,7 @@ export default async function About() {
                     </div>
                     <h4 className="text-xl font-bold text-on-background m-0 tracking-tight">{member.name}</h4>
                     <p className="text-sm font-label-bold text-secondary m-0 mt-1">{member.role}</p>
-                  </div>
+                  </Link>
                 );
               } else {
                 return (

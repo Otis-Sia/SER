@@ -178,49 +178,73 @@
         "name": "Jemimah Mwaura",
         "role": "Team Lead",
         "image": "/assets/images/home/volunteer-outreach.svg",
-        "position": "1"
+        "position": "1",
+        "bio": "Jemimah Mwaura serves as the Team Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Jemimah plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Emergency Preparedness",
+        "region": "Kenya"
       },
       {
         "name": "Eric Njoroge",
         "role": "National Volunteer Coordinator",
         "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-b47c3467-8240-4af1-bf27-cb7a7c57ea72.jpeg",
-        "position": "5"
+        "position": "5",
+        "bio": "Eric Njoroge serves as the National Volunteer Coordinator at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Eric plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Volunteer Coordination",
+        "region": "Kenya"
       },
       {
         "name": "Waheho Gachanja",
         "role": "Lead Trainor",
         "image": "/assets/images/home/volunteer-outreach.svg",
-        "position": "2"
+        "position": "2",
+        "bio": "Waheho Gachanja serves as the Lead Trainor at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Waheho plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Training & Drills",
+        "region": "Kenya"
       },
       {
         "name": "Raymond Simiyu",
         "role": "Program's Lead",
         "image": "/assets/images/home/volunteer-outreach.svg",
-        "position": "3"
+        "position": "3",
+        "bio": "Raymond Simiyu serves as the Program's Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Raymond plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Program Management",
+        "region": "Kenya"
       },
       {
         "name": "David Nduhiu",
         "role": "Media and Communications",
         "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-5cf1250b-a304-4dd7-b40e-4c1c0b8b967f.jpg",
-        "position": "8"
+        "position": "8",
+        "bio": "David Nduhiu serves as the Media and Communications Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, David plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Communications",
+        "region": "Kenya"
       },
       {
         "name": "Alicia Kinyua",
         "role": "Operations Coordinator",
         "image": "/assets/images/home/volunteer-outreach.svg",
-        "position": "6"
+        "position": "6",
+        "bio": "Alicia Kinyua serves as the Operations Coordinator at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Alicia plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Operations",
+        "region": "Kenya"
       },
       {
         "name": "Wesley Waweru",
         "role": "Finance Officer and Administrative",
         "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-bbd502c1-03d9-4f78-a2c9-fb9f6e252c8f.png",
-        "position": "4"
+        "position": "4",
+        "bio": "Wesley Waweru serves as the Finance Officer and Administrative Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Wesley plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Finance & Admin",
+        "region": "Kenya"
       },
       {
         "name": "Elvis Sia ",
         "role": "Technology and Digital Systems",
         "image": "/assets/images/home/volunteer-outreach.svg",
-        "position": "7"
+        "position": "7",
+        "bio": "Elvis Sia serves as the Technology and Digital Systems Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Elvis plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Technology",
+        "region": "Kenya"
       }
     ]
   },

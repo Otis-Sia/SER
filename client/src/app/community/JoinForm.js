@@ -144,6 +144,13 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
             next.phone = `+${country.phonecode} `;
           }
         }
+        if (name === 'isScout') {
+          if (value === 'No') {
+            next.crewDetails = 'N/A';
+          } else if (next.crewDetails === 'N/A') {
+            next.crewDetails = '';
+          }
+        }
         if (name === 'idType') {
           next.idNumber = value === 'N/A' ? '0000' : '';
         }
@@ -171,8 +178,15 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
   const handleTrainingToggle = (option) => {
     setFormData((prev) => {
       let current = [...prev.trainings];
+      let certifications = prev.certifications;
       if (option === 'None of the above') {
-        current = current.includes(option) ? [] : [option];
+        if (current.includes(option)) {
+          current = [];
+          if (certifications === 'N/A') certifications = '';
+        } else {
+          current = [option];
+          certifications = 'N/A';
+        }
       } else {
         current = current.filter((item) => item !== 'None of the above');
         if (current.includes(option)) {
@@ -180,8 +194,11 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
         } else {
           current.push(option);
         }
+        if (certifications === 'N/A') {
+          certifications = '';
+        }
       }
-      return { ...prev, trainings: current };
+      return { ...prev, trainings: current, certifications };
     });
   };
 
