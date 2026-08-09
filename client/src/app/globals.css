@@ -1788,16 +1788,34 @@ footer a:focus-visible {
 
 .marquee-track {
     display: inline-flex;
-    gap: 3rem;
+    align-items: center;
+    gap: 3.5rem;
     animation: scroll-left 25s linear infinite;
 }
 
-.marquee-track span {
-    font-size: 1.25rem;
+.partner-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    vertical-align: middle;
+}
+
+.partner-item img {
+    height: 42px;
+    max-height: 42px;
+    width: auto;
+    object-fit: contain;
+}
+
+.partner-item span {
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-color);
-    opacity: 0.7;
+    opacity: 0.85;
     white-space: nowrap;
+    text-align: center;
 }
 
 @keyframes scroll-left {

@@ -46,10 +46,7 @@ export const getSiteContent = cache(async () => {
 
   if (data._updatedAt) delete data._updatedAt;
   
-  // Ensure new schema fields exist for the admin dashboard
-  if (data.home && data.home.hero && data.home.hero.bgImage === undefined) {
-    data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
-  }
+  // Removed legacy home.hero.bgImage injection because it is now managed in SiteMeta
 
   if (data.home && Array.isArray(data.home.partners)) {
     data.home.partners = data.home.partners.map(partner => {

@@ -4,6 +4,7 @@ import InteractiveInfiniteScroll from '../components/InteractiveInfiniteScroll';
 import InstagramEmbed from '../components/InstagramEmbed';
 import TiktokEmbed from '../components/TiktokEmbed';
 import FacebookEmbed from '../components/FacebookEmbed';
+import PartnerImage from '../components/PartnerImage';
 import { getSiteContent, getSocialMedia } from './admin/actions';
 
 export async function generateMetadata() {
@@ -284,14 +285,14 @@ export default async function Home() {
         <div className="partners-marquee">
           <div className="marquee-track">
             {siteContent.home.partners.map((partner, index) => (
-              <span key={`partner-1-${index}`} className="partner-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-                {partner.logo && <img src={partner.logo} alt={partner.name} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />}
+              <span key={`partner-1-${index}`} className="partner-item">
+                <PartnerImage src={partner.logo} alt={partner.name} />
                 <span>{partner.name}</span>
               </span>
             ))}
             {siteContent.home.partners.map((partner, index) => (
-              <span key={`partner-2-${index}`} className="partner-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-                {partner.logo && <img src={partner.logo} alt={partner.name} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />}
+              <span key={`partner-2-${index}`} className="partner-item">
+                <PartnerImage src={partner.logo} alt={partner.name} />
                 <span>{partner.name}</span>
               </span>
             ))}
