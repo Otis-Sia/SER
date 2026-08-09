@@ -156,7 +156,7 @@ export default function CommunityClient({ posts }) {
               <div className="join-step">
                 <span className="join-step-number">3</span>
                 <h3>Welcome</h3>
-                <p>You&apos;ll be welcomed into SER and connected with your crew.</p>
+                <p>You&apos;ll be welcomed into SER as an active member of the organization.</p>
               </div>
             </div>
           </section>

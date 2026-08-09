@@ -4,18 +4,36 @@ import Script from 'next/script';
 import { getSiteContent } from '../admin/actions';
 import { ArrowRight, UserPlus } from 'lucide-react';
 
-export const metadata = {
-  title: 'About Us | Scouts Emergency Response',
-  description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment across Kenya.',
-  openGraph: {
-    title: 'About Us | Scouts Emergency Response',
-    description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment.',
-    url: '/about',
-  },
-  alternates: {
-    canonical: '/about',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'About Us | Scouts Emergency Response';
+  const description = 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment across Kenya.';
+  const rawImage = siteContent.siteMeta?.aboutHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/about',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'About Scouts Emergency Response',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/about',
+    },
+  };
+}
 
 export default async function About() {
   const siteContent = await getSiteContent();

@@ -49,14 +49,14 @@ export async function generateMetadata({ params }) {
       description: description,
       url: `/blog/${post.slug}`,
       type: 'article',
-      ...(post.cover_url && {
-        images: [
-          {
-            url: post.cover_url,
-            alt: post.title,
-          },
-        ],
-      }),
+      images: [
+        {
+          url: post.cover_url || '/assets/images/backgrounds/scouts_hero_bg.jpg',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     alternates: {
       canonical: `/blog/${post.slug}`,

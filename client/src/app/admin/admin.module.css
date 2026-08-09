@@ -772,3 +772,140 @@
     padding: 1.25rem;
   }
 }
+
+/* ============================================= */
+/* Collection Manager Card Styles               */
+/* ============================================= */
+
+.collectionCard {
+  background-color: var(--background-color);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: box-shadow 0.2s ease;
+}
+
+:root.dark-mode .collectionCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.collectionCard:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+:root.dark-mode .collectionCard:hover {
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.04);
+}
+
+.collectionCardContent {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.collectionCardContent h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+}
+
+.collectionCardContent p {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.collectionCardActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+/* Shared action button base */
+.actionBtn,
+.actionBtnEdit,
+.actionBtnDelete,
+.actionBtnCancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.actionBtn {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.actionBtn:hover {
+  opacity: 0.85;
+  box-shadow: 0 2px 8px rgba(18, 154, 68, 0.25);
+}
+
+.actionBtnEdit {
+  background: transparent;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.actionBtnEdit:hover {
+  background: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(18, 154, 68, 0.25);
+}
+
+.actionBtnDelete {
+  background: transparent;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.actionBtnDelete:hover {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.actionBtnCancel {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-color);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+:root.dark-mode .actionBtnCancel {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.actionBtnCancel:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+:root.dark-mode .actionBtnCancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Desktop: cards become horizontal */
+@media (min-width: 640px) {
+  .collectionCard {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .collectionCardActions {
+    flex-direction: row;
+  }
+}

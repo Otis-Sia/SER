@@ -33,18 +33,36 @@ async function getPosts() {
   }
 }
 
-export const metadata = {
-  title: 'Community & Network | Scouts Emergency Response',
-  description: 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.',
-  openGraph: {
-    title: 'Community & Network | Scouts Emergency Response',
-    description: 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.',
-    url: '/community',
-  },
-  alternates: {
-    canonical: '/community',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Community & Network | Scouts Emergency Response';
+  const description = 'Connect with Scouts, emergency responders, volunteers, and community leaders dedicated to safety, knowledge sharing, and emergency preparedness.';
+  const rawImage = siteContent.siteMeta?.communityHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/community',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'SER Community & Network',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/community',
+    },
+  };
+}
 
 export default async function Community() {
   const posts = await getPosts();

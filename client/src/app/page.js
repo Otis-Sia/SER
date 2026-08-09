@@ -6,18 +6,33 @@ import TiktokEmbed from '../components/TiktokEmbed';
 import FacebookEmbed from '../components/FacebookEmbed';
 import { getSiteContent, getSocialMedia } from './admin/actions';
 
-export const metadata = {
-  title: 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment',
-  description: 'Scouts Emergency Response (SER) is a youth-centered initiative equipping young people across Kenya with first aid, emergency preparedness, and disaster response skills.',
-  openGraph: {
-    title: 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment',
-    description: 'Equipping young people across Kenya with first aid, emergency preparedness, and disaster response skills.',
-    url: '/',
-  },
-  alternates: {
-    canonical: '/',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Scouts Emergency Response (SER) | Emergency Preparedness & Youth Empowerment';
+  const description = 'Scouts Emergency Response (SER) is a youth-centered initiative equipping young people across Kenya with first aid, emergency preparedness, and disaster response skills.';
+  const heroImage = siteContent.siteMeta?.homeHeroBgImage || '/og-image.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'Scouts Emergency Response Hero',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/',
+    },
+  };
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -258,9 +273,9 @@ export default async function Home() {
       <section className="socials-section">
         <h2>Latest from our Socials</h2>
         <div className="socials-grid">
-          <InstagramEmbed url={getEmbed("Instagram", siteContent.home.featuredInstagramPost)} />
-          <TiktokEmbed url={getEmbed("TikTok", siteContent.home.featuredTiktokPost)} />
-          <FacebookEmbed url={getEmbed("Facebook", siteContent.home.featuredFacebookPost)} />
+          <InstagramEmbed url={getEmbed("Instagram", "https://www.instagram.com/p/DFBC6L6A7q0/")} />
+          <TiktokEmbed url={getEmbed("TikTok", "https://www.tiktok.com/@scoutsemergencyresponse/video/7462018872016227589")} />
+          <FacebookEmbed url={getEmbed("Facebook", "https://www.facebook.com/61556534734628/posts/122115167094218042/")} />
         </div>
       </section>
 
@@ -269,10 +284,16 @@ export default async function Home() {
         <div className="partners-marquee">
           <div className="marquee-track">
             {siteContent.home.partners.map((partner, index) => (
-              <span key={`partner-1-${index}`}>{partner}</span>
+              <span key={`partner-1-${index}`} className="partner-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+                {partner.logo && <img src={partner.logo} alt={partner.name} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />}
+                <span>{partner.name}</span>
+              </span>
             ))}
             {siteContent.home.partners.map((partner, index) => (
-              <span key={`partner-2-${index}`}>{partner}</span>
+              <span key={`partner-2-${index}`} className="partner-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+                {partner.logo && <img src={partner.logo} alt={partner.name} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />}
+                <span>{partner.name}</span>
+              </span>
             ))}
           </div>
         </div>

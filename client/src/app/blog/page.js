@@ -21,6 +21,14 @@ export const metadata = {
     title: "Blog & Updates | Scouts Emergency Response",
     description: "Read the latest stories, training recaps, and emergency preparedness updates from the SER community.",
     url: "/blog",
+    images: [
+      {
+        url: "/assets/images/backgrounds/scouts_hero_bg.jpg",
+        width: 1200,
+        height: 630,
+        alt: "SER Blog & Updates",
+      },
+    ],
   },
   alternates: {
     canonical: "/blog",

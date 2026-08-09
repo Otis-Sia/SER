@@ -5,12 +5,34 @@
     "contactEmail": "info@scoutsemergencyresponse.org",
     "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-03148c21-6662-417f-97c9-f65b5ac72350.png",
     "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-375befff-9a31-4b91-97d0-0439eb446f32.jpg",
+    "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-20ac0a3a-ff9b-4bf3-a60a-6518e049310e.jpg",
     "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
     "projectsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
-    "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg"
+    "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "socialProfiles": [
+      {
+        "name": "Facebook",
+        "handle": "Scouts Emergency Response",
+        "url": "https://www.facebook.com/profile.php?id=61556534734628"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@scoutsemergencyresponse",
+        "url": "https://www.instagram.com/scoutsemergencyresponse"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@scouts.emergency",
+        "url": "https://www.tiktok.com/@scouts.emergency"
+      },
+      {
+        "name": "YouTube",
+        "handle": "#",
+        "url": "#"
+      }
+    ]
   },
   "navigation": [
     {
@@ -43,9 +65,6 @@
     }
   ],
   "home": {
-    "featuredInstagramPost": "https://www.instagram.com/p/DKoekfRteyB/",
-    "featuredTiktokPost": "https://www.tiktok.com/@scouts.emergency/photo/7662099423526259989",
-    "featuredFacebookPost": "https://www.facebook.com/permalink.php?story_fbid=pfbid0sYnPqYXhYotNwsVtABWAb8yhhJK26DY5rPFgBohFz2oxBowqfQMSJZebpBeoQHNml&id=61556534734628",
     "hero": {
       "heading": "Scouts Emergency Response",
       "subheading": "Compassion in Action",
@@ -72,14 +91,34 @@
       }
     ],
     "partners": [
-      "St John Ambulance",
-      "National Disaster Management Unit",
-      "County Fire Department",
-      "County Health Promoters",
-      "Kenya Scouts Association",
-      "Mike Test",
-      "123",
-      "Qwer"
+      {
+        "name": "National Disaster Management Unit",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "County Fire Department",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "County Health Promoters",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "Kenya Scouts Association",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "YMCA",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "Youth Care Initiative",
+        "logo": "/assets/images/home/response-team.svg"
+      },
+      {
+        "name": "KensWed",
+        "logo": "/assets/images/home/response-team.svg"
+      }
     ],
     "onTheGroundMoments": [
       {
@@ -194,8 +233,8 @@
       },
       {
         "name": "Waheho Gachanja",
-        "role": "Lead Trainor",
-        "image": "/assets/images/home/volunteer-outreach.svg",
+        "role": "Lead Trainer",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-bce51221-0412-4e30-96dd-8b8dfa1dfeca.png",
         "position": "2",
         "bio": "Waheho Gachanja serves as the Lead Trainor at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Waheho plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
         "focusArea": "Training & Drills",
@@ -375,38 +414,11 @@
     "phone": "0742435314",
     "phoneInternational": "+254 742 435 314",
     "whatsappLink": "https://wa.me/254742435314",
-    "osns": [
-      {
-        "name": "Facebook",
-        "handle": "Scouts Emergency Response",
-        "url": "https://www.facebook.com/profile.php?id=61556534734628"
-      },
-      {
-        "name": "Instagram",
-        "handle": "@scoutsemergencyresponse",
-        "url": "https://www.instagram.com/scoutsemergencyresponse"
-      },
-      {
-        "name": "TikTok",
-        "handle": "@scouts.emergency",
-        "url": "https://www.tiktok.com/@scouts.emergency"
-      },
-      {
-        "name": "YouTube",
-        "handle": "#",
-        "url": "#"
-      }
-    ],
     "adminEmail": "admin@seresponse.org"
   },
   "shop": {
     "title": "Welcome to the SER Shop",
     "description": "Support SER through official merchandise and essential safety items.",
     "items": []
-  },
-  "communications": {
-    "featuredInstagramPost": "https://www.instagram.com/p/DKoekfRteyB/",
-    "featuredTiktokPost": "https://www.tiktok.com/@scouts.emergency/photo/7662099423526259989",
-    "featuredFacebookPost": "https://www.facebook.com/permalink.php?story_fbid=pfbid0sYnPqYXhYotNwsVtABWAb8yhhJK26DY5rPFgBohFz2oxBowqfQMSJZebpBeoQHNml&id=61556534734628"
   }
 }

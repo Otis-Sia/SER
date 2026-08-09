@@ -1,7 +1,7 @@
 import express from "express";
 import { pool } from "../db.js";
 import { requireAdmin } from "../middleware/auth.js";
-import { createCalendarEvent, getCalendarEvents } from "../utils/googleCalendar.js";
+import { createCalendarEvent, getCalendarEvents, updateCalendarEvent, deleteCalendarEvent } from "../utils/googleCalendar.js";
 
 const router = express.Router();
 
@@ -67,6 +67,63 @@ router.post("/", requireAdmin, async (req, res) => {
       description,
       google_event_id: googleEventId
     });
+  }
+});
+
+// Admin: update event
+router.put("/:id", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { title, event_date, location, description, google_event_id } = req.body;
+
+  if (!title || !event_date || !location) {
+    return res.status(400).json({ error: "title, event_date, and location are required" });
+  }
+
+  const targetGoogleId = google_event_id || id;
+  try {
+    await updateCalendarEvent(targetGoogleId, { title, event_date, location, description });
+  } catch (error) {
+    console.error("Failed to update event in Google Calendar", error);
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `UPDATE events 
+       SET title = $1, event_date = $2, location = $3, description = $4
+       WHERE id = $5 OR google_event_id = $5
+       RETURNING *`,
+      [title, event_date, location, description || null, id]
+    );
+    
+    if (rows.length === 0) {
+      return res.json({ id, title, event_date, location, description, google_event_id: targetGoogleId });
+    }
+    res.json(rows[0]);
+  } catch (dbError) {
+    console.error("Database query failed during event update:", dbError.message);
+    res.status(500).json({ error: "Failed to update event" });
+  }
+});
+
+// Admin: delete event
+router.delete("/:id", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await deleteCalendarEvent(id);
+  } catch (error) {
+    console.error("Failed to delete event from Google Calendar", error);
+  }
+
+  try {
+    await pool.query(
+      `DELETE FROM events WHERE id = $1 OR google_event_id = $1`,
+      [id]
+    );
+    res.json({ success: true });
+  } catch (dbError) {
+    console.error("Database query failed during event deletion:", dbError.message);
+    res.status(500).json({ error: "Failed to delete event" });
   }
 });
 

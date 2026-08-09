@@ -4,18 +4,36 @@ import ContactForm from '../../components/ContactForm';
 import { getSiteContent, getFaqs, getContacts, getSocialMedia } from '../admin/actions';
 import JsonLd from '../../components/JsonLd';
 
-export const metadata = {
-  title: 'Contact Us | Scouts Emergency Response',
-  description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
-  openGraph: {
-    title: 'Contact Us | Scouts Emergency Response',
-    description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
-    url: '/contact',
-  },
-  alternates: {
-    canonical: '/contact',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Contact Us | Scouts Emergency Response';
+  const description = 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.';
+  const rawImage = siteContent.siteMeta?.contactHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/contact',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'Contact Scouts Emergency Response',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/contact',
+    },
+  };
+}
 
 export default async function Contact() {
   const siteContent = await getSiteContent();

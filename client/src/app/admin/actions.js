@@ -42,28 +42,22 @@ export const getSiteContent = cache(async () => {
     // If it fails, data is just an empty object
   }
 
-  // 2. Fetch communications (embeds) from Firestore DB
-  try {
-    const db = getAdminDb();
-    if (db) {
-      const docRef = db.collection("site_content").doc("main");
-      const docSnap = await docRef.get();
-      if (docSnap.exists) {
-        const dbData = docSnap.data();
-        if (dbData.communications) {
-          data.communications = dbData.communications;
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Firestore read warning (falling back to JSON communications):", error.message);
-  }
+  // Removed communications (embeds) DB fetch since they are now managed in the social_media collection.
 
   if (data._updatedAt) delete data._updatedAt;
   
   // Ensure new schema fields exist for the admin dashboard
   if (data.home && data.home.hero && data.home.hero.bgImage === undefined) {
     data.home.hero.bgImage = "/assets/images/backgrounds/scouts_hero_bg.jpg";
+  }
+
+  if (data.home && Array.isArray(data.home.partners)) {
+    data.home.partners = data.home.partners.map(partner => {
+      if (typeof partner === 'string') {
+        return { name: partner, logo: "" };
+      }
+      return partner;
+    });
   }
 
   if (data.about && Array.isArray(data.about.team)) {
@@ -159,13 +153,7 @@ export const getSiteContent = cache(async () => {
     ];
   }
 
-  if (!data.communications) {
-    data.communications = {
-      featuredInstagramPost: data.home?.featuredInstagramPost || "https://www.instagram.com/p/DFBC6L6A7q0/",
-      featuredTiktokPost: data.home?.featuredTiktokPost || "https://www.tiktok.com/@scoutsemergencyresponse/video/7462018872016227589",
-      featuredFacebookPost: data.home?.featuredFacebookPost || "https://www.facebook.com/61556534734628/posts/122115167094218042/"
-    };
-  }
+  // Communications defaults removed.
   
   if (data.contact && data.contact.adminEmail === undefined) {
     data.contact.adminEmail = "admin@seresponse.org";
@@ -182,21 +170,8 @@ export async function updateSiteContent(newData) {
 
     const oldData = await getSiteContent();
 
-    const db = getAdminDb();
-    if (db) {
-      const docRef = db.collection("site_content").doc("main");
-      await docRef.set({
-        communications: newData.communications || {},
-        _updatedAt: new Date().toISOString(),
-      }, { merge: true });
-      console.log("Successfully updated Firestore site_content/main document with communications.");
-    }
-
-    // Save everything except communications to local JSON
-    const localData = { ...newData };
-    delete localData.communications;
-
-    await fs.writeFile(contentFilePath, JSON.stringify(localData, null, 2), "utf8");
+    // Save to local JSON
+    await fs.writeFile(contentFilePath, JSON.stringify(newData, null, 2), "utf8");
     revalidatePath("/", "layout");
 
     // Delete orphaned S3 images after successful update
@@ -960,10 +935,97 @@ export const addProject = async (data) => addDocument("projects", data);
 export const updateProject = async (id, data) => updateDocument("projects", id, data);
 export const deleteProject = async (id) => deleteDocument("projects", id);
 
-export const getEvents = async () => fetchCollection("events");
-export const addEvent = async (data) => addDocument("events", data);
-export const updateEvent = async (id, data) => updateDocument("events", id, data);
-export const deleteEvent = async (id) => deleteDocument("events", id);
+export const getEvents = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const events = await res.json();
+    return events.map(e => ({
+      ...e,
+      eventDate: e.event_date ? new Date(e.event_date).toISOString().split('T')[0] : ''
+    }));
+  } catch (err) {
+    console.error("Error fetching events from API:", err);
+    return [];
+  }
+};
+
+export const addEvent = async (data) => {
+  try {
+    const payload = {
+      title: data.title,
+      event_date: data.eventDate,
+      location: data.location,
+      description: data.description
+    };
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const errRes = await res.json();
+      throw new Error(errRes.error || "Failed to create event");
+    }
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err) {
+    console.error("Error adding event:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+export const updateEvent = async (id, data) => {
+  try {
+    const payload = {
+      title: data.title,
+      event_date: data.eventDate,
+      location: data.location,
+      description: data.description,
+      google_event_id: data.google_event_id
+    };
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const errRes = await res.json();
+      throw new Error(errRes.error || "Failed to update event");
+    }
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err) {
+    console.error("Error updating event:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+export const deleteEvent = async (id) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${getAdminToken()}`
+      }
+    });
+    if (!res.ok) {
+      const errRes = await res.json();
+      throw new Error(errRes.error || "Failed to delete event");
+    }
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err) {
+    console.error("Error deleting event:", err);
+    return { success: false, message: err.message };
+  }
+};
 
 export const getGalleryItems = async () => fetchCollection("gallery");
 export const addGalleryItem = async (data) => addDocument("gallery", data);
@@ -1125,7 +1187,9 @@ export const getSocialMedia = cache(async () => {
     const db = getAdminDb();
     if (!db) return [];
     const snapshot = await db.collection("social_media").orderBy("platform", "asc").get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    // Filter out Profile Links since they are managed in SiteMeta now
+    return docs.filter(doc => doc.type !== "Profile Link");
   } catch (error) {
     console.error("Error fetching social media:", error);
     return [];

@@ -3,18 +3,36 @@ import { MapPin, Siren } from '../../components/Icons';
 import { getSiteContent } from '../admin/actions';
 import EventCard from '../../components/EventCard';
 
-export const metadata = {
-  title: 'Upcoming Training & Events | Scouts Emergency Response',
-  description: 'View upcoming emergency preparedness workshops, first aid training sessions, and community safety events hosted by Scouts Emergency Response.',
-  openGraph: {
-    title: 'Upcoming Training & Events | Scouts Emergency Response',
-    description: 'View upcoming emergency preparedness workshops, first aid training sessions, and community safety events.',
-    url: '/events',
-  },
-  alternates: {
-    canonical: '/events',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Upcoming Training & Events | Scouts Emergency Response';
+  const description = 'View upcoming emergency preparedness workshops, first aid training sessions, and community safety events hosted by Scouts Emergency Response.';
+  const rawImage = siteContent.siteMeta?.eventsHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/events',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'SER Events & Workshops',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/events',
+    },
+  };
+}
 
 async function fetchGoogleEvents() {
   try {

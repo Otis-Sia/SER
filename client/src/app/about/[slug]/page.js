@@ -44,9 +44,14 @@ export async function generateMetadata({ params }) {
       title,
       description,
       url: `/about/${slug}`,
-      images: member.image
-        ? [{ url: member.image, width: 600, height: 800, alt: member.name }]
-        : [],
+      images: [
+        {
+          url: member.image || '/assets/images/backgrounds/scouts_hero_bg.jpg',
+          width: member.image ? 600 : 1200,
+          height: member.image ? 800 : 630,
+          alt: member.name,
+        },
+      ],
     },
     alternates: {
       canonical: `/about/${slug}`,
