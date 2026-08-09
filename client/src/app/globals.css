@@ -344,11 +344,20 @@ main section.page-hero {
   padding: 3rem 2.5rem;
   border-radius: calc(var(--border-radius) + 4px);
   background-color: var(--white-color);
+  box-shadow: 0 16px 30px rgba(10, 60, 50, 0.18);
+}
+
+main section.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
   background-image: var(--hero-bg, url("/assets/images/backgrounds/scouts_hero_bg.jpg"));
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  box-shadow: 0 16px 30px rgba(10, 60, 50, 0.18);
+  filter: blur(2px);
+  -webkit-filter: blur(2px);
+  z-index: 0;
 }
 
 main section.page-hero::after {
@@ -360,9 +369,7 @@ main section.page-hero::after {
     rgba(255, 255, 255, 0.65),
     rgba(255, 255, 255, 0.40)
   );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 0;
+  z-index: 1;
 }
 
 body.dark-mode main section.page-hero::after,
@@ -372,13 +379,11 @@ body.dark-mode main section.page-hero::after,
     rgba(10, 15, 13, 0.85),
     rgba(10, 15, 13, 0.50)
   );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 main section.page-hero > * {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 main section.page-hero:hover {
