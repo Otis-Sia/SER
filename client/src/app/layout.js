@@ -4,30 +4,33 @@ import ClientLogic from "../components/ClientLogic";
 import FloatingActionButton from "../components/FloatingActionButton";
 import JsonLd from "../components/JsonLd";
 import "./globals.css";
-import { getSiteContent, getSocialMedia } from "./admin/actions";
+import { getSiteContent } from "./admin/actions";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org';
+const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org').replace(/\/$/, '');
+const organizationId = `${baseUrl}/#organization`;
+const websiteId = `${baseUrl}/#website`;
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
   const title = siteContent.siteMeta?.title || 'Scouts Emergency Response (SER)';
-  const description = siteContent.siteMeta?.description || 'Empowering youth with emergency preparedness, first aid training, and community disaster response skills.';
+  const description = siteContent.siteMeta?.description || 'Scouts Emergency Response (SER) is a Kenyan youth-centered initiative equipping communities with first aid, emergency preparedness, and disaster response skills.';
 
   return {
-    metadataBase: new URL(baseUrl),
+    metadataBase: new URL(`${baseUrl}/`),
     title: {
       default: title,
       template: `%s | Scouts Emergency Response`,
     },
-    description: description,
+    description,
     keywords: [
       'Scouts Emergency Response',
+      'Scouts Emergency Response Kenya',
       'SER Kenya',
-      'Emergency Preparedness',
-      'First Aid Training',
-      'Disaster Response',
-      'Youth Empowerment',
-      'Community Safety',
+      'first aid training Kenya',
+      'emergency preparedness Kenya',
+      'disaster response Kenya',
+      'youth emergency response',
+      'community safety Kenya',
       'Scouts Kenya',
     ],
     authors: [{ name: 'Scouts Emergency Response' }],
@@ -39,14 +42,14 @@ export async function generateMetadata() {
       telephone: false,
     },
     alternates: {
-      canonical: './',
+      canonical: baseUrl,
     },
     openGraph: {
-      title: title,
-      description: description,
+      title,
+      description,
       url: baseUrl,
-      siteName: title,
-      locale: 'en_US',
+      siteName: 'Scouts Emergency Response',
+      locale: 'en_KE',
       type: 'website',
       images: [
         {
@@ -59,8 +62,8 @@ export async function generateMetadata() {
     },
     twitter: {
       card: 'summary_large_image',
-      title: title,
-      description: description,
+      title,
+      description,
       images: ['/og-image.jpg'],
     },
     robots: {
@@ -84,20 +87,42 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   const siteContent = await getSiteContent();
   const osns = siteContent.siteMeta?.socialProfiles || [];
+  const description = siteContent.siteMeta?.description || 'Scouts Emergency Response (SER) is a Kenyan youth-centered initiative equipping communities with first aid, emergency preparedness, and disaster response skills.';
 
   const organizationSchema = {
     '@context': 'https://schema.org',
-    '@type': 'EmergencyService',
+    '@type': 'Organization',
+    '@id': organizationId,
     name: 'Scouts Emergency Response',
     alternateName: 'SER',
     url: baseUrl,
     logo: `${baseUrl}/icon.png`,
-    description: siteContent.siteMeta?.description || 'Empowering youth with emergency preparedness, first aid training, and community disaster response skills.',
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'KE',
+    image: `${baseUrl}/og-image.jpg`,
+    description,
+    areaServed: {
+      '@type': 'Country',
+      name: 'Kenya',
     },
+    knowsAbout: [
+      'First aid',
+      'Emergency preparedness',
+      'Disaster response',
+      'Community safety',
+      'Youth empowerment',
+      'Scout emergency response',
+    ],
     sameAs: osns.map((social) => social.url).filter(Boolean),
+  };
+
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': websiteId,
+    name: 'Scouts Emergency Response',
+    alternateName: 'SER',
+    url: `${baseUrl}/`,
+    publisher: { '@id': organizationId },
+    inLanguage: 'en-KE',
   };
 
   return (
@@ -105,6 +130,7 @@ export default async function RootLayout({ children }) {
       <head>
         <meta name="google-site-verification" content="G9LZrVdjCKWCmmaGjO-XgPSIXGyNXh-G72vRLJGrfm4" />
         <JsonLd data={organizationSchema} />
+        <JsonLd data={websiteSchema} />
         <script
           dangerouslySetInnerHTML={{
             __html: `
