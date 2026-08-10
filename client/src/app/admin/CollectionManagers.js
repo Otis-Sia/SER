@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./admin.module.css";
 import { FiRefreshCw, FiEdit, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
+import RichTextEditor from "../../components/RichTextEditor";
 import {
   getProjects, addProject, updateProject, deleteProject,
   getEvents, addEvent, updateEvent, deleteEvent,
@@ -156,7 +157,7 @@ const renderProjectFields = (data, onChange, readOnly = false) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <input className={styles.input} name="title" value={data.title || ''} onChange={onChange} placeholder="Title" />
       <input className={styles.input} name="focus" value={data.focus || ''} onChange={onChange} placeholder="Focus" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
       <input className={styles.input} name="link" value={data.link || ''} onChange={onChange} placeholder="Link URL" />
       <input className={styles.input} name="linkText" value={data.linkText || ''} onChange={onChange} placeholder="Link Text" />
     </div>
@@ -179,7 +180,7 @@ const renderEventFields = (data, onChange, readOnly = false) => {
       <input className={styles.input} name="title" value={data.title || ''} onChange={onChange} placeholder="Event Title" />
       <input type="date" className={styles.input} name="eventDate" value={data.eventDate || ''} onChange={onChange} />
       <input className={styles.input} name="location" value={data.location || ''} onChange={onChange} placeholder="Location" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
     </div>
   );
 };
@@ -215,7 +216,7 @@ const renderFaqFields = (data, onChange, readOnly = false) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <input className={styles.input} name="question" value={data.question || ''} onChange={onChange} placeholder="Question" />
-      <textarea className={styles.textarea} name="answer" value={data.answer || ''} onChange={onChange} placeholder="Answer" />
+      <RichTextEditor name="answer" value={data.answer || ''} onChange={(val) => onChange({ target: { name: 'answer', value: val } })} placeholder="Answer" />
       <input type="number" className={styles.input} name="order" value={data.order || 0} onChange={onChange} placeholder="Sort Order" />
     </div>
   );
@@ -238,7 +239,7 @@ const renderProductFields = (data, onChange, readOnly = false) => {
       <input className={styles.input} name="name" value={data.name || ''} onChange={onChange} placeholder="Product Name" />
       <input type="number" className={styles.input} name="priceKes" value={data.priceKes || 0} onChange={onChange} placeholder="Price (KES)" />
       <input className={styles.input} name="imageUrl" value={data.imageUrl || ''} onChange={onChange} placeholder="Image URL" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
       <label>
         <input type="checkbox" name="featured" checked={data.featured || false} onChange={onChange} />
         Featured Product

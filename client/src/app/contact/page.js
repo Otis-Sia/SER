@@ -114,7 +114,7 @@ export default async function Contact() {
         {faqs.map((item, index) => (
           <article className="faq-item" key={item.id || index}>
             <h3>{item.question}</h3>
-            <p>{item.answer}</p>
+            <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: item.answer }} />
           </article>
         ))}
       </section>

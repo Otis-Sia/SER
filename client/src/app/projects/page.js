@@ -59,7 +59,7 @@ export default async function Projects() {
               <div className="product-card-info">
                 <h3>{project.title}</h3>
                 <p><strong>Focus:</strong> {project.focus}</p>
-                <p>{project.description}</p>
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: project.description }} />
                 {project.link && (
                   <Link href={project.link} className="btn">{project.linkText || 'Learn More'}</Link>
                 )}

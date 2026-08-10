@@ -4,13 +4,13 @@
     "description": "Compassion in Action - Scouts Emergency Response",
     "contactEmail": "info@scoutsemergencyresponse.org",
     "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-03148c21-6662-417f-97c9-f65b5ac72350.png",
-    "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "aboutHeroBgImage": "https://placehold.net/2-800x600.png",
     "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-20ac0a3a-ff9b-4bf3-a60a-6518e049310e.jpg",
-    "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "contactHeroBgImage": "https://placehold.net/2-800x600.png",
+    "eventsHeroBgImage": "https://placehold.net/2-800x600.png",
+    "loginHeroBgImage": "https://placehold.net/2-800x600.png",
     "projectsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
-    "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
+    "shopHeroBgImage": "https://placehold.net/2-800x600.png",
     "socialProfiles": [
       {
         "name": "Facebook",
@@ -101,7 +101,7 @@
       },
       {
         "name": "County Health Promoters",
-        "logo": "/assets/images/home/response-team.svg"
+        "logo": "https://placehold.net/2-800x600.png"
       },
       {
         "name": "Kenya Scouts Association",
@@ -113,7 +113,7 @@
       },
       {
         "name": "Youth Care Initiative",
-        "logo": "/assets/images/home/response-team.svg"
+        "logo": "https://placehold.net/2-800x600.png"
       },
       {
         "name": "KensWed",

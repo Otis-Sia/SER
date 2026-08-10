@@ -59,7 +59,7 @@ export default async function Shop() {
               <div className="product-card-info">
                 <h3>{product.name}</h3>
                 <p><strong>Price:</strong> KES {product.priceKes}</p>
-                <p>{product.description}</p>
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: product.description }} />
               </div>
             </div>
           ))}
