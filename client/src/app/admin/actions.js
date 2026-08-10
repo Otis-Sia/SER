@@ -1041,33 +1041,23 @@ export const deleteProduct = async (id) => deleteDocument("products", id);
 
 export async function getDashboardStats() {
   try {
-    const db = getAdminDb();
-    if (!db) return {};
+    const [blogs, admin_users, events, projects, member_registrations, products] = await Promise.all([
+      getAdminPosts(),
+      getAdminUsers(),
+      getEvents(),
+      getProjects(),
+      getMemberRegistrations(),
+      getProducts()
+    ]);
 
-    const collectionsMap = {
-      blogs: "posts",
-      admin_users: "admin_users",
-      events: "events",
-      projects: "projects",
-      member_registrations: "members",
-      products: "products"
+    return {
+      blogs: blogs ? blogs.length : 0,
+      admin_users: admin_users ? admin_users.length : 0,
+      events: events ? events.length : 0,
+      projects: projects ? projects.length : 0,
+      member_registrations: member_registrations ? member_registrations.length : 0,
+      products: products ? products.length : 0
     };
-
-    const stats = {};
-
-    await Promise.all(
-      Object.entries(collectionsMap).map(async ([stateKey, collectionName]) => {
-        try {
-          const snapshot = await db.collection(collectionName).select().get();
-          stats[stateKey] = snapshot.size;
-        } catch (e) {
-          // If the collection doesn't exist or error occurs, default to 0
-          stats[stateKey] = 0;
-        }
-      })
-    );
-
-    return stats;
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
     return {};

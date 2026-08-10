@@ -27,7 +27,7 @@ const RichTextEditor = ({ value, onChange, placeholder = "Enter text here...", c
   const formats = [
     'header',
     'bold', 'italic', 'underline',
-    'list', 'bullet',
+    'list',
     'link'
   ];
 

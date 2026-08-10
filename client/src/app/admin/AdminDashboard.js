@@ -1517,13 +1517,18 @@ export default function AdminDashboard({ initialData }) {
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.5rem',
+              overflow: 'hidden'
             }}>
-              <span style={{ fontSize: '1rem', display: 'flex' }}><FiUser size={16} /></span>
-              <span>{adminUsername}</span>
-              <span style={{ marginLeft: 'auto', opacity: 0.75, fontWeight: 400 }}>
-                {userRole || 'Unknown Role'}
-              </span>
+              <span style={{ fontSize: '1rem', display: 'flex', flexShrink: 0 }}><FiUser size={16} /></span>
+              <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={adminUsername}>
+                  {adminUsername}
+                </span>
+                <span style={{ opacity: 0.75, fontWeight: 400, fontSize: '0.7rem' }}>
+                  {userRole || 'Unknown Role'}
+                </span>
+              </div>
             </div>
             <button
               className={styles.navButton}
