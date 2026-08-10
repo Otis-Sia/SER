@@ -1576,7 +1576,7 @@ export default function AdminDashboard({ initialData }) {
             : activeTab === "settings" ? "Personal Account Settings"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && activeTab !== "manual" && activeTab !== "settings" && (
+          {!nonJsonTabs.includes(activeTab) && activeTab !== "overview" && activeTab !== "manual" && activeTab !== "settings" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}
