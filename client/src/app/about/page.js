@@ -2,19 +2,38 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { getSiteContent } from '../admin/actions';
+import { ArrowRight, UserPlus } from 'lucide-react';
 
-export const metadata = {
-  title: 'About Us | Scouts Emergency Response',
-  description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment across Kenya.',
-  openGraph: {
-    title: 'About Us | Scouts Emergency Response',
-    description: 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment.',
-    url: '/about',
-  },
-  alternates: {
-    canonical: '/about',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'About Us | Scouts Emergency Response';
+  const description = 'Learn about Scouts Emergency Response (SER), our vision, mission, leadership, and our commitment to emergency preparedness and youth empowerment across Kenya.';
+  const rawImage = siteContent.siteMeta?.aboutHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/about',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'About Scouts Emergency Response',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/about',
+    },
+  };
+}
 
 export default async function About() {
   const siteContent = await getSiteContent();
@@ -81,32 +100,62 @@ export default async function About() {
         </ul>
       </section>
 
-      <section className="about-team">
-        <h2>Our Team</h2>
-        <p>
-          SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts. Each team member brings a mix of scouting experience, emergency readiness training, and a shared commitment to serve during crises.
-        </p>
-        <h3>Meet the Team</h3>
-        <div className="team-grid">
-          {siteContent.about.team.map((member, idx) => (
-            <article className="team-card" key={idx}>
-              {member.image ? (
-                <img src={member.image} alt={member.name} />
-              ) : (
-                <div style={{ height: '120px', width: '120px', borderRadius: '50%', backgroundColor: 'var(--surface-color)', border: '2px dashed var(--primary-color)', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '2rem', color: 'var(--primary-color)' }}>
-                    {member.name ? member.name.charAt(0) : '?'}
-                  </span>
-                </div>
-              )}
-              <h4>{member.role}</h4>
-              {member.name !== member.role && <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8 }}>{member.name}</p>}
-            </article>
-          ))}
+      <section className="py-24 px-4 md:px-10 bg-surface dark:bg-background border-t border-outline-variant/20">
+        <div className="max-w-container-max mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl">
+              <span className="text-secondary font-label-bold uppercase tracking-widest text-sm mb-2 block">Our Leaders</span>
+              <h2 className="text-primary dark:text-inverse-primary font-display-md md:font-display-lg mb-4">Meet the Team</h2>
+              <p className="text-on-surface-variant text-body-lg">
+                SER is powered by youth leaders, volunteer trainers, and community partners who coordinate local response efforts.
+              </p>
+            </div>
+            <Link href="/community#join" className="text-secondary font-bold flex items-center gap-1 hover:text-secondary-fixed transition-colors whitespace-nowrap mb-2">
+              Join the Team <ArrowRight size={20} />
+            </Link>
+          </div>
+
+          <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+            {siteContent.about.team
+              .slice()
+              .sort((a, b) => {
+                const posA = a.position !== undefined && a.position !== "" ? Number(a.position) : 999;
+                const posB = b.position !== undefined && b.position !== "" ? Number(b.position) : 999;
+                return posA - posB;
+              })
+              .map((member, idx) => {
+              const isFilled = member.name && member.name.trim() !== '' && member.name !== member.role;
+              
+              if (isFilled) {
+                const memberSlug = member.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                return (
+                  <Link key={idx} href={`/about/${memberSlug}`} className="flex flex-col w-full mx-auto lg:mx-0" style={{ maxWidth: '280px', textDecoration: 'none', color: 'inherit' }}>
+                    <div className="w-full bg-surface-container mb-4 shadow-sm" style={{ borderRadius: '6px', position: 'relative', overflow: 'hidden', paddingBottom: '133.33%' }}>
+                      {member.image ? (
+                        <img src={member.image} alt={member.name} className="grayscale hover:grayscale-0 transition-all duration-500" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div className="bg-surface-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span className="text-4xl text-primary opacity-20 font-bold">{member.name.charAt(0)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="text-xl font-bold text-on-background m-0 tracking-tight">{member.name}</h4>
+                    <p className="text-sm font-label-bold text-secondary m-0 mt-1">{member.role}</p>
+                  </Link>
+                );
+              } else {
+                return (
+                  <Link href="/community#join" key={idx} className="w-full mx-auto lg:mx-0 border-2 border-dashed border-outline-variant/30 text-on-surface-variant hover:border-secondary hover:text-secondary transition-colors group shadow-sm bg-surface hover:bg-secondary/5" style={{ borderRadius: '6px', maxWidth: '280px', position: 'relative', display: 'block', paddingBottom: '133.33%' }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '1rem' }}>
+                        <UserPlus size={48} className="mb-3 opacity-40 group-hover:opacity-100 transition-opacity text-secondary" />
+                        <span className="text-sm font-medium">{member.role || 'Open Role'}</span>
+                      </div>
+                  </Link>
+                );
+              }
+            })}
+          </div>
         </div>
-        <p>
-          Your role could be next, and we’ll help shape the title together based on your strengths and the needs of the mission.
-        </p>
       </section>
 
       <section className="about-socials text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem 0' }}>

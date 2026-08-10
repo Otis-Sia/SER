@@ -1,4 +1,5 @@
 import express from "express";
+import "express-async-errors";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
@@ -15,6 +16,7 @@ import uploadRouter from "./routes/upload.js";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -37,6 +39,14 @@ app.use("/api/posts", postsRouter);
 app.use("/api/gallery", galleryRouter);
 app.use("/api/members", membersRouter);
 app.use("/api/upload", uploadRouter);
+
+// Global error handler for async errors
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 const port = Number(process.env.PORT || 0);
 const host = process.env.HOST || undefined;

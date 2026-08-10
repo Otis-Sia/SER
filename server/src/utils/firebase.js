@@ -1,6 +1,7 @@
+process.env.GRPC_DNS_RESOLVER = 'native';
+
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -37,5 +38,3 @@ if (serviceAccount && !getApps().length) {
 }
 
 export const db = app ? getFirestore(app) : null;
-export const auth = app ? getAuth(app) : null;
-export default app;

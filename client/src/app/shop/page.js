@@ -1,18 +1,36 @@
 import Link from 'next/link';
 import { getProducts, getSiteContent } from '../admin/actions';
 
-export const metadata = {
-  title: 'Official Shop & Gear | Scouts Emergency Response',
-  description: 'Support Scouts Emergency Response (SER) by purchasing official merchandise, emergency kits, badges, and safety gear.',
-  openGraph: {
-    title: 'Official Shop & Gear | Scouts Emergency Response',
-    description: 'Support Scouts Emergency Response (SER) by purchasing official merchandise, emergency kits, badges, and safety gear.',
-    url: '/shop',
-  },
-  alternates: {
-    canonical: '/shop',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Official Shop & Gear | Scouts Emergency Response';
+  const description = 'Support Scouts Emergency Response (SER) by purchasing official merchandise, emergency kits, badges, and safety gear.';
+  const rawImage = siteContent.siteMeta?.shopHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/shop',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'SER Official Shop & Gear',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/shop',
+    },
+  };
+}
 
 export default async function Shop() {
   const products = await getProducts();
@@ -41,7 +59,7 @@ export default async function Shop() {
               <div className="product-card-info">
                 <h3>{product.name}</h3>
                 <p><strong>Price:</strong> KES {product.priceKes}</p>
-                <p>{product.description}</p>
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: product.description }} />
               </div>
             </div>
           ))}

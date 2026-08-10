@@ -3,14 +3,36 @@
     "title": "Scouts Emergency Response",
     "description": "Compassion in Action - Scouts Emergency Response",
     "contactEmail": "info@scoutsemergencyresponse.org",
-    "homeHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "aboutHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "communityHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "contactHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "eventsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "loginHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "projectsHeroBgImage": "/assets/images/home/volunteer-outreach.svg",
-    "shopHeroBgImage": "/assets/images/home/volunteer-outreach.svg"
+    "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-03148c21-6662-417f-97c9-f65b5ac72350.png",
+    "aboutHeroBgImage": "https://placehold.net/2-800x600.png",
+    "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-20ac0a3a-ff9b-4bf3-a60a-6518e049310e.jpg",
+    "contactHeroBgImage": "https://placehold.net/2-800x600.png",
+    "eventsHeroBgImage": "https://placehold.net/2-800x600.png",
+    "loginHeroBgImage": "https://placehold.net/2-800x600.png",
+    "projectsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
+    "shopHeroBgImage": "https://placehold.net/2-800x600.png",
+    "socialProfiles": [
+      {
+        "name": "Facebook",
+        "handle": "Scouts Emergency Response",
+        "url": "https://www.facebook.com/profile.php?id=61556534734628"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@scoutsemergencyresponse",
+        "url": "https://www.instagram.com/scoutsemergencyresponse"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@scouts.emergency",
+        "url": "https://www.tiktok.com/@scouts.emergency"
+      },
+      {
+        "name": "YouTube",
+        "handle": "#",
+        "url": "#"
+      }
+    ]
   },
   "navigation": [
     {
@@ -48,7 +70,7 @@
       "subheading": "Compassion in Action",
       "ctaText": "Learn More",
       "ctaLink": "/about",
-      "bgImage": "/assets/images/home/volunteer-outreach.svg"
+      "bgImage": "https://placehold.net/800x600.png"
     },
     "features": [
       {
@@ -69,38 +91,58 @@
       }
     ],
     "partners": [
-      "St John Ambulance",
-      "National Disaster Management Unit",
-      "County Fire Department",
-      "County Health Promoters",
-      "Kenya Scouts Association",
-      "Mike Test",
-      "123",
-      "Qwer"
+      {
+        "name": "NDMU",
+        "logo": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-1a409c6c-ac60-4084-aa89-23de4d85af40.png"
+      },
+      {
+        "name": "Nairobi County Fire Department",
+        "logo": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-c5449c43-f259-44be-b859-4eaba31ca818.png"
+      },
+      {
+        "name": "County Health Promoters",
+        "logo": "https://placehold.net/2-800x600.png"
+      },
+      {
+        "name": "Kenya Scouts Association",
+        "logo": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-1821de62-5965-4ca7-bb16-f214c88e5e11.webp"
+      },
+      {
+        "name": "YMCA",
+        "logo": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-a0ba63c8-94ce-4e1b-90b5-dcde80c1d230.png"
+      },
+      {
+        "name": "Youth Care Initiative",
+        "logo": "https://placehold.net/2-800x600.png"
+      },
+      {
+        "name": "KensWed",
+        "logo": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-a0b8c81f-b352-46dd-a0b5-d80e3a477843.png"
+      }
     ],
     "onTheGroundMoments": [
       {
-        "image": "/assets/images/home/response-team.svg",
+        "image": "https://placehold.net/5-800x600.png",
         "title": "Response Teams",
         "description": "Coordinated scouts ready to mobilize in minutes."
       },
       {
-        "image": "/assets/images/home/training-day.svg",
+        "image": "https://placehold.net/5-800x600.png",
         "title": "Training Days",
         "description": "Hands-on drills that keep communities prepared."
       },
       {
-        "image": "/assets/images/home/community-support.svg",
+        "image": "https://placehold.net/5-800x600.png",
         "title": "Community Support",
         "description": "Outreach efforts that bring safety to every block."
       },
       {
-        "image": "/assets/images/home/rescue-gear.svg",
+        "image": "https://placehold.net/5-800x600.png",
         "title": "Rescue Gear",
         "description": "Essential kits and tools packed for quick deployment."
       },
       {
-        "image": "/assets/images/home/volunteer-outreach.svg",
+        "image": "https://placehold.net/5-800x600.png",
         "title": "Volunteer Outreach",
         "description": "Growing our network of compassionate responders."
       }
@@ -174,42 +216,74 @@
       {
         "name": "Jemimah Mwaura",
         "role": "Team Lead",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "image": "https://placehold.net/avatar.png",
+        "position": "1",
+        "bio": "Jemimah Mwaura serves as the Team Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Jemimah plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Emergency Preparedness",
+        "region": "Kenya"
       },
       {
-        "name": "Lead Trainer",
+        "name": "Eric Njoroge",
+        "role": "National Volunteer Coordinator",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-b47c3467-8240-4af1-bf27-cb7a7c57ea72.jpeg",
+        "position": "5",
+        "bio": "Eric Njoroge serves as the National Volunteer Coordinator at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Eric plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Volunteer Coordination",
+        "region": "Kenya"
+      },
+      {
+        "name": "Waheho Gachanja",
         "role": "Lead Trainer",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-bce51221-0412-4e30-96dd-8b8dfa1dfeca.png",
+        "position": "2",
+        "bio": "Waheho Gachanja serves as the Lead Trainor at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Waheho plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Training & Drills",
+        "region": "Kenya"
       },
       {
-        "name": "Programs Lead",
-        "role": "Programs Lead",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Raymond Simiyu",
+        "role": "Program's Lead",
+        "image": "https://placehold.net/avatar.png",
+        "position": "3",
+        "bio": "Raymond Simiyu serves as the Program's Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Raymond plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Program Management",
+        "region": "Kenya"
       },
       {
-        "name": "Volunteer Coordinator",
-        "role": "Volunteer Coordinator",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "David Nduhiu",
+        "role": "Media and Communications",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-5cf1250b-a304-4dd7-b40e-4c1c0b8b967f.jpg",
+        "position": "8",
+        "bio": "David Nduhiu serves as the Media and Communications Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, David plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Communications",
+        "region": "Kenya"
       },
       {
-        "name": "Finance Officer",
-        "role": "Finance Officer",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Alicia Kinyua",
+        "role": "Operations Coordinator",
+        "image": "https://placehold.net/avatar.png",
+        "position": "6",
+        "bio": "Alicia Kinyua serves as the Operations Coordinator at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Alicia plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Operations",
+        "region": "Kenya"
       },
       {
-        "name": "Secretary",
-        "role": "Secretary",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Wesley Waweru",
+        "role": "Finance Officer and Administrative",
+        "image": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-bbd502c1-03d9-4f78-a2c9-fb9f6e252c8f.png",
+        "position": "4",
+        "bio": "Wesley Waweru serves as the Finance Officer and Administrative Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Wesley plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Finance & Admin",
+        "region": "Kenya"
       },
       {
-        "name": "Media & Communication",
-        "role": "Media & Communication",
-        "image": "/assets/images/home/volunteer-outreach.svg"
-      },
-      {
-        "name": "Elvis Sia",
-        "role": "Tech Lead",
-        "image": "/assets/images/home/volunteer-outreach.svg"
+        "name": "Elvis Sia ",
+        "role": "Technology and Digital Systems",
+        "image": "https://placehold.net/avatar.png",
+        "position": "7",
+        "bio": "Elvis Sia serves as the Technology and Digital Systems Lead at Scouts Emergency Response (SER). As a dedicated member of the SER leadership team, Elvis plays a vital role in empowering youth with emergency preparedness skills and building community resilience across Kenya.",
+        "focusArea": "Technology",
+        "region": "Kenya"
       }
     ]
   },
@@ -299,7 +373,13 @@
         "alt": "dd",
         "description": "dwdcsa"
       }
-    ]
+    ],
+    "socialEmbeds": {
+      "facebook": "https://facebook.com/example",
+      "instagram": "https://instagram.com/example",
+      "tiktok": "https://tiktok.com/@example",
+      "youtube": "https://youtube.com/c/example"
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions (FAQs)",
@@ -326,6 +406,15 @@
         "a": "1234"
       }
     ]
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.",
+    "email": "info@scoutsemergencyresponse.org",
+    "phone": "0742435314",
+    "phoneInternational": "+254 742 435 314",
+    "whatsappLink": "https://wa.me/254742435314",
+    "adminEmail": "admin@seresponse.org"
   },
   "shop": {
     "title": "Welcome to the SER Shop",

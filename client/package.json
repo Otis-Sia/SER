@@ -2,15 +2,18 @@
   "name": "ser-client",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1093.0",
-    "@formspree/react": "^3.0.0",
     "country-state-city": "^3.2.1",
     "dotenv": "^17.4.2",
     "firebase": "^12.16.0",
@@ -18,15 +21,13 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.21.0",
     "next": "^16.2.12",
-    "puppeteer": "^25.1.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-icons": "^5.7.0",
-    "react-markdown": "^10.1.0",
-    "react-quill-new": "^3.7.0",
-    "remark-gfm": "^4.0.1"
+    "react-quill-new": "^3.7.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^12.0.4",

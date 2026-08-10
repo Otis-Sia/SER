@@ -2,18 +2,36 @@ import Link from 'next/link';
 import { ShieldAlert, FireExtinguisher, HeartPulse, Leaf, Users } from 'lucide-react';
 import { getSiteContent, getProjects, getGalleryItems } from '../admin/actions';
 
-export const metadata = {
-  title: 'Our Projects | Scouts Emergency Response',
-  description: 'Explore community emergency initiatives, first aid training campaigns, and youth safety programs led by Scouts Emergency Response.',
-  openGraph: {
-    title: 'Our Projects | Scouts Emergency Response',
-    description: 'Explore community emergency initiatives, first aid training campaigns, and youth safety programs led by Scouts Emergency Response.',
-    url: '/projects',
-  },
-  alternates: {
-    canonical: '/projects',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Our Projects | Scouts Emergency Response';
+  const description = 'Explore community emergency initiatives, first aid training campaigns, and youth safety programs led by Scouts Emergency Response.';
+  const rawImage = siteContent.siteMeta?.projectsHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/projects',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'Scouts Emergency Response Projects',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/projects',
+    },
+  };
+}
 
 export default async function Projects() {
   const siteContent = await getSiteContent();
@@ -41,7 +59,7 @@ export default async function Projects() {
               <div className="product-card-info">
                 <h3>{project.title}</h3>
                 <p><strong>Focus:</strong> {project.focus}</p>
-                <p>{project.description}</p>
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: project.description }} />
                 {project.link && (
                   <Link href={project.link} className="btn">{project.linkText || 'Learn More'}</Link>
                 )}

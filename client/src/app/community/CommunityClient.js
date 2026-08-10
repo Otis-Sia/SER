@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiCalendar, FiArrowRight } from "react-icons/fi";
 import blogStyles from "../blog/blog.module.css";
@@ -8,6 +8,25 @@ import JoinForm from './JoinForm';
 
 export default function CommunityClient({ posts }) {
   const [activeTab, setActiveTab] = useState('overview');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const hash = window.location.hash;
+
+      if (tabParam === 'join' || params.get('register') === 'true' || hash === '#join') {
+        setActiveTab('join');
+        setTimeout(() => {
+          document.getElementById('join')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else if (tabParam === 'blog' || tabParam === 'updates' || hash === '#blog' || hash === '#updates') {
+        setActiveTab('blog');
+      } else if (tabParam === 'overview' || hash === '#overview') {
+        setActiveTab('overview');
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -137,7 +156,7 @@ export default function CommunityClient({ posts }) {
               <div className="join-step">
                 <span className="join-step-number">3</span>
                 <h3>Welcome</h3>
-                <p>You&apos;ll be welcomed into SER and connected with your crew.</p>
+                <p>You&apos;ll be welcomed into SER as an active member of the organization.</p>
               </div>
             </div>
           </section>

@@ -128,3 +128,57 @@ export const createCalendarEvent = async (eventDetails) => {
     return null;
   }
 };
+
+export const updateCalendarEvent = async (eventId, eventDetails) => {
+  if (!calendar) return null;
+  try {
+    const authClient = await calendar.context._options.auth.getClient();
+    const cal = google.calendar({ version: "v3", auth: authClient });
+
+    const startTime = new Date(eventDetails.event_date);
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+
+    const event = {
+      summary: eventDetails.title,
+      location: eventDetails.location,
+      description: eventDetails.description,
+      start: {
+        dateTime: startTime.toISOString(),
+        timeZone: TIMEZONE,
+      },
+      end: {
+        dateTime: endTime.toISOString(),
+        timeZone: TIMEZONE,
+      },
+    };
+
+    const res = await cal.events.update({
+      calendarId,
+      eventId,
+      resource: event,
+    });
+
+    return res.data;
+  } catch (err) {
+    console.error("Error updating Google Calendar event:", err.message);
+    return null;
+  }
+};
+
+export const deleteCalendarEvent = async (eventId) => {
+  if (!calendar) return false;
+  try {
+    const authClient = await calendar.context._options.auth.getClient();
+    const cal = google.calendar({ version: "v3", auth: authClient });
+
+    await cal.events.delete({
+      calendarId,
+      eventId,
+    });
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting Google Calendar event:", err.message);
+    return false;
+  }
+};

@@ -697,12 +697,26 @@ function CommunicationManual() {
       <Section title="Editing Site Content" defaultOpen={false}>
         <p>Your available tabs depend on the site content structure, but typically include:</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li><strong>Home</strong> — Hero section text, feature descriptions, social media embed URLs, partner names.</li>
+          <li><strong>Home</strong> — Hero section text, feature descriptions, partner names.</li>
+          <li><strong>Communications</strong> — Social media embed URLs (Instagram, TikTok, Facebook).</li>
           <li><strong>Contact</strong> — Email, phone numbers, WhatsApp link.</li>
           <li><strong>Social / Socials</strong> — Social media profile links and handles.</li>
           <li><strong>Footer</strong> — Footer content and quick links.</li>
         </ul>
         <Callout type="warning">After editing, always click <strong>"Save Changes"</strong> (the green floating button). Changes go live immediately.</Callout>
+      </Section>
+
+      <Section title="Adding Social Media Embeds" defaultOpen={false}>
+        <p>You can embed social media posts directly onto the public site via the <strong>Communications</strong> tab.</p>
+        <StepList steps={[
+          'Navigate to the "Communications" tab in the admin panel.',
+          'Find the relevant field (e.g., TikTok Embed, Instagram Embed).',
+          'Go to the social media platform (TikTok, Instagram, etc.), find the post you want to feature, and look for the "Embed" or "Share" option.',
+          'Copy the provided Embed Code (it usually starts with <blockquote...> or <iframe...).',
+          'Paste the entire Embed Code into the corresponding field in the Communications tab.',
+          'Click the green "Save Changes" button.',
+        ]} />
+        <Callout type="info">Ensure you paste the full HTML embed code provided by the platform, not just the URL of the post.</Callout>
       </Section>
 
       <Section title="Account Settings" defaultOpen={false}>

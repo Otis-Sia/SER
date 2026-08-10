@@ -979,6 +979,14 @@ export default function AdminDashboard({ initialData }) {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({});
+
+  const toggleSection = (sectionPath) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionPath]: !prev[sectionPath]
+    }));
+  };
 
   useEffect(() => {
     try {
@@ -1072,6 +1080,25 @@ export default function AdminDashboard({ initialData }) {
   useEffect(() => {
     if (isBlogOnlyUser) {
       setActiveTab("blogs");
+    } else if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const hash = window.location.hash;
+      const validTabs = ["overview", "registrations", "blogs", "users", "manual", "settings"];
+      
+      let targetTab = null;
+      if (tabParam && validTabs.includes(tabParam)) {
+        targetTab = tabParam;
+      } else if (hash) {
+        const hashTab = hash.substring(1);
+        if (validTabs.includes(hashTab)) {
+          targetTab = hashTab;
+        }
+      }
+      
+      if (targetTab) {
+        setActiveTab(targetTab);
+      }
     }
   }, [isBlogOnlyUser]);
 
@@ -1159,59 +1186,7 @@ export default function AdminDashboard({ initialData }) {
   };
 
   const renderField = (key, value, path) => {
-    if (key === 'featuredInstagramPost') {
-      return (
-        <div className={styles.formGroup} key={path.join(".")}>
-          <label className={styles.label}>Featured Instagram Post URL</label>
-          <input
-            type="text"
-            className={styles.input}
-            value={value}
-            onChange={(e) => handleChange(path, e.target.value)}
-            placeholder="https://www.instagram.com/p/..."
-          />
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-            Paste the base link of the Instagram post you want to feature on the homepage.
-          </p>
-        </div>
-      );
-    }
 
-    if (key === 'featuredTiktokPost') {
-      return (
-        <div className={styles.formGroup} key={path.join(".")}>
-          <label className={styles.label}>Featured TikTok Post URL</label>
-          <input
-            type="text"
-            className={styles.input}
-            value={value}
-            onChange={(e) => handleChange(path, e.target.value)}
-            placeholder="https://www.tiktok.com/@..."
-          />
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-            Paste the link to the TikTok video or photo you want to feature on the homepage.
-          </p>
-        </div>
-      );
-    }
-
-    if (key === 'featuredFacebookPost') {
-      return (
-        <div className={styles.formGroup} key={path.join(".")}>
-          <label className={styles.label}>Featured Facebook Post URL</label>
-          <input
-            type="text"
-            className={styles.input}
-            value={value}
-            onChange={(e) => handleChange(path, e.target.value)}
-            placeholder="https://www.facebook.com/permalink.php?..."
-          />
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-            Paste the raw Facebook post link you want to feature on the homepage.
-          </p>
-        </div>
-      );
-    }
 
     if (typeof value === "string") {
       const lowerKey = key.toLowerCase();
@@ -1279,107 +1254,144 @@ export default function AdminDashboard({ initialData }) {
     if (Array.isArray(value)) {
       const isStringArray = value.length > 0 && typeof value[0] === 'string';
       const template = isStringArray ? "" : (value.length > 0 ? Object.fromEntries(Object.keys(value[0]).map(k => [k, ""])) : {});
+      const isTopLevel = path.length === 2;
+      const sectionPathStr = path.join(".");
+      const isExpanded = !isTopLevel || expandedSections[sectionPathStr];
       
       return (
-        <div className={styles.section} key={path.join(".")}>
-          <h3 className={styles.sectionTitle}>{key}</h3>
-          {value.map((item, index) => {
-            const itemImage =
-              typeof item === "object" && item !== null
-                ? item.image || item.photo || item.avatar || item.src || item.logo || item.picture
-                : null;
+        <div className={styles.section} key={sectionPathStr}>
+          {isTopLevel ? (
+            <div 
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '0.75rem', background: 'var(--light-gray-color, #f1f5f9)', borderRadius: '6px', marginBottom: isExpanded ? '1rem' : '0' }}
+              onClick={() => toggleSection(sectionPathStr)}
+            >
+              <h3 className={styles.sectionTitle} style={{ margin: 0, textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</h3>
+              <span style={{ fontSize: '1.5rem', color: 'var(--primary-color)' }}>{isExpanded ? '−' : '+'}</span>
+            </div>
+          ) : (
+            <h3 className={styles.sectionTitle}>{key}</h3>
+          )}
 
-            const isGallery = path[0] === 'gallery' && path[1] === 'items';
-            
-            return (
-              <div className={styles.nestedGroup} key={index}>
-                {isGallery ? (
-                  <>
-                    {(userRole === "Super Admin" || userRole === "Project Lead") && (
-                      <button
-                        className={styles.deleteButton}
-                        onClick={() => handleArrayDelete(path, index)}
-                      >
-                        Delete
-                      </button>
-                    )}
-                    {!item.hidden ? (
-                      <button className={styles.deleteButton} style={{ background: '#ff9800' }} onClick={() => handleGalleryHide(path, index, true)}>
-                        Hide
-                      </button>
+          {isExpanded && (
+            <div style={{ paddingLeft: isTopLevel ? '1rem' : '0', borderLeft: isTopLevel ? '2px solid var(--primary-color)' : 'none' }}>
+              {value.map((item, index) => {
+                const itemImage =
+                  typeof item === "object" && item !== null
+                    ? item.image || item.photo || item.avatar || item.src || item.logo || item.picture
+                    : null;
+
+                const isGallery = path[0] === 'gallery' && path[1] === 'items';
+                
+                return (
+                  <div className={styles.nestedGroup} key={index}>
+                    {isGallery ? (
+                      <>
+                        {(userRole === "Super Admin" || userRole === "Project Lead") && (
+                          <button
+                            className={styles.deleteButton}
+                            onClick={() => handleArrayDelete(path, index)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                        {!item.hidden ? (
+                          <button className={styles.deleteButton} style={{ background: '#ff9800' }} onClick={() => handleGalleryHide(path, index, true)}>
+                            Hide
+                          </button>
+                        ) : (
+                          (item.hiddenByEmail === adminUsername || userRole === "Super Admin" || userRole === "Project Lead") && (
+                            <button className={styles.deleteButton} style={{ background: '#4caf50' }} onClick={() => handleGalleryHide(path, index, false)}>
+                              Unhide
+                            </button>
+                          )
+                        )}
+                        {item.hidden && (
+                           <span style={{ color: 'red', marginLeft: '10px', fontSize: '0.85em', fontWeight: 'bold' }}>
+                             Hidden {item.hiddenByEmail ? `(by ${item.hiddenByEmail})` : ''}
+                           </span>
+                        )}
+                      </>
                     ) : (
-                      (item.hiddenByEmail === adminUsername || userRole === "Super Admin" || userRole === "Project Lead") && (
-                        <button className={styles.deleteButton} style={{ background: '#4caf50' }} onClick={() => handleGalleryHide(path, index, false)}>
-                          Unhide
+                      (userRole === "Super Admin" || userRole === "Project Lead") && (
+                        <button
+                          className={styles.deleteButton}
+                          onClick={() => handleArrayDelete(path, index)}
+                        >
+                          Delete
                         </button>
                       )
                     )}
-                    {item.hidden && (
-                       <span style={{ color: 'red', marginLeft: '10px', fontSize: '0.85em', fontWeight: 'bold' }}>
-                         Hidden {item.hiddenByEmail ? `(by ${item.hiddenByEmail})` : ''}
-                       </span>
+
+                    {itemImage && typeof itemImage === "string" && itemImage.trim() !== "" && (
+                      <div className={styles.cardHeaderPreview}>
+                        <img
+                          src={itemImage}
+                          alt="Thumbnail"
+                          className={styles.cardThumbnail}
+                          onClick={() => setPreviewModalUrl(itemImage)}
+                          style={{ cursor: "pointer" }}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                        <strong style={{ fontSize: "0.95rem" }}>
+                          {item.title || item.name || `Item #${index + 1}`}
+                        </strong>
+                      </div>
                     )}
-                  </>
-                ) : (
-                  (userRole === "Super Admin" || userRole === "Project Lead") && (
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => handleArrayDelete(path, index)}
-                    >
-                      Delete
-                    </button>
-                  )
-                )}
 
-                {itemImage && typeof itemImage === "string" && itemImage.trim() !== "" && (
-                  <div className={styles.cardHeaderPreview}>
-                    <img
-                      src={itemImage}
-                      alt="Thumbnail"
-                      className={styles.cardThumbnail}
-                      onClick={() => setPreviewModalUrl(itemImage)}
-                      style={{ cursor: "pointer" }}
-                      onError={(e) => { e.currentTarget.style.display = "none"; }}
-                    />
-                    <strong style={{ fontSize: "0.95rem" }}>
-                      {item.title || item.name || `Item #${index + 1}`}
-                    </strong>
+                    {isStringArray ? (
+                      <div className={styles.formGroup}>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          value={item}
+                          onChange={(e) => handleChange([...path, index], e.target.value)}
+                        />
+                      </div>
+                    ) : (
+                      Object.entries(item).map(([subKey, subValue]) =>
+                        renderField(subKey, subValue, [...path, index, subKey])
+                      )
+                    )}
                   </div>
-                )}
-
-                {isStringArray ? (
-                  <div className={styles.formGroup}>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      value={item}
-                      onChange={(e) => handleChange([...path, index], e.target.value)}
-                    />
-                  </div>
-                ) : (
-                  Object.entries(item).map(([subKey, subValue]) =>
-                    renderField(subKey, subValue, [...path, index, subKey])
-                  )
-                )}
-              </div>
-            );
-          })}
-          <button 
-            className={styles.addButton}
-            onClick={() => handleArrayAdd(path, template)}
-          >
-            + Add New {key} Item
-          </button>
+                );
+              })}
+              <button 
+                className={styles.addButton}
+                onClick={() => handleArrayAdd(path, template)}
+              >
+                + Add New {key.replace(/([A-Z])/g, ' $1').trim()} Item
+              </button>
+            </div>
+          )}
         </div>
       );
     }
 
     if (typeof value === "object" && value !== null) {
+      const isTopLevel = path.length === 2;
+      const sectionPathStr = path.join(".");
+      const isExpanded = !isTopLevel || expandedSections[sectionPathStr];
+
       return (
-        <div className={styles.section} key={path.join(".")}>
-          <h3 className={styles.sectionTitle}>{key}</h3>
-          {Object.entries(value).map(([subKey, subValue]) => 
-            renderField(subKey, subValue, [...path, subKey])
+        <div className={styles.section} key={sectionPathStr}>
+          {isTopLevel ? (
+            <div 
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '0.75rem', background: 'var(--light-gray-color, #f1f5f9)', borderRadius: '6px', marginBottom: isExpanded ? '1rem' : '0' }}
+              onClick={() => toggleSection(sectionPathStr)}
+            >
+              <h3 className={styles.sectionTitle} style={{ margin: 0, textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</h3>
+              <span style={{ fontSize: '1.5rem', color: 'var(--primary-color)' }}>{isExpanded ? '−' : '+'}</span>
+            </div>
+          ) : (
+            <h3 className={styles.sectionTitle}>{key}</h3>
+          )}
+
+          {isExpanded && (
+            <div style={{ paddingLeft: isTopLevel ? '1rem' : '0', borderLeft: isTopLevel ? '2px solid var(--primary-color)' : 'none' }}>
+              {Object.entries(value).map(([subKey, subValue]) => 
+                renderField(subKey, subValue, [...path, subKey])
+              )}
+            </div>
           )}
         </div>
       );
@@ -1505,13 +1517,18 @@ export default function AdminDashboard({ initialData }) {
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.5rem',
+              overflow: 'hidden'
             }}>
-              <span style={{ fontSize: '1rem', display: 'flex' }}><FiUser size={16} /></span>
-              <span>{adminUsername}</span>
-              <span style={{ marginLeft: 'auto', opacity: 0.75, fontWeight: 400 }}>
-                {userRole || 'Unknown Role'}
-              </span>
+              <span style={{ fontSize: '1rem', display: 'flex', flexShrink: 0 }}><FiUser size={16} /></span>
+              <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={adminUsername}>
+                  {adminUsername}
+                </span>
+                <span style={{ opacity: 0.75, fontWeight: 400, fontSize: '0.7rem' }}>
+                  {userRole || 'Unknown Role'}
+                </span>
+              </div>
             </div>
             <button
               className={styles.navButton}
@@ -1564,7 +1581,7 @@ export default function AdminDashboard({ initialData }) {
             : activeTab === "settings" ? "Personal Account Settings"
             : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings`}
           </h1>
-          {activeTab !== "overview" && activeTab !== "registrations" && activeTab !== "blogs" && activeTab !== "users" && activeTab !== "manual" && activeTab !== "settings" && (
+          {!nonJsonTabs.includes(activeTab) && activeTab !== "overview" && activeTab !== "manual" && activeTab !== "settings" && (
             <button 
               className={styles.saveButton} 
               onClick={handleSave}

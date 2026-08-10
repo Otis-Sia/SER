@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./admin.module.css";
 import { FiRefreshCw, FiEdit, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
+import RichTextEditor from "../../components/RichTextEditor";
 import {
   getProjects, addProject, updateProject, deleteProject,
   getEvents, addEvent, updateEvent, deleteEvent,
@@ -85,13 +86,13 @@ function CollectionManager({
 
   return (
     <div className={styles.section}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h3 className={styles.sectionTitle}>{title}</h3>
-        <div>
-          <button className={styles.refreshBtn} onClick={loadItems} style={{ marginRight: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <h3 className={styles.sectionTitle} style={{ marginBottom: 0 }}>{title}</h3>
+        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+          <button className={styles.refreshBtn} onClick={loadItems}>
             <FiRefreshCw /> Refresh
           </button>
-          <button className={styles.addButton} onClick={handleAddNew}>
+          <button className={styles.addButton} style={{ width: 'auto', marginTop: 0, padding: '0.65rem 1.25rem' }} onClick={handleAddNew}>
             <FiPlus /> Add New
           </button>
         </div>
@@ -102,36 +103,36 @@ function CollectionManager({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {editingId === 'new' && (
-            <div className={styles.card} style={{ border: '2px solid var(--primary-color)' }}>
+            <div className={styles.collectionCard} style={{ border: '2px solid var(--primary-color)' }}>
               <h4>Add New {title}</h4>
               {renderFields(editFormData, handleChange)}
-              <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                <button className={styles.btn} onClick={() => handleSave('new')}><FiSave /> Save</button>
-                <button className={styles.btn} style={{ background: '#ccc', color: '#333' }} onClick={handleCancel}><FiX /> Cancel</button>
+              <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button className={styles.actionBtn} onClick={() => handleSave('new')}><FiSave /> Save</button>
+                <button className={styles.actionBtnCancel} onClick={handleCancel}><FiX /> Cancel</button>
               </div>
             </div>
           )}
 
           {items.map(item => (
-            <div key={item.id} className={styles.card}>
+            <div key={item.id} className={styles.collectionCard}>
               {editingId === item.id ? (
                 <div>
                   {renderFields(editFormData, handleChange)}
-                  <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                    <button className={styles.btn} onClick={() => handleSave(item.id)}><FiSave /> Save</button>
-                    <button className={styles.btn} style={{ background: '#ccc', color: '#333' }} onClick={handleCancel}><FiX /> Cancel</button>
+                  <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button className={styles.actionBtn} onClick={() => handleSave(item.id)}><FiSave /> Save</button>
+                    <button className={styles.actionBtnCancel} onClick={handleCancel}><FiX /> Cancel</button>
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
+                <>
+                  <div className={styles.collectionCardContent}>
                     {renderFields(item, null, true)}
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
-                    <button className={styles.btn} onClick={() => handleEdit(item)} style={{ background: '#4CAF50' }}><FiEdit /> Edit</button>
-                    <button className={styles.deleteButton} onClick={() => handleDelete(item.id)} style={{ position: 'static' }}><FiTrash2 /> Delete</button>
+                  <div className={styles.collectionCardActions}>
+                    <button className={styles.actionBtnEdit} onClick={() => handleEdit(item)}><FiEdit /> Edit</button>
+                    <button className={styles.actionBtnDelete} onClick={() => handleDelete(item.id)}><FiTrash2 /> Delete</button>
                   </div>
-                </div>
+                </>
               )}
             </div>
           ))}
@@ -146,17 +147,17 @@ function CollectionManager({
 const renderProjectFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <>
-      <h4>{data.title}</h4>
-      <p><strong>Focus:</strong> {data.focus}</p>
-      <p>{data.description}</p>
-      {data.link && <p><strong>Link:</strong> <a href={data.link} target="_blank" rel="noreferrer">{data.linkText || 'Link'}</a></p>}
+      <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.title}</h4>
+      {data.focus && <p style={{ margin: '0 0 0.25rem 0' }}><span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(18,154,68,0.1)', color: 'var(--primary-color)', fontWeight: 600 }}>{data.focus}</span></p>}
+      <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', opacity: 0.8 }}>{data.description}</p>
+      {data.link && <p style={{ margin: 0, fontSize: '0.85rem' }}><a href={data.link} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-color)' }}>{data.linkText || 'View Link →'}</a></p>}
     </>
   );
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <input className={styles.input} name="title" value={data.title || ''} onChange={onChange} placeholder="Title" />
       <input className={styles.input} name="focus" value={data.focus || ''} onChange={onChange} placeholder="Focus" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
       <input className={styles.input} name="link" value={data.link || ''} onChange={onChange} placeholder="Link URL" />
       <input className={styles.input} name="linkText" value={data.linkText || ''} onChange={onChange} placeholder="Link Text" />
     </div>
@@ -166,10 +167,12 @@ const renderProjectFields = (data, onChange, readOnly = false) => {
 const renderEventFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <>
-      <h4>{data.title}</h4>
-      <p><strong>Date:</strong> {data.eventDate}</p>
-      <p><strong>Location:</strong> {data.location}</p>
-      <p>{data.description}</p>
+      <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.title}</h4>
+      <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        {data.eventDate && <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(18,154,68,0.1)', color: 'var(--primary-color)', fontWeight: 600 }}>{data.eventDate}</span>}
+        {data.location && <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(0,0,0,0.06)', fontWeight: 600 }}>{data.location}</span>}
+      </p>
+      {data.description && <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>{data.description}</p>}
     </>
   );
   return (
@@ -177,7 +180,7 @@ const renderEventFields = (data, onChange, readOnly = false) => {
       <input className={styles.input} name="title" value={data.title || ''} onChange={onChange} placeholder="Event Title" />
       <input type="date" className={styles.input} name="eventDate" value={data.eventDate || ''} onChange={onChange} />
       <input className={styles.input} name="location" value={data.location || ''} onChange={onChange} placeholder="Location" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
     </div>
   );
 };
@@ -185,10 +188,10 @@ const renderEventFields = (data, onChange, readOnly = false) => {
 const renderGalleryFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      {data.imageUrl && <img src={data.imageUrl} alt={data.alt} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />}
-      <div>
-        <h4>{data.title}</h4>
-        <p>{data.description}</p>
+      {data.imageUrl && <img src={data.imageUrl} alt={data.alt} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />}
+      <div style={{ minWidth: 0 }}>
+        <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.title}</h4>
+        {data.description && <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>{data.description}</p>}
       </div>
     </div>
   );
@@ -205,15 +208,15 @@ const renderGalleryFields = (data, onChange, readOnly = false) => {
 const renderFaqFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <>
-      <h4>Q: {data.question}</h4>
-      <p><strong>A:</strong> {data.answer}</p>
-      <p><small>Order: {data.order}</small></p>
+      <h4 style={{ margin: '0 0 0.25rem 0' }}>Q: {data.question}</h4>
+      <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', opacity: 0.8 }}><strong>A:</strong> {data.answer}</p>
+      <p style={{ margin: 0 }}><span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(0,0,0,0.06)', fontWeight: 600 }}>Order: {data.order}</span></p>
     </>
   );
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <input className={styles.input} name="question" value={data.question || ''} onChange={onChange} placeholder="Question" />
-      <textarea className={styles.textarea} name="answer" value={data.answer || ''} onChange={onChange} placeholder="Answer" />
+      <RichTextEditor name="answer" value={data.answer || ''} onChange={(val) => onChange({ target: { name: 'answer', value: val } })} placeholder="Answer" />
       <input type="number" className={styles.input} name="order" value={data.order || 0} onChange={onChange} placeholder="Sort Order" />
     </div>
   );
@@ -222,12 +225,12 @@ const renderFaqFields = (data, onChange, readOnly = false) => {
 const renderProductFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      {data.imageUrl && <img src={data.imageUrl} alt={data.name} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />}
-      <div>
-        <h4>{data.name}</h4>
-        <p><strong>Price:</strong> KES {data.priceKes}</p>
-        <p>{data.description}</p>
-        <p><small>{data.featured ? 'Featured' : 'Regular'}</small></p>
+      {data.imageUrl && <img src={data.imageUrl} alt={data.name} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />}
+      <div style={{ minWidth: 0 }}>
+        <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.name}</h4>
+        <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary-color)' }}>KES {data.priceKes}</p>
+        {data.description && <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', opacity: 0.8 }}>{data.description}</p>}
+        <p style={{ margin: 0 }}><span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: data.featured ? 'rgba(18,154,68,0.1)' : 'rgba(0,0,0,0.06)', color: data.featured ? 'var(--primary-color)' : 'inherit', fontWeight: 600 }}>{data.featured ? '★ Featured' : 'Regular'}</span></p>
       </div>
     </div>
   );
@@ -236,7 +239,7 @@ const renderProductFields = (data, onChange, readOnly = false) => {
       <input className={styles.input} name="name" value={data.name || ''} onChange={onChange} placeholder="Product Name" />
       <input type="number" className={styles.input} name="priceKes" value={data.priceKes || 0} onChange={onChange} placeholder="Price (KES)" />
       <input className={styles.input} name="imageUrl" value={data.imageUrl || ''} onChange={onChange} placeholder="Image URL" />
-      <textarea className={styles.textarea} name="description" value={data.description || ''} onChange={onChange} placeholder="Description" />
+      <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
       <label>
         <input type="checkbox" name="featured" checked={data.featured || false} onChange={onChange} />
         Featured Product
@@ -255,9 +258,9 @@ export const ProductsManager = () => <CollectionManager title="Products" fetchAc
 const renderContactFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <>
-      <h4>{data.type}</h4>
-      <p><strong>Value:</strong> {data.value}</p>
-      <p><small>Order: {data.order}</small></p>
+      <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.type}</h4>
+      <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', wordBreak: 'break-all', opacity: 0.8 }}>{data.value}</p>
+      <p style={{ margin: 0 }}><span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(0,0,0,0.06)', fontWeight: 600 }}>Order: {data.order}</span></p>
     </>
   );
   return (
@@ -278,9 +281,9 @@ const renderContactFields = (data, onChange, readOnly = false) => {
 const renderSocialFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
     <>
-      <h4>{data.platform}</h4>
-      <p><strong>URL/Embed:</strong> {data.url}</p>
-      <p><small>Type: {data.type}</small></p>
+      <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.platform}</h4>
+      <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', wordBreak: 'break-all', opacity: 0.8 }}><strong>URL:</strong> {data.url}</p>
+      <p style={{ margin: 0 }}><span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(18,154,68,0.1)', color: 'var(--primary-color)', fontWeight: 600 }}>{data.type}</span></p>
     </>
   );
   return (
@@ -293,9 +296,7 @@ const renderSocialFields = (data, onChange, readOnly = false) => {
         <option value="Twitter/X">Twitter/X</option>
         <option value="LinkedIn">LinkedIn</option>
       </select>
-      <select className={styles.input} name="type" value={data.type || ''} onChange={onChange}>
-        <option value="">Select Link Type</option>
-        <option value="Profile Link">Profile Link</option>
+      <select className={styles.input} name="type" value={data.type || 'Embedded Post'} onChange={onChange}>
         <option value="Embedded Post">Embedded Post</option>
       </select>
       <input className={styles.input} name="url" value={data.url || ''} onChange={onChange} placeholder="URL or Post Link" />

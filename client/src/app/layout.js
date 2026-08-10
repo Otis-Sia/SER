@@ -83,15 +83,7 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const siteContent = await getSiteContent();
-  const socials = await getSocialMedia();
-
-  const osns = socials
-    .filter(s => s.type === 'Profile Link')
-    .map(s => ({
-      name: s.platform,
-      url: s.url,
-      handle: s.url.replace(/^https?:\/\/(www\.)?[^/]+\//, '')
-    }));
+  const osns = siteContent.siteMeta?.socialProfiles || [];
 
   const organizationSchema = {
     '@context': 'https://schema.org',

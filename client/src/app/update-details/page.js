@@ -8,6 +8,14 @@ export const metadata = {
     title: 'Update Your Details | Scouts Emergency Response',
     description: 'Update your existing member registration details for Scouts Emergency Response.',
     url: '/update-details',
+    images: [
+      {
+        url: '/assets/images/backgrounds/scouts_hero_bg.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Update Details Scouts Emergency Response',
+      },
+    ],
   },
   alternates: {
     canonical: '/update-details',

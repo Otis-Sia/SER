@@ -4,38 +4,49 @@ import ContactForm from '../../components/ContactForm';
 import { getSiteContent, getFaqs, getContacts, getSocialMedia } from '../admin/actions';
 import JsonLd from '../../components/JsonLd';
 
-export const metadata = {
-  title: 'Contact Us | Scouts Emergency Response',
-  description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
-  openGraph: {
-    title: 'Contact Us | Scouts Emergency Response',
-    description: 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.',
-    url: '/contact',
-  },
-  alternates: {
-    canonical: '/contact',
-  },
-};
+export async function generateMetadata() {
+  const siteContent = await getSiteContent();
+  const title = 'Contact Us | Scouts Emergency Response';
+  const description = 'Get in touch with Scouts Emergency Response (SER). Request emergency preparedness training, partner with us, or send us a message.';
+  const rawImage = siteContent.siteMeta?.contactHeroBgImage;
+  const heroImage = (rawImage && (rawImage.endsWith('.jpg') || rawImage.endsWith('.png') || rawImage.startsWith('http')))
+    ? rawImage
+    : '/assets/images/backgrounds/scouts_hero_bg.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: '/contact',
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: 'Contact Scouts Emergency Response',
+        },
+      ],
+    },
+    alternates: {
+      canonical: '/contact',
+    },
+  };
+}
 
 export default async function Contact() {
   const siteContent = await getSiteContent();
   const faqs = await getFaqs();
   const contacts = await getContacts();
-  const socials = await getSocialMedia();
-
+  
   const emails = contacts.filter(c => c.type === 'Email');
   const phones = contacts.filter(c => c.type === 'Phone');
   const whatsapps = contacts.filter(c => c.type === 'WhatsApp');
   const addresses = contacts.filter(c => c.type === 'Physical Address');
 
-  // Convert new socials structure to legacy osns structure for SocialIcons
-  const osns = socials
-    .filter(s => s.type === 'Profile Link')
-    .map(s => ({
-      name: s.platform,
-      url: s.url,
-      handle: s.url.replace(/^https?:\/\/(www\.)?[^/]+\//, '') // simple handle extraction
-    }));
+  // Read social profiles from siteMeta
+  const osns = siteContent.siteMeta?.socialProfiles || [];
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -103,7 +114,7 @@ export default async function Contact() {
         {faqs.map((item, index) => (
           <article className="faq-item" key={item.id || index}>
             <h3>{item.question}</h3>
-            <p>{item.answer}</p>
+            <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: item.answer }} />
           </article>
         ))}
       </section>
