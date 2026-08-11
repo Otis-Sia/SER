@@ -7,14 +7,23 @@ import { config } from "@/lib/config";
 
 const firebaseConfig = config.firebase;
 
-// Initialize Firebase only once
 let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
-}
+let auth;
 
-const auth = getAuth(app);
+if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApps()[0];
+  }
+  auth = getAuth(app);
+} else {
+  console.warn("Firebase config is missing apiKey. Skipping initialization (likely during build).");
+  // Provide a mock auth object so components don't crash when importing it
+  auth = {
+    onAuthStateChanged: () => () => {},
+    currentUser: null,
+  };
+}
 
 export { app, auth };
