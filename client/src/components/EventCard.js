@@ -43,15 +43,15 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
   if (compact) {
     return (
       <div 
-        className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 w-full" 
-        style={{ display: 'flex', flexDirection: 'row', height: '128px', borderRadius: '16px', overflow: 'hidden' }}
+        className="border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 w-full" 
+        style={{ display: 'flex', flexDirection: 'row', height: '160px', borderRadius: '16px', overflow: 'hidden', backgroundColor: '#ffffff' }}
       >
         {/* Left Thumbnail */}
-        <div style={{ position: 'relative', width: '128px', height: '128px', minWidth: '128px', flexShrink: 0, backgroundColor: '#F4FBF6', borderRight: '1px solid #f3f4f6', padding: '4px' }}>
-          <img src={imageSrc} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }} />
+        <div style={{ position: 'relative', width: '160px', height: '160px', minWidth: '160px', flexShrink: 0, backgroundColor: '#F4FBF6', borderRight: '1px solid #f3f4f6', padding: '6px' }}>
+          <img src={imageSrc} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '10px' }} />
           {isLive && (
-            <div style={{ position: 'absolute', top: '8px', left: '8px' }}>
-              <span style={{ backgroundColor: '#ef4444', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '9999px', display: 'flex', alignItems: 'center', gap: '4px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+              <span style={{ backgroundColor: '#ef4444', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '3px 10px', borderRadius: '9999px', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                 <span style={{ width: '6px', height: '6px', backgroundColor: 'white', borderRadius: '50%' }}></span> LIVE
               </span>
             </div>
@@ -59,13 +59,13 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
         </div>
         
         {/* Right Content */}
-        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1, minWidth: 0, overflow: 'hidden' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#1f2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 0 4px 0' }} title={event.title}>{event.title}</h3>
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#15803d', margin: '0 0 2px 0' }}>{formattedDate}</div>
-          <div style={{ fontSize: '12px', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 0 8px 0' }}>{formattedStartTime} - {formattedEndTime}</div>
+        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1, minWidth: 0, overflow: 'hidden' }}>
+          <h3 style={{ fontSize: '1.25rem', lineHeight: '1.5', fontWeight: '700', color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0', paddingBottom: '8px' }} title={event.title}>{event.title}</h3>
+          <div style={{ fontSize: '15px', lineHeight: '1.5', fontWeight: 'bold', color: '#15803d', margin: '0', paddingBottom: '4px' }}>{formattedDate}</div>
+          <div style={{ fontSize: '14px', lineHeight: '1.5', color: '#4b5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 0 8px 0', paddingBottom: '4px' }}>{formattedStartTime} - {formattedEndTime}</div>
           
           <div style={{ marginTop: 'auto' }}>
-            <Link href={`/events/${event.id}`} style={{ fontSize: '12px', fontWeight: '500', color: 'white', backgroundColor: '#15803d', padding: '6px 12px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' }}>
+            <Link href={`/events/${event.id}`} style={{ fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: '#15803d', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' }}>
               View Event
             </Link>
           </div>
