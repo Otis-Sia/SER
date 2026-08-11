@@ -25,15 +25,15 @@ const FloatingActionButton = () => {
   return (
     <div className={`fab-container ${isOpen ? 'active' : ''}`}>
       <div className="fab-menu">
-        <Link href="/contact" className="fab-item" title="Contact Us">
+        <Link href="/contact" className="fab-item" title="Contact Us" onClick={() => setIsOpen(false)}>
           <Mail size={20} />
           <span className="fab-label">Contact</span>
         </Link>
-        <Link href="/join" className="fab-item" title="Join Us">
+        <Link href="/community#join" className="fab-item" title="Join Us" onClick={() => setIsOpen(false)}>
           <UserPlus size={20} />
           <span className="fab-label">Join</span>
         </Link>
-        <Link href="/faq" className="fab-item" title="FAQ">
+        <Link href="/contact#faq" className="fab-item" title="FAQ" onClick={() => setIsOpen(false)}>
           <HelpCircle size={20} />
           <span className="fab-label">FAQ</span>
         </Link>
