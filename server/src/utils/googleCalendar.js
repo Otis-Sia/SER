@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { config } from "../config.js";
 
 dotenv.config();
 
@@ -27,14 +28,14 @@ if (process.env.GOOGLE_CREDENTIALS) {
 
 if (!auth) {
   // For Local Development: Use credentials.json file
-  const KEYFILEPATH = path.join(__dirname, '../../../credentials.json');
+  const KEYFILEPATH = config.googleCredentialsPath || path.join(__dirname, '../../../credentials.json');
   auth = new google.auth.GoogleAuth({
     keyFile: KEYFILEPATH,
     scopes: SCOPES,
   });
 }
 const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
-const TIMEZONE = "Africa/Nairobi";
+const TIMEZONE = config.timezone;
 
 let calendar;
 
@@ -55,7 +56,7 @@ export const getCalendarEvents = async () => {
       calendarId,
       timeMin: new Date().toISOString(),
       timeZone: TIMEZONE,
-      maxResults: 50,
+      maxResults: config.googleCalendarMaxResults,
       singleEvents: true,
       orderBy: "startTime",
     });
@@ -101,7 +102,7 @@ export const createCalendarEvent = async (eventDetails) => {
     const cal = google.calendar({ version: "v3", auth: authClient });
 
     const startTime = new Date(eventDetails.event_date);
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Default 1 hour
+    const endTime = new Date(startTime.getTime() + config.defaultEventDurationMs); // Default 1 hour
 
     const event = {
       summary: eventDetails.title,
@@ -136,7 +137,7 @@ export const updateCalendarEvent = async (eventId, eventDetails) => {
     const cal = google.calendar({ version: "v3", auth: authClient });
 
     const startTime = new Date(eventDetails.event_date);
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+    const endTime = new Date(startTime.getTime() + config.defaultEventDurationMs);
 
     const event = {
       summary: eventDetails.title,

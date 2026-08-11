@@ -132,7 +132,15 @@ export default async function About() {
                   <Link key={idx} href={`/about/${memberSlug}`} className="flex flex-col w-full mx-auto lg:mx-0" style={{ maxWidth: '280px', textDecoration: 'none', color: 'inherit' }}>
                     <div className="w-full bg-surface-container mb-4 shadow-sm" style={{ borderRadius: '6px', position: 'relative', overflow: 'hidden', paddingBottom: '133.33%' }}>
                       {member.image ? (
-                        <img src={member.image} alt={member.name} className="grayscale hover:grayscale-0 transition-all duration-500" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <Image 
+                          src={member.image} 
+                          alt={member.name || "Team member"} 
+                          fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 280px"
+                          quality={75}
+                          className="grayscale hover:grayscale-0 transition-all duration-500" 
+                          style={{ objectFit: 'cover' }} 
+                        />
                       ) : (
                         <div className="bg-surface-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span className="text-4xl text-primary opacity-20 font-bold">{member.name.charAt(0)}</span>

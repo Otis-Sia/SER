@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getProducts, getSiteContent } from '../admin/actions';
 
 export async function generateMetadata() {
@@ -54,7 +55,16 @@ export default async function Shop() {
           {featuredProducts.map((product) => (
             <div className="product-card" key={product.id}>
               {product.imageUrl && (
-                <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                <div style={{ position: 'relative', width: '100%', height: '200px', overflow: 'hidden' }}>
+                  <Image 
+                    src={product.imageUrl} 
+                    alt={product.name || "Product image"} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 300px" 
+                    quality={75}
+                    style={{ objectFit: 'cover' }} 
+                  />
+                </div>
               )}
               <div className="product-card-info">
                 <h3>{product.name}</h3>

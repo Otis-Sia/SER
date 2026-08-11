@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../utils/firebase.js";
 import { requireAdmin } from "../middleware/auth.js";
 import slugify from "slugify";
+import { config } from "../config.js";
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.get("/", async (_req, res) => {
     if (!db) return res.status(503).json({ error: "Database not available" });
 
     const snapshot = await db
-      .collection("posts")
+      .collection(config.firestoreCollections.posts)
       .where("published", "==", true)
       .orderBy("published_at", "desc")
       .get();
@@ -61,7 +62,7 @@ router.get("/all", async (_req, res) => {
     if (!db) return res.status(503).json({ error: "Database not available" });
 
     const snapshot = await db
-      .collection("posts")
+      .collection(config.firestoreCollections.posts)
       .orderBy("created_at", "desc")
       .get();
 
@@ -78,7 +79,7 @@ router.get("/slug/:slug", async (req, res) => {
     if (!db) return res.status(503).json({ error: "Database not available" });
 
     const snapshot = await db
-      .collection("posts")
+      .collection(config.firestoreCollections.posts)
       .where("slug", "==", req.params.slug)
       .where("published", "==", true)
       .limit(1)
@@ -114,7 +115,7 @@ router.post("/", requireAdmin, async (req, res) => {
       : slugify(String(title), { lower: true, strict: true });
 
     // Check slug uniqueness
-    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    const existing = await db.collection(config.firestoreCollections.posts).where("slug", "==", safeSlug).limit(1).get();
     if (!existing.empty) {
       return res.status(409).json({ error: "A post with that slug already exists" });
     }
@@ -131,7 +132,7 @@ router.post("/", requireAdmin, async (req, res) => {
       updated_at: now,
     };
 
-    const docRef = await db.collection("posts").add(postData);
+    const docRef = await db.collection(config.firestoreCollections.posts).add(postData);
 
     res.status(201).json({ id: docRef.id, ...postData });
   } catch (err) {
@@ -158,12 +159,12 @@ router.put("/:id", requireAdmin, async (req, res) => {
       : slugify(String(title), { lower: true, strict: true });
 
     // Check slug uniqueness (excluding this doc)
-    const existing = await db.collection("posts").where("slug", "==", safeSlug).limit(1).get();
+    const existing = await db.collection(config.firestoreCollections.posts).where("slug", "==", safeSlug).limit(1).get();
     if (!existing.empty && existing.docs[0].id !== id) {
       return res.status(409).json({ error: "A post with that slug already exists" });
     }
 
-    const docRef = db.collection("posts").doc(id);
+    const docRef = db.collection(config.firestoreCollections.posts).doc(id);
     const docSnap = await docRef.get();
     if (!docSnap.exists) {
       return res.status(404).json({ error: "Post not found" });
@@ -197,7 +198,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!db) return res.status(503).json({ error: "Database not available" });
 
     const { id } = req.params;
-    const docRef = db.collection("posts").doc(id);
+    const docRef = db.collection(config.firestoreCollections.posts).doc(id);
     const docSnap = await docRef.get();
 
     if (!docSnap.exists) {

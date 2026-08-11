@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShieldAlert, FireExtinguisher, HeartPulse, Leaf, Users } from 'lucide-react';
 import { getSiteContent, getProjects, getGalleryItems } from '../admin/actions';
 
@@ -74,8 +75,15 @@ export default async function Projects() {
         <div className="gallery-grid">
           {galleryItems.filter(item => !item.hidden).map((item, index) => (
             <div className="gallery-item" key={item.id || index}>
-              <a href={item.imageUrl || item.image} title={item.title}>
-                <img src={item.imageUrl || item.image} alt={item.alt || item.title || `SER Event photo ${index + 1}`} loading="lazy" />
+              <a href={item.imageUrl || item.image} title={item.title} style={{ position: 'relative', display: 'block', width: '100%', height: '100%', minHeight: '240px' }}>
+                <Image 
+                  src={item.imageUrl || item.image} 
+                  alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 350px"
+                  quality={75}
+                  style={{ objectFit: 'cover' }}
+                />
                 <div className="overlay">
                   <span className="overlay-title">{item.title}</span>
                   {item.description && (

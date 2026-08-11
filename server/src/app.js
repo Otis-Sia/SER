@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
+import { config } from "./config.js";
 
 import productsRouter from "./routes/products.js";
 import eventsRouter from "./routes/events.js";
@@ -19,8 +20,8 @@ const app = express();
 app.set("trust proxy", 1);
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: config.rateLimitWindowMs, // 15 minutes
+  max: config.rateLimitMax, // Limit each IP to 100 requests per windowMs
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
@@ -48,8 +49,8 @@ app.use((err, req, res, next) => {
   }
 });
 
-const port = Number(process.env.PORT || 0);
-const host = process.env.HOST || undefined;
+const port = config.port;
+const host = config.host;
 
 const server = app.listen(port, host, () => {
   const address = server.address();

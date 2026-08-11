@@ -1,4 +1,5 @@
 import { getSiteContent } from './admin/actions';
+import { config } from '@/lib/config';
 
 const slugify = (value) => value
   .trim()
@@ -7,7 +8,7 @@ const slugify = (value) => value
   .replace(/(^-|-$)+/g, '');
 
 export default async function sitemap() {
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org').replace(/\/$/, '');
+  const baseUrl = (config.siteUrl || 'https://www.seresponse.org').replace(/\/$/, '');
   const currentDate = new Date().toISOString();
 
   const routes = [
@@ -47,8 +48,7 @@ export default async function sitemap() {
   }
 
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000';
-    const res = await fetch(`${API_BASE}/api/posts`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${config.apiUrl}/api/posts`, { next: { revalidate: 3600 } });
     if (res.ok) {
       const posts = await res.json();
       for (const post of posts) {

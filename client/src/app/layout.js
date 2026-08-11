@@ -1,3 +1,5 @@
+import { Poppins } from 'next/font/google';
+import Script from 'next/script';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ClientLogic from "../components/ClientLogic";
@@ -5,8 +7,16 @@ import FloatingActionButton from "../components/FloatingActionButton";
 import JsonLd from "../components/JsonLd";
 import "./globals.css";
 import { getSiteContent } from "./admin/actions";
+import { config } from '@/lib/config';
 
-const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.seresponse.org').replace(/\/$/, '');
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
+
+const baseUrl = (config.siteUrl || 'https://www.seresponse.org').replace(/\/$/, '');
 const organizationId = `${baseUrl}/#organization`;
 const websiteId = `${baseUrl}/#website`;
 
@@ -132,6 +142,8 @@ export default async function RootLayout({ children }) {
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
         <script
+          id="theme-init"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -142,11 +154,11 @@ export default async function RootLayout({ children }) {
                   }
                 } catch (e) {}
               })();
-            `,
+            `
           }}
         />
       </head>
-      <body suppressHydrationWarning>
+      <body className={`${poppins.variable} ${poppins.className}`} suppressHydrationWarning>
         <Header navigation={siteContent.navigation} />
         <main>{children}</main>
         <Footer osns={osns} />

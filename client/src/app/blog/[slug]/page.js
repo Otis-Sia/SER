@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import styles from "../blog.module.css";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
@@ -87,11 +88,17 @@ export default async function BlogPostPage({ params }) {
         </header>
 
         {post.cover_url && (
-          <img 
-            src={post.cover_url} 
-            alt={post.title} 
-            className={styles.postCover} 
-          />
+          <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '2rem', borderRadius: '16px', overflow: 'hidden' }}>
+            <Image 
+              src={post.cover_url} 
+              alt={post.title || "Blog cover"} 
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 1200px"
+              quality={80}
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
         )}
 
         <div 

@@ -30,6 +30,37 @@ router.get("/", async (_req, res) => {
   }
 });
 
+// Public: get single event
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const googleEvents = await getCalendarEvents();
+    if (googleEvents) {
+      const gEvent = googleEvents.find(e => e.id === id || e.google_event_id === id);
+      if (gEvent) return res.json(gEvent);
+    }
+  } catch (error) {
+    console.error("Failed to fetch from Google Calendar for single event, falling back to local DB", error);
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, title, event_date, location, description, google_event_id
+       FROM events
+       WHERE id = $1 OR google_event_id = $1`,
+      [id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    res.json(rows[0]);
+  } catch (dbError) {
+    console.error("Database query failed during single event fallback:", dbError.message);
+    res.status(500).json({ error: "Failed to fetch event" });
+  }
+});
+
 // Admin: create event
 router.post("/", requireAdmin, async (req, res) => {
   const { title, event_date, location, description } = req.body;

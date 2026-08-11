@@ -1,5 +1,4 @@
 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 :root {
   /* Modern Color Palette */
   --primary-color: #129a44; /* Brand Green (rgb 18,154,68) */
@@ -13,7 +12,7 @@
   --light-gray-color: #f2f2f2;
 
   /* Typography */
-  --font-family: "Poppins", system-ui, -apple-system, sans-serif;
+  --font-family: var(--font-poppins), "Poppins", system-ui, -apple-system, sans-serif;
   --font-size-base: 16px;
 
   /* Effects */
@@ -129,30 +128,47 @@ section {
 
 /* Buttons */
 
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   background-color: var(--primary-color);
   color: #fff;
-  padding: 14px 28px;
-  border-radius: var(--border-radius);
+  padding: 12px 24px;
+  border-radius: 10px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  transition: all var(--transition-speed) var(--ease-out-quart);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(18, 154, 68, 0.25);
+  text-decoration: none;
 }
 
 .btn:hover {
   background-color: var(--secondary-color);
   color: #fff;
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(18, 154, 68, 0.35);
 }
 
 body.dark-mode .btn:hover,
 :root.dark-mode .btn:hover {
-  color: #0b0b0b;
+  color: #ffffff;
 }
 
 .btn-accent {

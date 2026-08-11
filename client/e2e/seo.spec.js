@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SEO & Metadata E2E Tests', () => {
   test('Homepage has strong metadata, canonical, robots and structured data', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveTitle(/Scouts Emergency Response/i);
 
@@ -11,7 +11,7 @@ test.describe('SEO & Metadata E2E Tests', () => {
     expect(description).toContain('Scouts Emergency Response');
 
     const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-    expect(canonical).toBe('https://www.seresponse.org/');
+    expect(canonical?.replace(/\/$/, '')).toBe('https://www.seresponse.org');
 
     const ogTitle = await page.locator('meta[property="og:title"]').getAttribute('content');
     expect(ogTitle).toBeTruthy();
@@ -37,7 +37,7 @@ test.describe('SEO & Metadata E2E Tests', () => {
     ['/blog', /Blog/i],
   ]) {
     test(`${route[0]} has indexable metadata`, async ({ page }) => {
-      await page.goto(route[0]);
+      await page.goto(route[0], { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveTitle(route[1]);
 
       const description = await page.locator('meta[name="description"]').getAttribute('content');

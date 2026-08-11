@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { config } from "@/lib/config";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -46,14 +47,14 @@ export default function ContactForm() {
     setStatus({ submitting: true, succeeded: false, error: null });
 
     try {
-      const response = await fetch('https://splitforms.com/api/submit', {
+      const response = await fetch(config.splitformsApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          access_key: '8789084bed8d420589cd99bd80534fe4',
+          access_key: config.splitformsAccessKey,
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
@@ -117,7 +118,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} noValidate aria-label="Contact Form">
       {/* SplitForms Required Hidden Access Key */}
-      <input type="hidden" name="access_key" value="8789084bed8d420589cd99bd80534fe4" />
+      <input type="hidden" name="access_key" value={config.splitformsAccessKey} />
 
       {/* Spam trap honeypot (hidden from real users) */}
       <input

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { config } from "../config.js";
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.post("/register", async(req, res) => {
     }
 
     try {
-        const hash = await bcrypt.hash(password, 10);
+        const hash = await bcrypt.hash(password, config.bcryptSaltRounds);
 
         const { rows } = await pool.query(
             `INSERT INTO users (full_name, email, password_hash)
@@ -68,7 +69,7 @@ router.post("/login", async(req, res) => {
             const token = jwt.sign(
                 { id: admin.id, email: admin.email, role: "admin" },
                 process.env.JWT_SECRET,
-                { expiresIn: "8h" }
+                { expiresIn: config.jwtExpiresIn }
             );
 
             return res.json({

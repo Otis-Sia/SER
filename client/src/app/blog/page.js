@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./blog.module.css";
 import { FiCalendar, FiArrowRight } from "react-icons/fi";
+import { config } from "@/lib/config";
 
 async function getPosts() {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
-    const res = await fetch(`${API_BASE}/api/posts`, { next: { revalidate: 60 } });
+    const res = await fetch(`${config.apiUrl}/api/posts`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
@@ -52,8 +53,15 @@ export default async function BlogPage() {
           posts.map((post) => (
             <Link href={`/blog/${post.slug}`} key={post.id} className={styles.card}>
               {post.cover_url && (
-                <div className={styles.imageWrapper}>
-                  <img src={post.cover_url} alt={post.title} className={styles.image} />
+                <div className={styles.imageWrapper} style={{ position: 'relative' }}>
+                  <Image 
+                    src={post.cover_url} 
+                    alt={post.title || "Blog post cover"} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" 
+                    quality={75}
+                    style={{ objectFit: 'cover' }} 
+                  />
                 </div>
               )}
               <div className={styles.content}>

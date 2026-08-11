@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAuthToken, registerIPN, submitOrderRequest } from '@/lib/pesapal';
 import { randomUUID } from 'crypto';
+import { config } from '@/lib/config';
 
 export async function POST(request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request) {
 
     // 2. Register IPN (or retrieve existing)
     // Note: The IPN URL should be publicly accessible.
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://seresponse.org';
+    const baseUrl = config.siteUrl;
     const ipnUrl = `${baseUrl}/api/pesapal/ipn`;
     
     let ipnId;

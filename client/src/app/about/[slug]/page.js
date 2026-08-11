@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getSiteContent } from '../../admin/actions';
 import { ArrowLeft, Users, Briefcase, ChevronRight } from 'lucide-react';
@@ -195,7 +196,14 @@ export default async function MemberProfilePage({ params }) {
               >
                 <div className="member-profile-team-card__photo">
                   {other.image ? (
-                    <img src={other.image} alt={other.name} />
+                    <Image 
+                      src={other.image} 
+                      alt={other.name || "Team member"} 
+                      fill
+                      sizes="100px"
+                      quality={75}
+                      style={{ objectFit: 'cover' }}
+                    />
                   ) : (
                     <div className="member-profile-team-card__initials">
                       {other.name

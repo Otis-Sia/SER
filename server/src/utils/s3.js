@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import path from "path";
+import { config } from "../config.js";
 
 const s3Client = new S3Client({
   region: process.env.APP_AWS_REGION,
@@ -12,7 +13,7 @@ const s3Client = new S3Client({
 
 export async function uploadToS3(file) {
   const ext = path.extname(file.originalname) || "";
-  const key = `SER-${randomUUID()}${ext}`;
+  const key = `${config.s3KeyPrefix}${randomUUID()}${ext}`;
 
   const command = new PutObjectCommand({
     Bucket: process.env.APP_AWS_S3_BUCKET_NAME,

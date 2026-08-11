@@ -1,11 +1,14 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { HeartPulse, Siren, Brain, Flame } from 'lucide-react';
 import InteractiveInfiniteScroll from '../components/InteractiveInfiniteScroll';
 import InstagramEmbed from '../components/InstagramEmbed';
 import TiktokEmbed from '../components/TiktokEmbed';
 import FacebookEmbed from '../components/FacebookEmbed';
 import PartnerImage from '../components/PartnerImage';
+import EventCard from '../components/EventCard';
 import { getSiteContent, getSocialMedia } from './admin/actions';
+import { config } from '@/lib/config';
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
@@ -35,12 +38,11 @@ export async function generateMetadata() {
   };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // Revalidate page every 5 minutes (ISR)
 
 async function fetchRecentEvents() {
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000';
-    const res = await fetch(`${API_BASE}/api/events`, { cache: 'no-store' });
+    const res = await fetch(`${config.apiUrl}/api/events`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const allEvents = await res.json();
     return allEvents.slice(0, 3);
@@ -52,9 +54,11 @@ async function fetchRecentEvents() {
 }
 
 export default async function Home() {
-  const siteContent = await getSiteContent();
-  const recentEvents = await fetchRecentEvents();
-  const socialMedia = await getSocialMedia();
+  const [siteContent, recentEvents, socialMedia] = await Promise.all([
+    getSiteContent(),
+    fetchRecentEvents(),
+    getSocialMedia(),
+  ]);
 
   // Helper to find specific embedded posts
   const getEmbed = (platformName, defaultUrl) => {
@@ -220,32 +224,16 @@ export default async function Home() {
                 const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
                 const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
 
-                const durationHrs = Math.round((endDate - startDate) / (1000 * 60 * 60) * 10) / 10;
-                const durationStr = durationHrs > 0 ? ` (${durationHrs} hour${durationHrs === 1 ? '' : 's'})` : '';
+                const isLive = new Date() >= startDate && new Date() <= endDate;
 
                 return (
-                  <div className="event-card" key={event.id}>
-                    <div className="event-card-header">
-                      <h3 className="event-card-title">{event.title}</h3>
-                      <div className="event-card-meta">
-                        <strong>Date:</strong> <span>{startDate.toLocaleDateString(undefined, { timeZone: 'Africa/Nairobi' })}</span>
-                      </div>
-                      <div className="event-card-meta">
-                        <strong>Time:</strong> <span>{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })} - {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Nairobi' })}{durationStr}</span>
-                      </div>
-                      {event.location && (
-                        <div className="event-card-meta">
-                          <strong>Venue:</strong> <span>{event.location}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="event-card-actions" style={{ marginTop: '1.5rem' }}>
-                      <Link className="btn" href="/contact">Ask to Join</Link>
-                      <a className="btn btn-accent" href={googleCalUrl} target="_blank" rel="noopener noreferrer">
-                        Add to Calendar
-                      </a>
-                    </div>
+                  <div key={event.id} className="h-full">
+                    <EventCard 
+                      event={event} 
+                      isLive={isLive} 
+                      googleCalUrl={googleCalUrl} 
+                      compact={true}
+                    />
                   </div>
                 );
               })
@@ -260,7 +248,16 @@ export default async function Home() {
         <InteractiveInfiniteScroll>
           {(siteContent.home.onTheGroundMoments || []).map((moment, index) => (
             <article className="image-card" key={index}>
-              <img src={moment.image} alt={moment.title} />
+              <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+                <Image 
+                  src={moment.image} 
+                  alt={moment.title || "On the ground moment"} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" 
+                  quality={75}
+                  style={{ objectFit: 'cover' }} 
+                />
+              </div>
               <div className="image-caption">
                 <h3>{moment.title}</h3>
                 <p>{moment.description}</p>
@@ -304,7 +301,7 @@ export default async function Home() {
       <section className="home-register" style={{ marginTop: '2rem' }}>
         <h2>Join the Response Network</h2>
         <p>Be part of the scouts and volunteers who train, respond, and serve across Kenya.</p>
-        <Link href="/login/signup" className="btn btn-accent">Register</Link>
+        <Link href="/community#join" className="btn btn-accent">Register</Link>
       </section>
     </>
   );

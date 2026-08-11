@@ -17,6 +17,7 @@ export default function FacebookEmbed({ url }) {
         scrolling="no" 
         frameBorder="0" 
         allowFullScreen={true} 
+        loading="lazy"
         allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
       ></iframe>
     </div>

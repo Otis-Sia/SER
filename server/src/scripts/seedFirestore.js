@@ -2,6 +2,7 @@ import { db } from "../utils/firebase.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { config } from "../config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,28 +24,28 @@ async function seedFirestore() {
     // 1. Seed Site Content Documents
     console.log("--> Seeding collection: 'site_content'...");
     
-    await db.collection("site_content").doc("metadata").set({
+    await db.collection(config.firestoreCollections.siteContent).doc("metadata").set({
       siteMeta: data.siteMeta || {},
       navigation: data.navigation || [],
       updatedAt: new Date().toISOString()
     });
 
-    await db.collection("site_content").doc("home").set({
+    await db.collection(config.firestoreCollections.siteContent).doc("home").set({
       ...data.home,
       updatedAt: new Date().toISOString()
     });
 
-    await db.collection("site_content").doc("about").set({
+    await db.collection(config.firestoreCollections.siteContent).doc("about").set({
       ...data.about,
       updatedAt: new Date().toISOString()
     });
 
-    await db.collection("site_content").doc("contact").set({
+    await db.collection(config.firestoreCollections.siteContent).doc("contact").set({
       ...data.contact,
       updatedAt: new Date().toISOString()
     });
 
-    await db.collection("site_content").doc("faq_meta").set({
+    await db.collection(config.firestoreCollections.siteContent).doc("faq_meta").set({
       title: data.faq?.title || "Frequently Asked Questions (FAQs)",
       description: data.faq?.description || "",
       updatedAt: new Date().toISOString()
@@ -55,7 +56,7 @@ async function seedFirestore() {
       console.log("--> Seeding collection: 'projects'...");
       const batch = db.batch();
       data.projects.items.forEach((project) => {
-        const docRef = db.collection("projects").doc(project.id || db.collection("projects").doc().id);
+        const docRef = db.collection(config.firestoreCollections.projects).doc(project.id || db.collection(config.firestoreCollections.projects).doc().id);
         batch.set(docRef, {
           title: project.title,
           focus: project.focus || "",
@@ -73,7 +74,7 @@ async function seedFirestore() {
       console.log("--> Seeding collection: 'events'...");
       const batch = db.batch();
       data.events.items.forEach((event) => {
-        const docRef = db.collection("events").doc(event.id || db.collection("events").doc().id);
+        const docRef = db.collection(config.firestoreCollections.events).doc(event.id || db.collection(config.firestoreCollections.events).doc().id);
         batch.set(docRef, {
           title: event.title,
           eventDate: event.date || "",
@@ -90,7 +91,7 @@ async function seedFirestore() {
       console.log("--> Seeding collection: 'gallery'...");
       const batch = db.batch();
       data.gallery.items.forEach((item, index) => {
-        const docRef = db.collection("gallery").doc(`item_${index + 1}`);
+        const docRef = db.collection(config.firestoreCollections.gallery).doc(`item_${index + 1}`);
         batch.set(docRef, {
           title: item.title,
           imageUrl: item.image,
@@ -108,7 +109,7 @@ async function seedFirestore() {
       console.log("--> Seeding collection: 'faqs'...");
       const batch = db.batch();
       data.faq.questions.forEach((faqItem, index) => {
-        const docRef = db.collection("faqs").doc(`faq_${index + 1}`);
+        const docRef = db.collection(config.firestoreCollections.faqs).doc(`faq_${index + 1}`);
         batch.set(docRef, {
           question: faqItem.q,
           answer: faqItem.a,
@@ -144,7 +145,7 @@ async function seedFirestore() {
 
     const productBatch = db.batch();
     sampleProducts.forEach((prod) => {
-      const docRef = db.collection("products").doc(prod.id);
+      const docRef = db.collection(config.firestoreCollections.products).doc(prod.id);
       productBatch.set(docRef, prod);
     });
     await productBatch.commit();
