@@ -6,7 +6,7 @@ import { Sun, Moon } from './Icons';
 
 // Random comment: Always remember to stay hydrated while coding!
 
-export default function Header({ navigation = [] }) {
+export default function Header({ navigation = [], siteMeta = {} }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -64,7 +64,7 @@ export default function Header({ navigation = [] }) {
         </div>
 
         <div className="mobile-header-title">
-          Scout&apos;s Emergency Response
+          {siteMeta.title || "Scouts Emergency Response"}
         </div>
 
         <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import SocialIcons from '../../components/SocialIcons';
 import ContactForm from '../../components/ContactForm';
-import { getSiteContent, getFaqs, getContacts, getSocialMedia } from '../admin/actions';
+import { getSiteContent, getFaqs } from '../admin/actions';
 import JsonLd from '../../components/JsonLd';
 
 export async function generateMetadata() {
@@ -38,12 +38,7 @@ export async function generateMetadata() {
 export default async function Contact() {
   const siteContent = await getSiteContent();
   const faqs = await getFaqs();
-  const contacts = await getContacts();
-  
-  const emails = contacts.filter(c => c.type === 'Email');
-  const phones = contacts.filter(c => c.type === 'Phone');
-  const whatsapps = contacts.filter(c => c.type === 'WhatsApp');
-  const addresses = contacts.filter(c => c.type === 'Physical Address');
+  const contactData = siteContent.contact || {};
 
   // Read social profiles from siteMeta
   const osns = siteContent.siteMeta?.socialProfiles || [];
@@ -80,29 +75,24 @@ export default async function Contact() {
       <section className="contact-info">
         <h2>Other Ways to Reach Us</h2>
         <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
-          {emails.map((email, idx) => (
-            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+          {contactData.email && (
+            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
               <strong>Email:</strong>{' '}
-              <a href={`mailto:${email.value}`}>{email.value}</a>
+              <a href={`mailto:${contactData.email}`}>{contactData.email}</a>
             </li>
-          ))}
-          {phones.map((phone, idx) => (
-            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+          )}
+          {contactData.phoneInternational && (
+            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
               <strong>Phone:</strong>{' '}
-              <a href={`tel:${phone.value}`}>{phone.value}</a>
+              <a href={`tel:${contactData.phoneInternational.replace(/\s+/g, '')}`}>{contactData.phoneInternational}</a>
             </li>
-          ))}
-          {whatsapps.map((wa, idx) => (
-            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+          )}
+          {contactData.whatsappLink && (
+            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
               <strong>WhatsApp:</strong>{' '}
-              <a href={wa.value} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+              <a href={contactData.whatsappLink} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
             </li>
-          ))}
-          {addresses.map((address, idx) => (
-            <li key={idx} style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-              <strong>Location:</strong> {address.value}
-            </li>
-          ))}
+          )}
         </ul>
 
         <h3 className="mt-1_5" style={{ marginBottom: '1rem' }}>Follow SER on Social Media</h3>

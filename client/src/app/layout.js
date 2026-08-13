@@ -159,9 +159,9 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body className={`${poppins.variable} ${poppins.className}`} suppressHydrationWarning>
-        <Header navigation={siteContent.navigation} />
+        <Header navigation={siteContent.navigation} siteMeta={siteContent.siteMeta} />
         <main>{children}</main>
-        <Footer osns={osns} />
+        <Footer osns={osns} siteContent={siteContent} />
         <FloatingActionButton />
         <ClientLogic />
       </body>
