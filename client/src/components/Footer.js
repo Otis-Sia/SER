@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import SocialIcons from './SocialIcons';
 
-export default function Footer({ osns = [] }) {
+export default function Footer({ osns = [], siteContent = {} }) {
   const currentYear = new Date().getFullYear();
+  
+  const siteMeta = siteContent?.siteMeta || {};
+  const contact = siteContent?.contact || {};
 
   return (
     <footer>
@@ -12,10 +15,10 @@ export default function Footer({ osns = [] }) {
           <div className="footer-column footer-brand">
             <div className="footer-logo">
               <img src="/assets/images/brand/logo.svg" alt="SER Logo" />
-              <span>Scout's Emergency Response</span>
+              <span>{siteMeta.title || "Scouts Emergency Response"}</span>
             </div>
             <p className="footer-tagline">
-              Compassion in Action — equipping scouts with life-saving skills and fostering community resilience.
+              {siteMeta.description || "Compassion in Action — equipping scouts with life-saving skills and fostering community resilience."}
             </p>
           </div>
 
@@ -36,15 +39,15 @@ export default function Footer({ osns = [] }) {
             <ul className="footer-contact-list">
               <li>
                 <span className="footer-contact-label">Email</span>
-                <a href="mailto:scoutsemergencyresponse@gmail.com">scoutsemergencyresponse@gmail.com</a>
+                <a href={`mailto:${contact.email || 'info@seresponse.org'}`}>{contact.email || 'info@seresponse.org'}</a>
               </li>
               <li>
                 <span className="footer-contact-label">Phone</span>
-                <a href="tel:+254742435314">+254 742 435 314</a>
+                <a href={`tel:${contact.phoneInternational?.replace(/\s+/g, '') || '+254742435314'}`}>{contact.phoneInternational || '+254 742 435 314'}</a>
               </li>
               <li>
                 <span className="footer-contact-label">WhatsApp</span>
-                <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer">Chat with us</a>
+                <a href={contact.whatsappLink || 'https://wa.me/254742435314'} target="_blank" rel="noopener noreferrer">Chat with us</a>
               </li>
             </ul>
           </div>
@@ -59,7 +62,7 @@ export default function Footer({ osns = [] }) {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <p>&copy; {currentYear} Scouts Emergency Response. All rights reserved.</p>
+          <p>&copy; {currentYear} {siteMeta.title || "Scouts Emergency Response"}. All rights reserved.</p>
           <p className="footer-subtitle">Youths &middot; Volunteers &middot; Members</p>
         </div>
       </div>

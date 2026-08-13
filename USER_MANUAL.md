@@ -153,7 +153,7 @@ Additional header features:
 #### Footer
 The footer includes:
 - **Quick Links**: Home, About, Projects, Events, Gallery
-- **Contact Info**: Email (scoutsemergencyresponse@gmail.com), phone (+254 742 435 314), WhatsApp direct link
+- **Contact Info**: Email (info@seresponse.org), phone (+254 742 435 314), WhatsApp direct link
 - **Social Media**: Links to all social platforms
 - **Floating Action Button (FAB)**: A floating button for quick access to key actions
 
@@ -266,7 +266,7 @@ Navigate to `/contact` to get in touch:
 - Error alerts appear in red if submission fails
 
 **Other Ways to Reach SER:**
-- **Email**: scoutsemergencyresponse@gmail.com
+- **Email**: info@seresponse.org
 - **Phone (Local)**: +254 742 435 314
 - **WhatsApp**: Direct chat link
 - **Social Media**: Links to all platforms
@@ -874,5 +874,5 @@ The login system checks credentials in the following order:
 
 > **Need help?** Contact your system administrator or Super Admin for assistance with account issues, role changes, or technical problems.
 >
-> **Email**: scoutsemergencyresponse@gmail.com
+> **Email**: info@seresponse.org
 > **WhatsApp**: +254 742 435 314

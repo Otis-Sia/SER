@@ -88,6 +88,12 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [duplicateError, setDuplicateError] = useState(null);
   const [submittedData, setSubmittedData] = useState(null);
+  const [showOtherAddress, setShowOtherAddress] = useState(() => {
+    if (initialData) {
+      return !!(initialData.otherCounty || initialData.otherCity);
+    }
+    return false;
+  });
 
   const primaryCountryIso = allCountriesRaw.find(c => c.name === formData.addressCountry)?.isoCode;
   const primaryCities = primaryCountryIso ? City.getCitiesOfCountry(primaryCountryIso).map(c => ({ value: c.name, label: c.name })) : [];
@@ -95,27 +101,8 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
   const otherCountryIso = allCountriesRaw.find(c => c.name === formData.otherAddressCountry)?.isoCode;
   const otherCities = otherCountryIso ? City.getCitiesOfCountry(otherCountryIso).map(c => ({ value: c.name, label: c.name })) : [];
 
-  // Validate Sections 1-7
-  const isForm1To7Filled =
-    formData.name.trim() !== '' &&
-    formData.email.trim() !== '' &&
-    formData.phone.trim() !== '' &&
-    formData.idNumber.trim() !== '' &&
-    formData.dob.trim() !== '' &&
-    (formData.addressCountry === 'Kenya' 
-      ? (formData.county.trim() !== '' && formData.subCounty.trim() !== '') 
-      : formData.city.trim() !== '') &&
-    formData.nextOfKinName.trim() !== '' &&
-    formData.nextOfKinPhone.trim() !== '' &&
-    formData.educationLevel.trim() !== '' &&
-    formData.crewDetails.trim() !== '' &&
-    formData.trainings.length > 0 &&
-    formData.certifications.trim() !== '' &&
     formData.communityPreparedness.trim() !== '' &&
-    formData.whyJoin.trim() !== '' &&
-    formData.hopeToContribute.trim() !== '' &&
-    formData.calendarRecommendations.trim() !== '' &&
-    formData.memberGoals.trim() !== '';
+    formData.whyJoin.trim() !== '';
 
   const handleChange = (e) => {
     let { name, value, type, checked } = e.target;
@@ -232,6 +219,9 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
 
     const payload = {
       ...formData,
+      hopeToContribute: formData.hopeToContribute.trim() || 'N/A',
+      calendarRecommendations: formData.calendarRecommendations.trim() || 'N/A',
+      memberGoals: formData.memberGoals.trim() || 'N/A',
       joinedWhatsapp: joinedWhatsappBool,
       firstName,
       lastName,
@@ -866,82 +856,109 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
               )}
             </div>
 
-            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
-              <div className="join-field" style={{ gridColumn: '1 / -1' }}>
-                <label>
-                  Other Address - Country (optional)
-                </label>
-                <SearchableSelect
-                  id="otherAddressCountry"
-                  name="otherAddressCountry"
-                  value={formData.otherAddressCountry}
-                  onChange={handleChange}
-                  options={ALL_COUNTRIES}
-                  placeholder="Select country"
+            <div className="join-row" style={{ marginTop: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <input 
+                  type="checkbox" 
+                  checked={showOtherAddress} 
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setShowOtherAddress(checked);
+                    if (!checked) {
+                      setFormData(prev => ({
+                        ...prev,
+                        otherAddressCountry: 'Kenya',
+                        otherCity: '',
+                        otherCounty: '',
+                        otherSubCounty: ''
+                      }));
+                    }
+                  }}
                 />
-              </div>
+                Add a secondary / alternative address
+              </label>
             </div>
 
-            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
-              {formData.otherAddressCountry === 'Kenya' ? (
-                <>
-                  <div className="join-field">
-                    <label htmlFor="otherCounty">
-                      Other Address - County (optional)
+            {showOtherAddress && (
+              <>
+                <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+                  <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                    <label>
+                      Other Address - Country (optional)
                     </label>
-                    <select
-                      id="otherCounty"
-                      name="otherCounty"
-                      value={formData.otherCounty}
+                    <SearchableSelect
+                      id="otherAddressCountry"
+                      name="otherAddressCountry"
+                      value={formData.otherAddressCountry}
                       onChange={handleChange}
-                    >
-                      <option value="">Select county (if applicable)</option>
-                      {KENYA_COUNTIES.map((c) => (
-                        <option key={c.name} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="join-field-hint">e.g. school or relative's county</span>
+                      options={ALL_COUNTRIES}
+                      placeholder="Select country"
+                    />
                   </div>
-
-                  <div className="join-field">
-                    <label htmlFor="otherSubCounty">
-                      Other Address - Sub-County (optional)
-                    </label>
-                    <select
-                      id="otherSubCounty"
-                      name="otherSubCounty"
-                      value={formData.otherSubCounty}
-                      onChange={handleChange}
-                      disabled={!formData.otherCounty}
-                    >
-                      <option value="">Select sub-county</option>
-                      {(KENYA_COUNTIES.find(c => c.name === formData.otherCounty)?.sub_counties || []).map((sc) => (
-                        <option key={sc} value={sc}>
-                          {sc}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="join-field-hint">Select specific sub-county or area</span>
-                  </div>
-                </>
-              ) : (
-                <div className="join-field" style={{ gridColumn: '1 / -1' }}>
-                  <label>
-                    Other Address - City / Town (optional)
-                  </label>
-                  <SearchableSelect
-                    id="otherCity"
-                    name="otherCity"
-                    value={formData.otherCity}
-                    onChange={handleChange}
-                    options={otherCities}
-                    placeholder="Search city..."
-                  />
                 </div>
-              )}
-            </div>
+
+                <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+                  {formData.otherAddressCountry === 'Kenya' ? (
+                    <>
+                      <div className="join-field">
+                        <label htmlFor="otherCounty">
+                          Other Address - County (optional)
+                        </label>
+                        <select
+                          id="otherCounty"
+                          name="otherCounty"
+                          value={formData.otherCounty}
+                          onChange={handleChange}
+                        >
+                          <option value="">Select county (if applicable)</option>
+                          {KENYA_COUNTIES.map((c) => (
+                            <option key={c.name} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="join-field-hint">e.g. school or relative's county</span>
+                      </div>
+
+                      <div className="join-field">
+                        <label htmlFor="otherSubCounty">
+                          Other Address - Sub-County (optional)
+                        </label>
+                        <select
+                          id="otherSubCounty"
+                          name="otherSubCounty"
+                          value={formData.otherSubCounty}
+                          onChange={handleChange}
+                          disabled={!formData.otherCounty}
+                        >
+                          <option value="">Select sub-county</option>
+                          {(KENYA_COUNTIES.find(c => c.name === formData.otherCounty)?.sub_counties || []).map((sc) => (
+                            <option key={sc} value={sc}>
+                              {sc}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="join-field-hint">Select specific sub-county or area</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="join-field" style={{ gridColumn: '1 / -1' }}>
+                      <label>
+                        Other Address - City / Town (optional)
+                      </label>
+                      <SearchableSelect
+                        id="otherCity"
+                        name="otherCity"
+                        value={formData.otherCity}
+                        onChange={handleChange}
+                        options={otherCities}
+                        placeholder="Search city..."
+                      />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </fieldset>
 
           {/* Section 3: Next of Kin */}
@@ -1031,21 +1048,22 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
               </div>
             </div>
 
-            <div className="join-field" style={{ marginTop: '1rem' }}>
-              <label htmlFor="crewDetails">
-                Scout Crew Details <span className="required-star">*</span>
-              </label>
-              <input
-                type="text"
-                id="crewDetails"
-                name="crewDetails"
-                placeholder="e.g. Alpha Rover Crew - Embakasi - Nairobi (or N/A)"
-                value={formData.crewDetails}
-                onChange={handleChange}
-                required
-              />
-              <span className="join-field-hint">If not a scout, indicate N/A</span>
-            </div>
+            {formData.isScout === 'Yes' && (
+              <div className="join-field" style={{ marginTop: '1rem' }}>
+                <label htmlFor="crewDetails">
+                  Scout Crew Details <span className="required-star">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="crewDetails"
+                  name="crewDetails"
+                  placeholder="e.g. Alpha Rover Crew - Embakasi - Nairobi"
+                  value={formData.crewDetails}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )}
           </fieldset>
 
           {/* Section 5: Experience & Training */}
@@ -1070,21 +1088,22 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
               </div>
             </div>
 
-            <div className="join-field">
-              <label htmlFor="certifications">
-                If trained, please specify certifications (if any) <span className="required-star">*</span>
-              </label>
-              <input
-                type="text"
-                id="certifications"
-                name="certifications"
-                placeholder="e.g. St. John First Aid, Red Cross BLS, or N/A"
-                value={formData.certifications}
-                onChange={handleChange}
-                required
-              />
-              <span className="join-field-hint">If not trained, indicate N/A</span>
-            </div>
+            {!formData.trainings.includes('None of the above') && formData.trainings.length > 0 && (
+              <div className="join-field" style={{ marginTop: '1rem' }}>
+                <label htmlFor="certifications">
+                  Please specify certifications (if any) <span className="required-star">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="certifications"
+                  name="certifications"
+                  placeholder="e.g. St. John First Aid, Red Cross BLS, or N/A"
+                  value={formData.certifications}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )}
           </fieldset>
 
           {/* Section 6: Preparedness & Availability */}
@@ -1159,13 +1178,13 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
 
             <div className="join-field" style={{ marginBottom: '1rem' }}>
               <label htmlFor="whyJoin">
-                Why do you want to join SER? <span className="required-star">*</span>
+                Why do you want to join SER and how do you hope to contribute? <span className="required-star">*</span>
               </label>
               <textarea
                 id="whyJoin"
                 name="whyJoin"
-                rows="3"
-                placeholder="Share your motivation for joining Scouts Emergency Response..."
+                rows="4"
+                placeholder="Share your motivation, skills, ideas, time you wish to commit..."
                 value={formData.whyJoin}
                 onChange={handleChange}
                 required
@@ -1173,47 +1192,16 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
             </div>
 
             <div className="join-field" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="hopeToContribute">
-                What do you hope to contribute to SER? <span className="required-star">*</span>
-              </label>
-              <textarea
-                id="hopeToContribute"
-                name="hopeToContribute"
-                rows="3"
-                placeholder="Skills, time, ideas, enthusiasm, leadership..."
-                value={formData.hopeToContribute}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="join-field" style={{ marginBottom: '1rem' }}>
               <label htmlFor="calendarRecommendations">
-                What activities would you recommend for our 2026 calendar? <span className="required-star">*</span>
+                Do you have any recommendations for our 2026 calendar or personal goals as a member? (optional)
               </label>
               <textarea
                 id="calendarRecommendations"
                 name="calendarRecommendations"
-                rows="3"
-                placeholder="e.g. First aid workshops, community drills, blood drives..."
+                rows="4"
+                placeholder="e.g. First aid workshops, community drills, personal growth aims, leadership certifications..."
                 value={formData.calendarRecommendations}
                 onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="join-field">
-              <label htmlFor="memberGoals">
-                What do you aim to achieve as a member of the team? <span className="required-star">*</span>
-              </label>
-              <textarea
-                id="memberGoals"
-                name="memberGoals"
-                rows="3"
-                placeholder="Personal growth, certifications, leadership experience..."
-                value={formData.memberGoals}
-                onChange={handleChange}
-                required
               />
             </div>
           </fieldset>
