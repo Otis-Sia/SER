@@ -62,7 +62,7 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
         <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1, minWidth: 0, overflow: 'hidden' }}>
           <h3 style={{ fontSize: '1.25rem', lineHeight: '1.5', fontWeight: '700', color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0', paddingBottom: '8px' }} title={event.title}>{event.title}</h3>
           <div style={{ fontSize: '15px', lineHeight: '1.5', fontWeight: 'bold', color: '#15803d', margin: '0', paddingBottom: '4px' }}>{formattedDate}</div>
-          <div style={{ fontSize: '14px', lineHeight: '1.5', color: '#4b5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 0 8px 0', paddingBottom: '4px' }}>{formattedStartTime} - {formattedEndTime}</div>
+          <div style={{ fontSize: '14px', lineHeight: '1.5', color: '#4b5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 0 8px 0', paddingBottom: '4px' }}>{event.time || `${formattedStartTime} - ${formattedEndTime}`}</div>
           
           <div style={{ marginTop: 'auto' }}>
             <Link href={`/events/${event.id}`} style={{ fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: '#15803d', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' }}>
@@ -101,7 +101,7 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
           <h3 className="text-[1.1rem] font-medium text-gray-800">{event.title}</h3>
           <div className="text-right whitespace-nowrap">
             <div className="text-sm font-bold text-gray-800">{formattedDate}</div>
-            <div className="text-[13px] text-gray-500 mt-0.5">{formattedStartTime} - {formattedEndTime}</div>
+            <div className="text-[13px] text-gray-500 mt-0.5">{event.time || `${formattedStartTime} - ${formattedEndTime}`}</div>
           </div>
         </div>
 

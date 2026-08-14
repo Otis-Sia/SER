@@ -72,6 +72,7 @@ SER has **five** distinct roles, each with different levels of access:
 | **Public Visitor** | ❌ | ❌ | Read only | Read only | ❌ |
 | **Registered User** | ✅ | ❌ | Read only | Read only | ❌ |
 | **Author** | ✅ | ✅ (Blog only) | ✅ Create / Edit / Delete | ❌ | ❌ |
+| **Events** | ✅ | ✅ (Events & Blogs) | ✅ Write Event Reports | ✅ Create / Edit Events | ❌ |
 | **Communication** | ✅ | ✅ (Socials & Contacts) | ❌ | ✅ Manage (No delete) | ❌ |
 | **Admin** | ✅ | ✅ (Limited) | ✅ Create / Edit | ✅ Limited CRUD (No delete) | ❌ |
 | **Project Lead** | ✅ | ✅ (Most tabs) | ✅ Create / Edit / Delete | ✅ Full CRUD | ✅ Flag/Hide only |
@@ -91,8 +92,15 @@ SER has **five** distinct roles, each with different levels of access:
 │       │                  • Blog posts                          │
 │       │                  • Account settings                    │
 │       │                                                       │
-│  Project Lead ─────────── Blog post management                │
-│       │                   • Create / Edit / Delete posts       │
+│  Project Lead ─────────── Platform management                 │
+│       │                   • Create / Edit / Delete content     │
+│       │                                                       │
+│  Events ───────────────── Event & report management           │
+│       │                   • Create / Edit Events               │
+│       │                   • Write Event Reports (Blogs)        │
+│       │                                                       │
+│  Communication ────────── Socials & Contact management        │
+│       │                   • Contacts & Social Media links      │
 │       │                                                       │
 │  Author ───────────────── Blog post management                │
 │       │                   • Create / Edit / Delete posts       │
@@ -112,6 +120,7 @@ SER has **five** distinct roles, each with different levels of access:
 - **Public Visitor**: Anyone on the internet. Can browse all public pages, read blog posts, view events, gallery, and products. Can submit the Contact form and the Join/Membership application form.
 - **Registered User**: Has created an account via the Sign Up page. Can log in but has no admin dashboard access. This role is intended for future community features.
 - **Author**: A Firestore-managed role assigned by a Super Admin. Can log into the admin dashboard and manage **blog posts only** — create, edit, publish/unpublish, and delete articles.
+- **Events**: A Firestore-managed role assigned by a Super Admin. In charge of creating, editing, and managing **events** as well as writing **event reports** (via Blog Posts).
 - **Communication**: A Firestore-managed role assigned by a Super Admin. Manages everything social media and Contacts (via the dedicated Contacts and Social Media tabs). Can only hide/flag items (cannot delete).
 - **Admin**: Has limited access to manage forms, events, FAQ, and Gallery. Cannot delete content, can only hide/flag.
 - **Project Lead**: A Firestore-managed role assigned by a Super Admin. Has broad management access across the platform. Can delete content including blog posts and gallery pictures.

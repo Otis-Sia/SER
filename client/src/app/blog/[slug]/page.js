@@ -4,30 +4,27 @@ import { notFound } from "next/navigation";
 import styles from "../blog.module.css";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
 
-import { getAdminDb } from "@/lib/firebaseAdmin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 async function getPostBySlug(slug) {
   try {
     if (!slug) return null;
-    const db = getAdminDb();
-    if (!db) return null;
 
-    const snapshot = await db.collection("posts")
-      .where("slug", "==", slug)
-      .where("published", "==", true)
+    const { data: doc, error } = await supabaseAdmin
+      .from("posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("published", true)
       .limit(1)
-      .get();
+      .maybeSingle();
 
-    if (snapshot.empty) return null;
+    if (error || !doc) return null;
     
-    const doc = snapshot.docs[0];
-    const data = doc.data();
     return {
-      id: doc.id,
-      ...data,
-      created_at: data.created_at?.toDate?.()?.toISOString?.() ?? data.created_at ?? new Date().toISOString(),
-      updated_at: data.updated_at?.toDate?.()?.toISOString?.() ?? data.updated_at ?? new Date().toISOString(),
-      published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
+      ...doc,
+      created_at: doc.created_at,
+      updated_at: doc.updated_at,
+      published_at: doc.published_at,
     };
   } catch (error) {
     console.error("Failed to fetch post:", error);

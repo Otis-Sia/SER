@@ -1,35 +1,46 @@
 import express from "express";
-import { pool } from "../db.js";
+import { supabase } from "../utils/supabase.js";
 import { requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Public: list gallery items (featured first, then newest)
+// Public: list gallery items (newest first)
 router.get("/", async(_req, res) => {
-  const { rows } = await pool.query(
-    `SELECT id, title, image_url, category, featured, created_at
-     FROM gallery_items
-     ORDER BY featured DESC, created_at DESC`
-  );
-  res.json(rows);
+  try {
+    const { data, error } = await supabase
+      .from('gallery')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error("Failed to fetch gallery:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Admin: create gallery item
 router.post("/", requireAdmin, async(req, res) => {
-  const { title, image_url, category, featured } = req.body;
+  const { title, image_url, alt, description } = req.body;
 
   if (!title || !image_url) {
     return res.status(400).json({ error: "title and image_url are required" });
   }
 
-  const { rows } = await pool.query(
-    `INSERT INTO gallery_items (title, image_url, category, featured)
-     VALUES ($1,$2,$3,$4)
-     RETURNING *`,
-    [title, image_url, category || null, !!featured]
-  );
+  try {
+    const { data, error } = await supabase
+      .from('gallery')
+      .insert([{ title, image_url, alt: alt || null, description: description || null }])
+      .select()
+      .single();
 
-  res.status(201).json(rows[0]);
+    if (error) throw error;
+    res.status(201).json(data);
+  } catch (err) {
+    console.error("Failed to create gallery item:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 export default router;

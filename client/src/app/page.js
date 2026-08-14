@@ -57,7 +57,7 @@ export default async function Home() {
   const [siteContent, recentEvents, socialMedia] = await Promise.all([
     getSiteContent(),
     fetchRecentEvents(),
-    getSocialMedia(),
+    getSocialMedia(true),
   ]);
 
   // Helper to find specific embedded posts

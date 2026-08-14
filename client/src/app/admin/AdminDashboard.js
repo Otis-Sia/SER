@@ -13,18 +13,19 @@ import {
   addAdminUser,
   deleteAdminUser,
   getDashboardStats,
+  getFlaggedPosts,
   flagMemberRegistration,
   updateMemberRegistration,
   updateAdminProfile,
-  updateAdminEmail
+  updateAdminEmail,
+  resolveEmailFromUsername
 } from "./actions";
 import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle, FiSun, FiMoon, FiUser, FiChevronDown } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
 import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
-import { auth } from "@/lib/firebaseClient";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { supabase } from "@/lib/supabaseClient";
 import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager, ContactsManager, SocialsManager } from "./CollectionManagers";
 import UserManual from "./UserManual";
 
@@ -775,6 +776,7 @@ function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
 
 function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
   const [stats, setStats] = useState({});
+  const [flaggedPosts, setFlaggedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -782,8 +784,10 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
     const fetchStats = async () => {
       try {
         const data = await getDashboardStats();
+        const posts = await getFlaggedPosts();
         if (isMounted) {
           setStats(data || {});
+          setFlaggedPosts(posts || []);
           setLoading(false);
         }
       } catch (err) {
@@ -867,9 +871,40 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
                 <div style={{ color: 'var(--text-color, #666)', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Shop Products</div>
               </div>
             )}
+            {(userRole === "Super Admin" || userRole === "Admin" || userRole === "Project Lead") && (
+              <div style={{ padding: '1.5rem', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ef4444' }}>{stats.flagged_items || 0}</div>
+                <div style={{ color: '#991b1b', opacity: 0.8, fontSize: '0.9rem', marginTop: '0.5rem' }}>Flagged Items</div>
+              </div>
+            )}
           </>
         )}
       </div>
+
+      {(userRole === "Super Admin" || userRole === "Admin" || userRole === "Project Lead") && flaggedPosts.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FiAlertTriangle /> Flagged Posts
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {flaggedPosts.map(post => (
+              <div key={post.id} style={{ padding: '1.5rem', background: 'var(--white-color, #fff)', border: '1px solid var(--light-gray-color, #eaeaea)', borderRadius: '8px', borderLeft: '4px solid #ef4444' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{post.title}</h4>
+                  <span style={{ fontSize: '0.8rem', color: '#ef4444', background: '#fee2e2', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>Flagged</span>
+                </div>
+                <p style={{ margin: 0, color: 'var(--text-color, #666)', fontSize: '0.95rem' }}>
+                  {post.content?.replace(/<[^>]+>/g, '').substring(0, 150) || "No content available."}...
+                </p>
+                <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: '#888' }}>
+                  Author: {post.author || 'Unknown'} • Flagged by: {post.flagged_by_email || 'Unknown'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Quick Actions</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -926,7 +961,7 @@ function AdminProfileSettings({ user, userName, showToast }) {
         }
         showToast("Email updated successfully. You will be signed out.", "success");
         setTimeout(() => {
-          signOut(auth);
+          supabase.auth.signOut();
         }, 2000);
         return;
       }
@@ -1027,19 +1062,20 @@ export default function AdminDashboard({ initialData }) {
       setAuthLoading(false);
     }, 4000);
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const currentUser = session?.user;
       setUser(currentUser);
       try {
         if (currentUser) {
           const userData = await getAdminUserData(currentUser.email).catch(() => null);
           if (userData) {
             if (userData.flagged) {
-              await signOut(auth);
+              await supabase.auth.signOut();
               setLoginError("Your account has been restricted. Please contact a Super Admin.");
               return;
             }
             setUserRole(userData.role || "Admin");
-            setUserUsername(userData.username || "");
+            setUserUsername(userData.username || userData.name || "");
             setUserName(userData.name || "");
             setMustChangePassword(userData.mustChangePassword === true);
           } else {
@@ -1063,9 +1099,15 @@ export default function AdminDashboard({ initialData }) {
       }
     });
 
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setAuthLoading(false);
+      }
+    });
+
     return () => {
       clearTimeout(timer);
-      unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
@@ -1111,14 +1153,21 @@ export default function AdminDashboard({ initialData }) {
     e.preventDefault();
     setLoginError("");
     try {
-      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      const targetEmail = await resolveEmailFromUsername(loginEmail);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: targetEmail,
+        password: loginPassword,
+      });
+      if (error) {
+        setLoginError("Invalid email/username or password.");
+      }
     } catch (err) {
-      setLoginError("Invalid email or password.");
+      setLoginError("Invalid email/username or password.");
     }
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
   };
 
   const handleSave = async () => {
@@ -1416,6 +1465,8 @@ export default function AdminDashboard({ initialData }) {
     tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
     tabs = ["contacts", "socials"];
+  } else if (userRole === "Events") {
+    tabs = ["events", "blogs"];
   }
 
   tabs = ["overview", ...tabs, "manual", "settings"];
@@ -1471,8 +1522,8 @@ export default function AdminDashboard({ initialData }) {
               {loginError && <div style={{ color: '#ef4444', background: '#fef2f2', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem' }}>{loginError}</div>}
               <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email Address</label>
-                  <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color, #ccc)', background: 'var(--background-color, #fff)', color: 'var(--text-color, #000)' }} />
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email Address or Username</label>
+                  <input type="text" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required placeholder="Enter email or username" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color, #ccc)', background: 'var(--background-color, #fff)', color: 'var(--text-color, #000)' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Password</label>
@@ -1602,19 +1653,19 @@ export default function AdminDashboard({ initialData }) {
           ) : activeTab === "users" ? (
             <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "projects" ? (
-            <ProjectsManager />
+            <ProjectsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "events" ? (
-            <EventsManager />
+            <EventsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "gallery" ? (
-            <GalleryManager />
+            <GalleryManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "faq" ? (
-            <FaqsManager />
+            <FaqsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "products" ? (
-            <ProductsManager />
+            <ProductsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "contacts" ? (
-            <ContactsManager />
+            <ContactsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "socials" ? (
-            <SocialsManager />
+            <SocialsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "manual" ? (
             <UserManual userRole={userRole} />
           ) : activeTab === "settings" ? (

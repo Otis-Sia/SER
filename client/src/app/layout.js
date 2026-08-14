@@ -154,7 +154,7 @@ export default async function RootLayout({ children }) {
                   }
                 } catch (e) {}
               })();
-            `
+            `,
           }}
         />
       </head>

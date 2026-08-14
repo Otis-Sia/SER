@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from 'next/dynamic';
 import styles from "./admin.module.css";
-import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost } from "./actions";
-import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader, FiEyeOff, FiEye } from "react-icons/fi";
+import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost, flagPost } from "./actions";
+import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader, FiEyeOff, FiEye, FiFlag } from "react-icons/fi";
 import 'react-quill-new/dist/quill.snow.css';
 
 const ReactQuill = dynamic(
@@ -74,13 +74,26 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
   };
 
   const handleToggleHide = async (id, currentHiddenStatus) => {
-    if (!confirm(`Are you sure you want to ${currentHiddenStatus ? 'hide' : 'unhide'} this post?`)) return;
-    const res = await toggleHidePost(id, currentHiddenStatus, currentUserEmail);
+    const nextHidden = !currentHiddenStatus;
+    if (!confirm(`Are you sure you want to ${nextHidden ? 'hide' : 'unhide'} this post?`)) return;
+    const res = await toggleHidePost(id, nextHidden, currentUserEmail);
     if (res.success) {
-      showToast(`Post ${currentHiddenStatus ? 'hidden' : 'unhidden'} successfully`);
+      showToast(`Post ${nextHidden ? 'hidden' : 'unhidden'} successfully`);
       loadPosts();
     } else {
       showToast("Error toggling post visibility: " + res.message, "error");
+    }
+  };
+
+  const handleFlag = async (post) => {
+    const nextFlagged = !post.flagged;
+    if (!confirm(`Are you sure you want to ${nextFlagged ? 'flag' : 'unflag'} "${post.title}"?`)) return;
+    const res = await flagPost(post.id, nextFlagged, currentUserEmail);
+    if (res.success) {
+      showToast(`Post "${post.title}" ${nextFlagged ? 'flagged' : 'unflagged'} successfully`);
+      loadPosts();
+    } else {
+      showToast("Error flagging post: " + res.message, "error");
     }
   };
 
@@ -298,64 +311,97 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
             </tr>
           </thead>
           <tbody>
-            {posts.filter(post => {
-              if (currentUserRole === 'Author') {
-                if (post.hidden && post.created_by_email !== currentUserEmail) return false;
-              }
-              return true;
-            }).length === 0 ? (
+            {posts.length === 0 ? (
               <tr><td colSpan="4" style={{ padding: '12px', textAlign: 'center' }}>No posts found.</td></tr>
-            ) : posts.filter(post => {
-              if (currentUserRole === 'Author') {
-                if (post.hidden && post.created_by_email !== currentUserEmail) return false;
-              }
-              return true;
-            }).map(post => (
-              <tr key={post.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: '12px' }}><strong>{post.title}</strong><br/><small style={{ color: '#666' }}>/{post.slug}</small></td>
-                <td style={{ padding: '12px' }}>
-                  {post.hidden ? (
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '12px', 
-                      fontSize: '0.85em', 
-                      background: '#ffebee',
-                      color: '#c62828'
-                    }}>
-                      Hidden
-                    </span>
-                  ) : (
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '12px', 
-                      fontSize: '0.85em', 
-                      background: post.published ? '#e8f5e9' : '#fff3e0',
-                      color: post.published ? '#2e7d32' : '#e65100'
-                    }}>
-                      {post.published ? 'Published' : 'Draft'}
-                    </span>
-                  )}
-                </td>
-                <td style={{ padding: '12px' }}>{new Date(post.created_at).toLocaleDateString()}</td>
-                <td style={{ padding: '12px', textAlign: 'right' }}>
-                  {post.created_by_email === currentUserEmail && (
-                    <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
-                  )}
-                  {post.created_by_email === currentUserEmail && (
-                    <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', marginRight: '8px', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
-                  )}
-                  {["Super Admin", "Admin", "Project Lead"].includes(currentUserRole) && post.created_by_email !== currentUserEmail && (
-                    !post.hidden ? (
-                      <button onClick={() => handleToggleHide(post.id, true)} className={styles.iconBtn} style={{ color: '#ff9800', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }} title="Hide Post"><FiEyeOff size={18} /></button>
-                    ) : (
-                      (post.hiddenByEmail === currentUserEmail || currentUserRole === "Super Admin") && (
-                        <button onClick={() => handleToggleHide(post.id, false)} className={styles.iconBtn} style={{ color: '#4caf50', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }} title="Unhide Post"><FiEye size={18} /></button>
-                      )
-                    )
-                  )}
-                </td>
-              </tr>
-            ))}
+            ) : posts.map(post => {
+              const isOwner = Boolean(post.created_by_email && currentUserEmail && post.created_by_email.toLowerCase() === currentUserEmail.toLowerCase());
+              const canDelete = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
+              const canFlag = !isOwner || ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
+              const canHide = ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
+              const canEdit = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
+
+              return (
+                <tr key={post.id} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '12px' }}>
+                    <strong>{post.title}</strong><br/>
+                    <small style={{ color: '#666' }}>/{post.slug}</small>
+                    {["Super Admin", "Project Lead"].includes(currentUserRole) && (post.created_by_email || post.author) && (
+                      <div style={{ marginTop: '4px' }}>
+                        <span style={{ 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          fontSize: '0.75rem', 
+                          background: '#e0f2fe', 
+                          color: '#0369a1', 
+                          fontWeight: 600,
+                          display: 'inline-block'
+                        }}>
+                          Posted by: {post.created_by_email || post.author}
+                        </span>
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      {post.flagged && (
+                        <span style={{ 
+                          padding: '4px 8px', 
+                          borderRadius: '12px', 
+                          fontSize: '0.8em', 
+                          background: '#fee2e2',
+                          color: '#ef4444',
+                          fontWeight: 600
+                        }}>
+                          Flagged {post.flaggedByEmail ? `by ${post.flaggedByEmail}` : ''}
+                        </span>
+                      )}
+                      {post.hidden && (
+                        <span style={{ 
+                          padding: '4px 8px', 
+                          borderRadius: '12px', 
+                          fontSize: '0.8em', 
+                          background: '#ffebee',
+                          color: '#c62828',
+                          fontWeight: 600
+                        }}>
+                          Hidden {post.hiddenByEmail ? `by ${post.hiddenByEmail}` : ''}
+                        </span>
+                      )}
+                      {!post.hidden && !post.flagged && (
+                        <span style={{ 
+                          padding: '4px 8px', 
+                          borderRadius: '12px', 
+                          fontSize: '0.8em', 
+                          background: post.published ? '#e8f5e9' : '#fff3e0',
+                          color: post.published ? '#2e7d32' : '#e65100'
+                        }}>
+                          {post.published ? 'Published' : 'Draft'}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px' }}>{new Date(post.created_at || post.createdAt || Date.now()).toLocaleDateString()}</td>
+                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                    {canFlag && (
+                      <button onClick={() => handleFlag(post)} className={styles.iconBtn} style={{ color: post.flagged ? '#dc2626' : '#d97706', marginRight: '6px', cursor: 'pointer', background: 'none', border: 'none' }} title={post.flagged ? 'Unflag Post' : 'Flag Post'}>
+                        <FiFlag size={18} />
+                      </button>
+                    )}
+                    {canHide && (
+                      <button onClick={() => handleToggleHide(post.id, post.hidden)} className={styles.iconBtn} style={{ color: post.hidden ? '#059669' : '#ff9800', marginRight: '6px', cursor: 'pointer', background: 'none', border: 'none' }} title={post.hidden ? 'Unhide Post' : 'Hide Post'}>
+                        {post.hidden ? <FiEye size={18} /> : <FiEyeOff size={18} />}
+                      </button>
+                    )}
+                    {canEdit && (
+                      <button onClick={() => handleEdit(post)} className={styles.iconBtn} style={{ color: '#2196F3', marginRight: '6px', cursor: 'pointer', background: 'none', border: 'none' }} title="Edit"><FiEdit size={18} /></button>
+                    )}
+                    {canDelete && (
+                      <button onClick={() => handleDelete(post.id, post.title)} className={styles.iconBtn} style={{ color: '#f44336', marginRight: '6px', cursor: 'pointer', background: 'none', border: 'none' }} title="Delete"><FiTrash2 size={18} /></button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

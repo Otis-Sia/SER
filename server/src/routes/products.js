@@ -1,28 +1,43 @@
 import express from "express";
-import { pool } from "../db.js";
+import { supabase } from "../utils/supabase.js";
 import { requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Public: list products
 router.get("/", async(_, res) => {
-    const { rows } = await pool.query(
-        "SELECT * FROM products ORDER BY featured DESC, created_at DESC"
-    );
-    res.json(rows);
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('featured', { ascending: false })
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        res.json(data);
+    } catch (err) {
+        console.error("Failed to fetch products:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 // Admin: create product
 router.post("/", requireAdmin, async(req, res) => {
     const { name, price_kes, image_url, description, featured } = req.body;
 
-    const { rows } = await pool.query(
-        `INSERT INTO products (name, price_kes, image_url, description, featured)
-     VALUES ($1,$2,$3,$4,$5)
-     RETURNING *`, [name, price_kes, image_url || null, description || null, !!featured]
-    );
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .insert([{ name, price_kes, image_url: image_url || null, description: description || null, featured: !!featured }])
+            .select()
+            .single();
 
-    res.status(201).json(rows[0]);
+        if (error) throw error;
+        res.status(201).json(data);
+    } catch (err) {
+        console.error("Failed to create product:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 export default router;

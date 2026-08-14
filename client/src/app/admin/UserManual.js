@@ -235,7 +235,7 @@ function SuperAdminManual() {
         <h4 style={{ margin: '0.75rem 0 0.5rem 0' }}>Creating a New Admin User</h4>
         <StepList steps={[
           'Click "Add User" or the "+" button.',
-          'Enter the email address, a secure initial password, and select a role (Super Admin, Project Lead, Author, Admin, or Communication).',
+          'Enter the email address, a secure initial password, and select a role (Super Admin, Project Lead, Author, Admin, Communication, or Events).',
           'Click "Create" to add the user.',
           'Instruct the new user to change their password on first login.',
         ]} />
@@ -248,6 +248,7 @@ function SuperAdminManual() {
             ["Project Lead", "Form Responses, Blog, Users, Events, Gallery, Projects, Products"],
             ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery"],
             ["Communication", "Contacts, Social Media"],
+            ["Events", "Events, Blog Posts (Event Reports)"],
             ["Author", "Blog Posts, Gallery"],
           ]}
         />
@@ -737,6 +738,62 @@ function CommunicationManual() {
   );
 }
 
+function EventsRoleManual() {
+  return (
+    <>
+      <Section title="Your Role — Events" icon={<FiBookOpen />}>
+        <p>
+          As an <strong>Events</strong> manager, you are in charge of creating, editing, and scheduling <strong>events</strong>, 
+          as well as writing <strong>event reports</strong> (published via Blog Posts).
+        </p>
+        <Table
+          headers={["Capability", "Access"]}
+          rows={[
+            ["Dashboard Overview", <PermBadge allowed />],
+            ["Events — Create / Edit / Delete", <PermBadge allowed />],
+            ["Blog Posts — Write & Edit Event Reports", <PermBadge allowed />],
+            ["Member Form Responses", <PermBadge allowed={false} />],
+            ["User Management", <PermBadge allowed={false} />],
+            ["Gallery / Projects / Products / FAQs", <PermBadge allowed={false} />],
+            ["Site Content & Settings", <PermBadge allowed={false} />],
+            ["Account Settings", <PermBadge allowed />],
+          ]}
+        />
+      </Section>
+
+      <Section title="Managing Events" defaultOpen={false}>
+        <p>Events appear on the public site and sync automatically to Google Calendar.</p>
+        <StepList steps={[
+          'Navigate to the "Events" tab.',
+          'Click "+ Add Event".',
+          'Fill in Title, Date, Location, and Description.',
+          'Save to publish the event live.',
+        ]} />
+      </Section>
+
+      <Section title="Writing Event Reports" defaultOpen={false}>
+        <p>You can publish event write-ups, summaries, and reports through the <strong>Blog Posts</strong> tab.</p>
+        <StepList steps={[
+          'Navigate to the "Blog Posts" tab.',
+          'Click "New Post".',
+          'Title your post (e.g. "Event Report: Emergency Prep Hub Drill").',
+          'Write the event report content using Markdown and upload cover media.',
+          'Toggle Published to make it live.',
+        ]} />
+      </Section>
+
+      <Section title="What You Cannot Do" defaultOpen={false}>
+        <ul style={{ paddingLeft: '1.5rem' }}>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage projects, shop products, or FAQs.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> View or delete member form responses.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage admin users or site-wide JSON content.</li>
+        </ul>
+        <Callout type="info">If you need additional permissions, contact a Super Admin.</Callout>
+      </Section>
+    </>
+  );
+}
+
 /* ───────────────────────────────────────────────────
    COMMON SECTIONS (shown for all roles)
    ─────────────────────────────────────────────────── */
@@ -813,9 +870,10 @@ export default function UserManual({ userRole }) {
       {roleLabel === "Author" && <AuthorManual />}
       {roleLabel === "Admin" && <AdminRoleManual />}
       {roleLabel === "Communication" && <CommunicationManual />}
+      {roleLabel === "Events" && <EventsRoleManual />}
 
       {/* Fallback for unknown roles */}
-      {!["Super Admin", "Project Lead", "Author", "Admin", "Communication", "Guest"].includes(roleLabel) && (
+      {!["Super Admin", "Project Lead", "Author", "Admin", "Communication", "Events", "Guest"].includes(roleLabel) && (
         <Section title={`Your Role — ${roleLabel}`} icon={<FiBookOpen />}>
           <p>Your role-specific manual is not yet available. Please contact a Super Admin for guidance on your permissions and responsibilities.</p>
         </Section>

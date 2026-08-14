@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { updatePassword } from "firebase/auth";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import { clearMustChangePassword } from "./actions";
 import styles from "./admin.module.css";
 import { FiLoader, FiLock } from "react-icons/fi";
@@ -9,10 +9,24 @@ import { FiLoader, FiLock } from "react-icons/fi";
 export default function ChangePasswordScreen({ user, initialName, initialUsername, onPasswordChanged }) {
   const [name, setName] = useState(initialName || "");
   const [username, setUsername] = useState(initialUsername || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // Hide global header and footer
+    const header = document.querySelector('header');
+    const footer = document.querySelector('footer');
+    if (header) header.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    
+    return () => {
+      if (header) header.style.display = '';
+      if (footer) footer.style.display = '';
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,11 +43,16 @@ export default function ChangePasswordScreen({ user, initialName, initialUsernam
     setError("");
 
     try {
-      // Update password in Firebase Auth
-      await updatePassword(user, newPassword);
+      // Update auth
+      const updatePayload = { password: newPassword };
+      if (email && email !== user.email) {
+        updatePayload.email = email;
+      }
+      const { error: updateError } = await supabase.auth.updateUser(updatePayload);
+      if (updateError) throw updateError;
       
-      // Clear flag in Firestore and save name/username
-      const res = await clearMustChangePassword(user.email, name, username);
+      // Clear flag in Firestore and save name/username/email
+      const res = await clearMustChangePassword(user.email, email || user.email, name, username);
       if (!res.success) {
         throw new Error(res.message);
       }
@@ -42,14 +61,14 @@ export default function ChangePasswordScreen({ user, initialName, initialUsernam
       onPasswordChanged();
     } catch (err) {
       console.error(err);
-      setError(err.message || "Failed to update password. Please try again.");
+      setError(err.message || "Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '2rem' }}>
       <div style={{ background: 'white', padding: '3rem', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
@@ -64,6 +83,17 @@ export default function ChangePasswordScreen({ user, initialName, initialUsernam
         {error && <div style={{ background: '#fef2f2', color: '#ef4444', padding: '0.75rem', borderRadius: '6px', fontSize: '0.9rem' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#334155' }}>Email Address</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              className={styles.input} 
+              required 
+              style={{ width: '100%' }}
+            />
+          </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#334155' }}>Full Name</label>
             <input 

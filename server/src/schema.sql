@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS members (
   county TEXT,
   sub_county TEXT,
   crew TEXT,
-  blood_type VARCHAR(5),
+  blood_type TEXT,
   email TEXT,
   whatsapp TEXT,
   phone TEXT,
@@ -136,4 +136,19 @@ CREATE TABLE IF NOT EXISTS members (
   flagged_by_email TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS donations (
+  id SERIAL PRIMARY KEY,
+  tracking_id TEXT UNIQUE NOT NULL,
+  merchant_reference TEXT,
+  notification_type TEXT,
+  status TEXT,
+  amount NUMERIC,
+  currency TEXT,
+  payment_method TEXT,
+  account TEXT,
+  raw_response JSONB,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );

@@ -46,15 +46,18 @@ try {
   console.warn("Failed to initialize Google Calendar client:", error.message);
 }
 
-export const getCalendarEvents = async () => {
+export const getCalendarEvents = async ({ past = false } = {}) => {
   if (!calendar) return [];
   try {
     const authClient = await calendar.context._options.auth.getClient();
     const cal = google.calendar({ version: "v3", auth: authClient });
 
+    const now = new Date().toISOString();
+    
     const response = await cal.events.list({
       calendarId,
-      timeMin: new Date().toISOString(),
+      timeMin: past ? undefined : now,
+      timeMax: past ? now : undefined,
       timeZone: TIMEZONE,
       maxResults: config.googleCalendarMaxResults,
       singleEvents: true,
@@ -62,6 +65,10 @@ export const getCalendarEvents = async () => {
     });
 
     const events = response.data.items || [];
+    if (past) {
+      // Reverse so newest past events are first
+      events.reverse();
+    }
 
     return events.map((event) => {
       let imageUrl = null;

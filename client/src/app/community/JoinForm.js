@@ -12,6 +12,18 @@ import SearchableSelect from '../../components/SearchableSelect';
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'N/A (Don\'t know)'];
 const ID_TYPES = ['National ID', 'Passport', 'Alien ID', 'Military ID', 'Refugee ID', 'N/A'];
 
+const COUNTRY_PHONE_LENGTHS = {
+  'KE': 9,  // Kenya
+  'US': 10, // USA
+  'CA': 10, // Canada
+  'GB': 10, // UK
+  'UG': 9,  // Uganda
+  'TZ': 9,  // Tanzania
+  'RW': 9,  // Rwanda
+  'IN': 10, // India
+  'ZA': 9,  // South Africa
+};
+
 const allCountriesRaw = Country.getAllCountries();
 const ALL_COUNTRIES = allCountriesRaw.map(c => ({
   value: c.name,
@@ -35,10 +47,12 @@ const ALL_COUNTRIES = allCountriesRaw.map(c => ({
 export default function JoinForm({ initialData = null, isUpdateMode = false }) {
   const [formData, setFormData] = useState(() => {
     const defaults = {
-      name: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
       email: '',
       nationality: 'Kenya',
-      idType: 'National ID',
+      idType: '',
       addressCountry: 'Kenya',
       city: '',
       county: '',
@@ -47,7 +61,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
       otherCity: '',
       otherCounty: '',
       otherSubCounty: '',
-      phone: '',
+      phone: '+254 ',
       idNumber: '',
       dob: '',
       gender: 'Male',
@@ -70,6 +84,16 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
     };
     if (initialData) {
       const merged = { ...defaults, ...initialData };
+      if (merged.name && !merged.firstName && !merged.lastName) {
+        const parts = merged.name.trim().split(/\s+/);
+        merged.firstName = parts[0] || '';
+        if (parts.length > 2) {
+          merged.middleName = parts[1] || '';
+          merged.lastName = parts.slice(2).join(' ') || '';
+        } else {
+          merged.lastName = parts[1] || '';
+        }
+      }
       if (typeof merged.trainings === 'string') {
         merged.trainings = merged.trainings.split(',').map(s => s.trim()).filter(Boolean);
       }
@@ -101,14 +125,38 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
   const otherCountryIso = allCountriesRaw.find(c => c.name === formData.otherAddressCountry)?.isoCode;
   const otherCities = otherCountryIso ? City.getCitiesOfCountry(otherCountryIso).map(c => ({ value: c.name, label: c.name })) : [];
 
+  const isForm1To7Filled =
+    formData.firstName.trim() !== '' &&
+    formData.lastName.trim() !== '' &&
+    formData.email.trim() !== '' &&
+    formData.phone.trim() !== '' &&
+    formData.idType !== '' &&
+    formData.idNumber.trim() !== '' &&
+    formData.dob !== '' &&
+    formData.nextOfKinName.trim() !== '' &&
+    formData.nextOfKinPhone.trim() !== '' &&
     formData.communityPreparedness.trim() !== '' &&
     formData.whyJoin.trim() !== '';
 
   const handleChange = (e) => {
     let { name, value, type, checked } = e.target;
     
-    if (['phone', 'nextOfKinPhone'].includes(name)) {
-      value = value.replace(/[^\d+]/g, '');
+    if (name === 'phone' || name === 'nextOfKinPhone') {
+      const countryField = name === 'phone' ? formData.addressCountry : 'Kenya';
+      const currentCountry = allCountriesRaw.find(c => c.name === countryField);
+      if (currentCountry) {
+        const prefix = `+${currentCountry.phonecode}`;
+        value = value.replace(/[^\d+]/g, '');
+        if (!value.startsWith(prefix)) {
+          value = prefix + ' ';
+        } else {
+          const digits = value.slice(prefix.length).replace(/\D/g, '');
+          const maxDigits = COUNTRY_PHONE_LENGTHS[currentCountry.isoCode] || 15;
+          value = prefix + ' ' + digits.slice(0, maxDigits);
+        }
+      } else {
+        value = value.replace(/[^\d+]/g, '');
+      }
     }
 
     if (name === 'idNumber') {
@@ -145,6 +193,10 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
           next.county = '';
           next.subCounty = '';
           next.city = '';
+          const country = allCountriesRaw.find(c => c.name === value);
+          if (country) {
+            next.phone = `+${country.phonecode} `;
+          }
         }
         if (name === 'otherAddressCountry') {
           next.otherCounty = '';
@@ -213,19 +265,15 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
     setStatus('submitting');
     setErrorMessage('');
 
-    const nameParts = formData.name.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0] || '';
+    const fullName = `${formData.firstName} ${formData.middleName ? formData.middleName + ' ' : ''}${formData.lastName}`.trim().replace(/\s+/g, ' ');
 
     const payload = {
       ...formData,
+      name: fullName,
       hopeToContribute: formData.hopeToContribute.trim() || 'N/A',
       calendarRecommendations: formData.calendarRecommendations.trim() || 'N/A',
       memberGoals: formData.memberGoals.trim() || 'N/A',
       joinedWhatsapp: joinedWhatsappBool,
-      firstName,
-      lastName,
-      middleName: nameParts.length > 2 ? nameParts[1] : '',
       county: formData.county,
       subCounty: formData.subCounty,
       crew: formData.crewDetails || 'N/A',
@@ -501,7 +549,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
               <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--primary-color)' }}>1. Personal Information</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', fontSize: '0.9rem' }}>
-                  <div><strong>Full Name:</strong> <div>{formData.name}</div></div>
+                  <div><strong>Full Name:</strong> <div>{`${formData.firstName} ${formData.middleName ? formData.middleName + ' ' : ''}${formData.lastName}`.trim().replace(/\s+/g, ' ')}</div></div>
                   <div><strong>Email Address:</strong> <div>{formData.email}</div></div>
                   <div><strong>Nationality:</strong> <div>{formData.nationality}</div></div>
                   <div><strong>Phone Number:</strong> <div>{formData.phone}</div></div>
@@ -620,23 +668,51 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
           <fieldset className="join-fieldset">
             <legend>1. Personal Details</legend>
 
-            <div className="join-row join-row--2">
+            <div className="join-row join-row--3">
               <div className="join-field">
-                <label htmlFor="name">
-                  Full Name <span className="required-star">*</span>
+                <label htmlFor="firstName">
+                  First Name <span className="required-star">*</span>
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  placeholder="e.g. John Doe Mwangi"
-                  value={formData.name}
+                  id="firstName"
+                  name="firstName"
+                  placeholder="e.g. John"
+                  value={formData.firstName}
                   onChange={handleChange}
                   required
                 />
-                <span className="join-field-hint">(Insert full name)</span>
               </div>
+              <div className="join-field">
+                <label htmlFor="middleName">
+                  Middle Name (optional)
+                </label>
+                <input
+                  type="text"
+                  id="middleName"
+                  name="middleName"
+                  placeholder="e.g. Doe"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="join-field">
+                <label htmlFor="lastName">
+                  Last Name <span className="required-star">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="e.g. Mwangi"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
+            <div className="join-row" style={{ marginTop: '1rem' }}>
               <div className="join-field">
                 <label htmlFor="email">
                   Email Address <span className="required-star">*</span>
@@ -684,7 +760,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
               </div>
             </div>
 
-            <div className="join-row join-row--2" style={{ marginTop: '1rem' }}>
+            <div className={`join-row ${formData.idType === 'N/A' ? '' : 'join-row--2'}`} style={{ marginTop: '1rem' }}>
               <div className="join-field">
                 <label htmlFor="idType">
                   Identity Type <span className="required-star">*</span>
@@ -696,26 +772,29 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
                   onChange={handleChange}
                   required
                 >
+                  <option value="" disabled>Select</option>
                   {ID_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
               </div>
-              <div className="join-field">
-                <label htmlFor="idNumber">
-                  {formData.idType} Number <span className="required-star">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="idNumber"
-                  name="idNumber"
-                  placeholder="e.g. 12345678"
-                  value={formData.idNumber}
-                  onChange={handleChange}
-                  required
-                />
-                <span className="join-field-hint">If you do not have an ID number, please enter "0000"</span>
-              </div>
+              {formData.idType !== 'N/A' && (
+                <div className="join-field">
+                  <label htmlFor="idNumber">
+                    {formData.idType ? `${formData.idType} Number` : 'ID Number'} <span className="required-star">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="idNumber"
+                    name="idNumber"
+                    placeholder="e.g. 12345678"
+                    value={formData.idNumber}
+                    onChange={handleChange}
+                    required
+                  />
+                  <span className="join-field-hint">If you do not have an ID number, please enter "0000"</span>
+                </div>
+              )}
             </div>
 
             <div className="join-row join-row--3" style={{ marginTop: '1rem' }}>
@@ -994,7 +1073,6 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
                   onChange={handleChange}
                   required
                 />
-                <span className="join-field-hint">(Begin with 07 or 01, Not +254)</span>
               </div>
             </div>
           </fieldset>
@@ -1036,15 +1114,18 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
                 <label htmlFor="educationLevel">
                   Highest Level of Education <span className="required-star">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   id="educationLevel"
                   name="educationLevel"
-                  placeholder="Primary, Secondary, University/College"
                   value={formData.educationLevel}
                   onChange={handleChange}
                   required
-                />
+                >
+                  <option value="" disabled>Select Education Level</option>
+                  <option value="Primary">Primary</option>
+                  <option value="Secondary">Secondary</option>
+                  <option value="Tertiary Education">Tertiary Education</option>
+                </select>
               </div>
             </div>
 

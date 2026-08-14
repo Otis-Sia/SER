@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./admin.module.css";
-import { FiRefreshCw, FiEdit, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
+import { FiRefreshCw, FiEdit, FiTrash2, FiSave, FiX, FiPlus, FiFlag, FiEye, FiEyeOff } from "react-icons/fi";
 import RichTextEditor from "../../components/RichTextEditor";
 import {
   getProjects, addProject, updateProject, deleteProject,
@@ -11,12 +11,14 @@ import {
   getFaqs, addFaq, updateFaq, deleteFaq,
   getProducts, addProduct, updateProduct, deleteProduct,
   getContacts, addContact, updateContact, deleteContact,
-  getSocialMedia, addSocialMedia, updateSocialMedia, deleteSocialMedia
+  getSocialMedia, addSocialMedia, updateSocialMedia, deleteSocialMedia,
+  flagCmsDocument, hideCmsDocument
 } from "./actions";
 
 // Generic Collection Manager Component
 function CollectionManager({ 
-  title, fetchAction, addAction, updateAction, deleteAction, defaultItem, renderFields 
+  collectionName, title, fetchAction, addAction, updateAction, deleteAction, defaultItem, renderFields,
+  currentUserEmail, currentUserRole 
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,11 @@ function CollectionManager({
   const handleSave = async (id) => {
     let result;
     if (id === 'new') {
-      result = await addAction(editFormData);
+      const payload = {
+        ...editFormData,
+        created_by_email: currentUserEmail || editFormData.created_by_email || ""
+      };
+      result = await addAction(payload);
     } else {
       result = await updateAction(id, editFormData);
     }
@@ -76,6 +82,29 @@ function CollectionManager({
       loadItems();
     } else {
       alert("Error deleting: " + result.message);
+    }
+  };
+
+  const handleFlag = async (item) => {
+    const nextFlagged = !item.flagged;
+    const label = item.title || item.name || item.question || item.type || item.platform || "this item";
+    if (!confirm(`Are you sure you want to ${nextFlagged ? 'flag' : 'unflag'} "${label}"?`)) return;
+    const result = await flagCmsDocument(collectionName, item.id, nextFlagged, currentUserEmail);
+    if (result.success) {
+      loadItems();
+    } else {
+      alert("Error updating flag: " + result.message);
+    }
+  };
+
+  const handleHide = async (id, currentHidden) => {
+    const nextHidden = !currentHidden;
+    if (!confirm(`Are you sure you want to ${nextHidden ? 'hide' : 'unhide'} this item?`)) return;
+    const result = await hideCmsDocument(collectionName, id, nextHidden, currentUserEmail);
+    if (result.success) {
+      loadItems();
+    } else {
+      alert("Error updating visibility: " + result.message);
     }
   };
 
@@ -113,29 +142,72 @@ function CollectionManager({
             </div>
           )}
 
-          {items.map(item => (
-            <div key={item.id} className={styles.collectionCard}>
-              {editingId === item.id ? (
-                <div>
-                  {renderFields(editFormData, handleChange)}
-                  <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button className={styles.actionBtn} onClick={() => handleSave(item.id)}><FiSave /> Save</button>
-                    <button className={styles.actionBtnCancel} onClick={handleCancel}><FiX /> Cancel</button>
+          {items.map(item => {
+            const isOwner = Boolean(item.created_by_email && currentUserEmail && item.created_by_email.toLowerCase() === currentUserEmail.toLowerCase());
+            const canDelete = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
+            const canFlag = !isOwner || ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
+            const canHide = ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
+            const canEdit = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
+
+            return (
+              <div key={item.id} className={styles.collectionCard}>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                  {/* Badges and metadata */}
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.5rem', alignItems: 'center' }}>
+                    {item.flagged && (
+                      <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', background: '#fee2e2', color: '#ef4444', fontWeight: 600 }}>
+                        Flagged {item.flaggedByEmail ? `by ${item.flaggedByEmail}` : ''}
+                      </span>
+                    )}
+                    {item.hidden && (
+                      <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', background: '#fff3e0', color: '#e65100', fontWeight: 600 }}>
+                        Hidden {item.hiddenByEmail ? `by ${item.hiddenByEmail}` : ''}
+                      </span>
+                    )}
+                    {["Super Admin", "Project Lead"].includes(currentUserRole) && item.created_by_email && (
+                      <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', fontWeight: 600 }}>
+                        Posted by: {item.created_by_email}
+                      </span>
+                    )}
                   </div>
+
+                  {editingId === item.id ? (
+                    <div>
+                      {renderFields(editFormData, handleChange)}
+                      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button className={styles.actionBtn} onClick={() => handleSave(item.id)}><FiSave /> Save</button>
+                        <button className={styles.actionBtnCancel} onClick={handleCancel}><FiX /> Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.collectionCardContent}>
+                      {renderFields(item, null, true)}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <div className={styles.collectionCardContent}>
-                    {renderFields(item, null, true)}
+                {editingId !== item.id && (
+                  <div className={styles.collectionCardActions} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0' }}>
+                    {canFlag && (
+                      <button className={styles.actionBtn} style={{ background: item.flagged ? '#dc2626' : '#d97706', color: '#fff', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={() => handleFlag(item)}>
+                        <FiFlag /> {item.flagged ? 'Unflag' : 'Flag'}
+                      </button>
+                    )}
+                    {canHide && (
+                      <button className={styles.actionBtn} style={{ background: item.hidden ? '#059669' : '#4b5563', color: '#fff', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={() => handleHide(item.id, item.hidden)}>
+                        {item.hidden ? <FiEye /> : <FiEyeOff />} {item.hidden ? 'Unhide' : 'Hide'}
+                      </button>
+                    )}
+                    {canEdit && (
+                      <button className={styles.actionBtnEdit} onClick={() => handleEdit(item)}><FiEdit /> Edit</button>
+                    )}
+                    {canDelete && (
+                      <button className={styles.actionBtnDelete} onClick={() => handleDelete(item.id)}><FiTrash2 /> Delete</button>
+                    )}
                   </div>
-                  <div className={styles.collectionCardActions}>
-                    <button className={styles.actionBtnEdit} onClick={() => handleEdit(item)}><FiEdit /> Edit</button>
-                    <button className={styles.actionBtnDelete} onClick={() => handleDelete(item.id)}><FiTrash2 /> Delete</button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
           {items.length === 0 && editingId !== 'new' && <p>No items found.</p>}
         </div>
       )}
@@ -170,6 +242,7 @@ const renderEventFields = (data, onChange, readOnly = false) => {
       <h4 style={{ margin: '0 0 0.25rem 0' }}>{data.title}</h4>
       <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
         {data.eventDate && <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(18,154,68,0.1)', color: 'var(--primary-color)', fontWeight: 600 }}>{data.eventDate}</span>}
+        {data.time && <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', fontWeight: 600 }}>{data.time}</span>}
         {data.location && <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '999px', background: 'rgba(0,0,0,0.06)', fontWeight: 600 }}>{data.location}</span>}
       </p>
       {data.description && <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>{data.description}</p>}
@@ -178,7 +251,10 @@ const renderEventFields = (data, onChange, readOnly = false) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <input className={styles.input} name="title" value={data.title || ''} onChange={onChange} placeholder="Event Title" />
-      <input type="date" className={styles.input} name="eventDate" value={data.eventDate || ''} onChange={onChange} />
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <input type="date" className={styles.input} style={{ flex: 1 }} name="eventDate" value={data.eventDate || ''} onChange={onChange} />
+        <input type="time" className={styles.input} style={{ flex: 1 }} name="time" value={data.time || ''} onChange={onChange} placeholder="Time" />
+      </div>
       <input className={styles.input} name="location" value={data.location || ''} onChange={onChange} placeholder="Location" />
       <RichTextEditor name="description" value={data.description || ''} onChange={(val) => onChange({ target: { name: 'description', value: val } })} placeholder="Description" />
     </div>
@@ -249,11 +325,11 @@ const renderProductFields = (data, onChange, readOnly = false) => {
 };
 
 // Export individual managers
-export const ProjectsManager = () => <CollectionManager title="Projects" fetchAction={getProjects} addAction={addProject} updateAction={updateProject} deleteAction={deleteProject} defaultItem={{ title: '', focus: '', description: '', link: '', linkText: '' }} renderFields={renderProjectFields} />;
-export const EventsManager = () => <CollectionManager title="Events" fetchAction={getEvents} addAction={addEvent} updateAction={updateEvent} deleteAction={deleteEvent} defaultItem={{ title: '', eventDate: '', location: '', description: '' }} renderFields={renderEventFields} />;
-export const GalleryManager = () => <CollectionManager title="Gallery Items" fetchAction={getGalleryItems} addAction={addGalleryItem} updateAction={updateGalleryItem} deleteAction={deleteGalleryItem} defaultItem={{ title: '', imageUrl: '', alt: '', description: '' }} renderFields={renderGalleryFields} />;
-export const FaqsManager = () => <CollectionManager title="FAQs" fetchAction={getFaqs} addAction={addFaq} updateAction={updateFaq} deleteAction={deleteFaq} defaultItem={{ question: '', answer: '', order: 0 }} renderFields={renderFaqFields} />;
-export const ProductsManager = () => <CollectionManager title="Products" fetchAction={getProducts} addAction={addProduct} updateAction={updateProduct} deleteAction={deleteProduct} defaultItem={{ name: '', priceKes: 0, imageUrl: '', description: '', featured: false }} renderFields={renderProductFields} />;
+export const ProjectsManager = (props) => <CollectionManager collectionName="projects" title="Projects" fetchAction={getProjects} addAction={addProject} updateAction={updateProject} deleteAction={deleteProject} defaultItem={{ title: '', focus: '', description: '', link: '', linkText: '' }} renderFields={renderProjectFields} {...props} />;
+export const EventsManager = (props) => <CollectionManager collectionName="events" title="Events" fetchAction={getEvents} addAction={addEvent} updateAction={updateEvent} deleteAction={deleteEvent} defaultItem={{ title: '', eventDate: '', time: '', location: '', description: '' }} renderFields={renderEventFields} {...props} />;
+export const GalleryManager = (props) => <CollectionManager collectionName="gallery" title="Gallery Items" fetchAction={getGalleryItems} addAction={addGalleryItem} updateAction={updateGalleryItem} deleteAction={deleteGalleryItem} defaultItem={{ title: '', imageUrl: '', alt: '', description: '' }} renderFields={renderGalleryFields} {...props} />;
+export const FaqsManager = (props) => <CollectionManager collectionName="faqs" title="FAQs" fetchAction={getFaqs} addAction={addFaq} updateAction={updateFaq} deleteAction={deleteFaq} defaultItem={{ question: '', answer: '', order: 0 }} renderFields={renderFaqFields} {...props} />;
+export const ProductsManager = (props) => <CollectionManager collectionName="products" title="Products" fetchAction={getProducts} addAction={addProduct} updateAction={updateProduct} deleteAction={deleteProduct} defaultItem={{ name: '', priceKes: 0, imageUrl: '', description: '', featured: false }} renderFields={renderProductFields} {...props} />;
 
 const renderContactFields = (data, onChange, readOnly = false) => {
   if (readOnly) return (
@@ -304,5 +380,5 @@ const renderSocialFields = (data, onChange, readOnly = false) => {
   );
 };
 
-export const ContactsManager = () => <CollectionManager title="Contact Info" fetchAction={getContacts} addAction={addContact} updateAction={updateContact} deleteAction={deleteContact} defaultItem={{ type: '', value: '', order: 0 }} renderFields={renderContactFields} />;
-export const SocialsManager = () => <CollectionManager title="Social Media" fetchAction={getSocialMedia} addAction={addSocialMedia} updateAction={updateSocialMedia} deleteAction={deleteSocialMedia} defaultItem={{ platform: '', type: '', url: '' }} renderFields={renderSocialFields} />;
+export const ContactsManager = (props) => <CollectionManager collectionName="contacts" title="Contact Info" fetchAction={getContacts} addAction={addContact} updateAction={updateContact} deleteAction={deleteContact} defaultItem={{ type: '', value: '', order: 0 }} renderFields={renderContactFields} {...props} />;
+export const SocialsManager = (props) => <CollectionManager collectionName="social_media" title="Social Media" fetchAction={getSocialMedia} addAction={addSocialMedia} updateAction={updateSocialMedia} deleteAction={deleteSocialMedia} defaultItem={{ platform: '', type: '', url: '' }} renderFields={renderSocialFields} {...props} />;

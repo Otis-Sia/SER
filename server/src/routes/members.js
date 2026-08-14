@@ -1,5 +1,5 @@
 import express from "express";
-import { pool } from "../db.js";
+import { supabase } from "../utils/supabase.js";
 
 const router = express.Router();
 
@@ -25,29 +25,34 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const { rows } = await pool.query(
-      `INSERT INTO members (first_name, middle_name, last_name, county, sub_county, crew, blood_type, email, whatsapp)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-       RETURNING *`,
-      [
-        first_name,
-        middle_name || null,
-        last_name,
-        county,
-        sub_county,
-        crew,
-        blood_type || null,
-        email,
-        whatsapp,
-      ]
-    );
+    const { data, error } = await supabase
+      .from('members')
+      .insert([
+        {
+          name: `${first_name} ${last_name}`,
+          first_name,
+          middle_name: middle_name || null,
+          last_name,
+          county,
+          sub_county,
+          crew,
+          blood_type: blood_type || null,
+          email,
+          whatsapp,
+        }
+      ])
+      .select()
+      .single();
 
-    res.status(201).json(rows[0]);
-  } catch (err) {
-    // Handle duplicate email
-    if (err.code === "23505" && err.constraint?.includes("email")) {
-      return res.status(409).json({ error: "This email address is already registered." });
+    if (error) {
+      if (error.code === "23505" && error.message?.includes("email")) {
+        return res.status(409).json({ error: "This email address is already registered." });
+      }
+      throw error;
     }
+
+    res.status(201).json(data);
+  } catch (err) {
     console.error("Failed to insert member:", err);
     res.status(500).json({ error: "Internal server error. Please try again later." });
   }
@@ -56,12 +61,13 @@ router.post("/", async (req, res) => {
 // Admin: list all members (no auth middleware required for now, can be added later)
 router.get("/", async (_req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT id, first_name, middle_name, last_name, county, sub_county, crew, blood_type, email, whatsapp, created_at
-       FROM members
-       ORDER BY created_at DESC`
-    );
-    res.json(rows);
+    const { data, error } = await supabase
+      .from('members')
+      .select('id, first_name, middle_name, last_name, county, sub_county, crew, blood_type, email, whatsapp, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     console.error("Failed to fetch members:", err);
     res.status(500).json({ error: "Internal server error" });

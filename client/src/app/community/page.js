@@ -5,28 +5,25 @@ import CommunityClient from './CommunityClient';
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { getSiteContent } from '../admin/actions';
 
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+
 async function getPosts() {
   try {
-    const db = getAdminDb();
-    if (!db) return [];
-    
-    const snapshot = await db.collection("posts")
-      .orderBy("published_at", "desc")
-      .get();
+    const { data: docs, error } = await supabaseAdmin
+      .from("posts")
+      .select("id, title, slug, cover_url, published_at")
+      .eq("published", true)
+      .order("published_at", { ascending: false });
       
-    // Filter published posts in memory to avoid needing a Firestore composite index
-    const docs = snapshot.docs.filter(doc => doc.data().published === true);
+    if (error) throw error;
     
-    return docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        title: data.title,
-        slug: data.slug,
-        cover_url: data.cover_url,
-        published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
-      };
-    });
+    return (docs || []).map(doc => ({
+      id: doc.id,
+      title: doc.title,
+      slug: doc.slug,
+      cover_url: doc.cover_url,
+      published_at: doc.published_at,
+    }));
   } catch (error) {
     console.error("Failed to fetch blog posts:", error);
     return [];

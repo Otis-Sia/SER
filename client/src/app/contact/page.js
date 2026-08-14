@@ -37,7 +37,7 @@ export async function generateMetadata() {
 
 export default async function Contact() {
   const siteContent = await getSiteContent();
-  const faqs = await getFaqs();
+  const faqs = await getFaqs(true);
   const contactData = siteContent.contact || {};
 
   // Read social profiles from siteMeta

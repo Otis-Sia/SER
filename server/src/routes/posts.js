@@ -1,55 +1,24 @@
 import express from "express";
-import { db } from "../utils/firebase.js";
+import { supabase } from "../utils/supabase.js";
 import { requireAdmin } from "../middleware/auth.js";
 import slugify from "slugify";
-import { config } from "../config.js";
 
 const router = express.Router();
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatPost(doc) {
-  const data = doc.data();
-  return {
-    id: doc.id,
-    ...data,
-    // Normalize Firestore Timestamps to ISO strings
-    created_at: data.created_at?.toDate?.()?.toISOString?.() ?? data.created_at ?? new Date().toISOString(),
-    updated_at: data.updated_at?.toDate?.()?.toISOString?.() ?? data.updated_at ?? new Date().toISOString(),
-    published_at: data.published_at?.toDate?.()?.toISOString?.() ?? data.published_at ?? null,
-  };
-}
 
 // ── Public Routes ─────────────────────────────────────────────────────────────
 
 // Public: list published posts (newest first)
 router.get("/", async (_req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id, title, slug, cover_url, published_at, created_at, updated_at')
+      .eq('published', true)
+      .eq('hidden', false)
+      .order('published_at', { ascending: false });
 
-    const snapshot = await db
-      .collection(config.firestoreCollections.posts)
-      .where("published", "==", true)
-      .orderBy("published_at", "desc")
-      .get();
-
-    const posts = snapshot.docs
-      .filter(doc => !doc.data().hidden)
-      .map((doc) => {
-      const p = formatPost(doc);
-      // Return only public fields
-      return {
-        id: p.id,
-        title: p.title,
-        slug: p.slug,
-        cover_url: p.cover_url,
-        published_at: p.published_at,
-        created_at: p.created_at,
-        updated_at: p.updated_at,
-      };
-    });
-
-    res.json(posts);
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     console.error("Error fetching posts:", err);
     res.status(500).json({ error: "Server error" });
@@ -59,14 +28,13 @@ router.get("/", async (_req, res) => {
 // Admin: list ALL posts (including drafts)
 router.get("/all", async (_req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const snapshot = await db
-      .collection(config.firestoreCollections.posts)
-      .orderBy("created_at", "desc")
-      .get();
-
-    res.json(snapshot.docs.map(formatPost));
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     console.error("Error fetching all posts:", err);
     res.status(500).json({ error: "Server error" });
@@ -76,20 +44,22 @@ router.get("/all", async (_req, res) => {
 // Public: get single post by slug
 router.get("/slug/:slug", async (req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', req.params.slug)
+      .eq('published', true)
+      .eq('hidden', false)
+      .single();
 
-    const snapshot = await db
-      .collection(config.firestoreCollections.posts)
-      .where("slug", "==", req.params.slug)
-      .where("published", "==", true)
-      .limit(1)
-      .get();
-
-    if (snapshot.empty || snapshot.docs[0].data().hidden) {
-      return res.status(404).json({ error: "Post not found" });
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      throw error;
     }
 
-    res.json(formatPost(snapshot.docs[0]));
+    res.json(data);
   } catch (err) {
     console.error("Error fetching post by slug:", err);
     res.status(500).json({ error: "Server error" });
@@ -101,8 +71,6 @@ router.get("/slug/:slug", async (req, res) => {
 // Admin: create post
 router.post("/", requireAdmin, async (req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
-
     const { title, slug, cover_url, body_md, published } = req.body;
 
     if (!title || !body_md) {
@@ -115,8 +83,14 @@ router.post("/", requireAdmin, async (req, res) => {
       : slugify(String(title), { lower: true, strict: true });
 
     // Check slug uniqueness
-    const existing = await db.collection(config.firestoreCollections.posts).where("slug", "==", safeSlug).limit(1).get();
-    if (!existing.empty) {
+    const { data: existing, error: existError } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('slug', safeSlug)
+      .maybeSingle();
+      
+    if (existError) throw existError;
+    if (existing) {
       return res.status(409).json({ error: "A post with that slug already exists" });
     }
 
@@ -132,9 +106,14 @@ router.post("/", requireAdmin, async (req, res) => {
       updated_at: now,
     };
 
-    const docRef = await db.collection(config.firestoreCollections.posts).add(postData);
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([postData])
+      .select()
+      .single();
 
-    res.status(201).json({ id: docRef.id, ...postData });
+    if (error) throw error;
+    res.status(201).json(data);
   } catch (err) {
     console.error("Error creating post:", err);
     res.status(500).json({ error: "Server error" });
@@ -144,8 +123,6 @@ router.post("/", requireAdmin, async (req, res) => {
 // Admin: update post
 router.put("/:id", requireAdmin, async (req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
-
     const { id } = req.params;
     const { title, slug, cover_url, body_md, published } = req.body;
 
@@ -159,18 +136,32 @@ router.put("/:id", requireAdmin, async (req, res) => {
       : slugify(String(title), { lower: true, strict: true });
 
     // Check slug uniqueness (excluding this doc)
-    const existing = await db.collection(config.firestoreCollections.posts).where("slug", "==", safeSlug).limit(1).get();
-    if (!existing.empty && existing.docs[0].id !== id) {
+    const { data: existing, error: existError } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('slug', safeSlug)
+      .neq('id', id)
+      .maybeSingle();
+      
+    if (existError) throw existError;
+    if (existing) {
       return res.status(409).json({ error: "A post with that slug already exists" });
     }
 
-    const docRef = db.collection(config.firestoreCollections.posts).doc(id);
-    const docSnap = await docRef.get();
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: "Post not found" });
+    const { data: docSnap, error: getError } = await supabase
+      .from('posts')
+      .select('published_at')
+      .eq('id', id)
+      .single();
+
+    if (getError) {
+      if (getError.code === 'PGRST116') {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      throw getError;
     }
 
-    const existing_published_at = docSnap.data().published_at;
+    const existing_published_at = docSnap.published_at;
     const now = new Date().toISOString();
 
     const updateData = {
@@ -183,9 +174,15 @@ router.put("/:id", requireAdmin, async (req, res) => {
       updated_at: now,
     };
 
-    await docRef.update(updateData);
+    const { data, error } = await supabase
+      .from('posts')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
 
-    res.json({ id, ...docSnap.data(), ...updateData });
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     console.error("Error updating post:", err);
     res.status(500).json({ error: "Server error" });
@@ -195,17 +192,14 @@ router.put("/:id", requireAdmin, async (req, res) => {
 // Admin: delete post
 router.delete("/:id", requireAdmin, async (req, res) => {
   try {
-    if (!db) return res.status(503).json({ error: "Database not available" });
-
     const { id } = req.params;
-    const docRef = db.collection(config.firestoreCollections.posts).doc(id);
-    const docSnap = await docRef.get();
+    
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', id);
 
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    await docRef.delete();
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     console.error("Error deleting post:", err);

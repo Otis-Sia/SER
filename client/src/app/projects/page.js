@@ -36,8 +36,8 @@ export async function generateMetadata() {
 
 export default async function Projects() {
   const siteContent = await getSiteContent();
-  const projects = await getProjects();
-  const galleryItems = await getGalleryItems();
+  const projects = await getProjects(true);
+  const galleryItems = await getGalleryItems(true);
 
   return (
     <>
@@ -73,11 +73,13 @@ export default async function Projects() {
       <section className="gallery-section" style={{ marginTop: '4rem' }} id="gallery">
         <h2 className="text-center" style={{ marginBottom: '2rem' }}>Project Gallery</h2>
         <div className="gallery-grid">
-          {galleryItems.filter(item => !item.hidden).map((item, index) => (
+          {galleryItems.filter(item => !item.hidden && (item.imageUrl || item.image || item.image_url)).map((item, index) => {
+            const imgSrc = item.imageUrl || item.image || item.image_url;
+            return (
             <div className="gallery-item" key={item.id || index}>
-              <a href={item.imageUrl || item.image} title={item.title} style={{ position: 'relative', display: 'block', width: '100%', height: '100%', minHeight: '240px' }}>
+              <a href={imgSrc} title={item.title} style={{ position: 'relative', display: 'block', width: '100%', height: '100%', minHeight: '240px' }}>
                 <Image 
-                  src={item.imageUrl || item.image} 
+                  src={imgSrc} 
                   alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 350px"
@@ -97,7 +99,8 @@ export default async function Projects() {
                 </div>
               </a>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

@@ -47,9 +47,22 @@ async function fetchGoogleEvents() {
   }
 }
 
+async function fetchPastGoogleEvents() {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/events?past=true`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    if (error.digest === 'DYNAMIC_SERVER_USAGE') throw error;
+    console.error("Failed to fetch past events from Node API:", error);
+    return [];
+  }
+}
+
 export default async function Events() {
   const siteContent = await getSiteContent();
   const events = await fetchGoogleEvents();
+  const pastEvents = await fetchPastGoogleEvents();
 
   return (
     <>
@@ -112,6 +125,33 @@ export default async function Events() {
           )}
         </div>
       </section>
+
+      {pastEvents.length > 0 && (
+        <section className="events-upcoming" style={{ backgroundColor: 'var(--light-gray-color)' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Past Events</h2>
+          <div className="product-grid grid-spaced">
+            {pastEvents.map((event) => {
+              const startDate = new Date(event.event_date || event.eventDate || new Date());
+              const endDate = event.end_date 
+                ? new Date(event.end_date) 
+                : new Date(startDate.getTime() + 60 * 60 * 1000);
+
+              const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+              const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
+              const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
+
+              return (
+                <EventCard 
+                  key={event.id}
+                  event={event}
+                  isLive={false}
+                  googleCalUrl={googleCalUrl}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="events-cta text-center">
         <h2>Stay Updated</h2>
