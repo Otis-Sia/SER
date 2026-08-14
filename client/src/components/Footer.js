@@ -63,6 +63,11 @@ export default function Footer({ osns = [], siteContent = {} }) {
         {/* Bottom Bar */}
         <div className="footer-bottom">
           <p>&copy; {currentYear} {siteMeta.title || "Scouts Emergency Response"}. All rights reserved.</p>
+          <div className="footer-legal-links" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', margin: '0.5rem 0', fontSize: '0.85rem' }}>
+            <Link href="/terms" style={{ color: 'inherit', textDecoration: 'underline' }}>Terms of Service &amp; Media Release</Link>
+            <span>&middot;</span>
+            <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'underline' }}>Privacy Policy</Link>
+          </div>
           <p className="footer-subtitle">Youths &middot; Volunteers &middot; Members</p>
         </div>
       </div>

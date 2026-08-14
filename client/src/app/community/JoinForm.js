@@ -637,7 +637,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
 
               {/* Section 8 Declaration confirmation */}
               <div style={{ background: '#ecfdf5', padding: '1rem', borderRadius: '8px', border: '1px solid #10b981', fontSize: '0.9rem', color: '#065f46' }}>
-                <strong><FiCheck style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Declaration Confirmed:</strong> Legal guidelines and terms accepted.
+                <strong><FiCheck style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Declaration &amp; Media Release Confirmed:</strong> Legal guidelines, photo/media release consent, terms of service, and privacy policies accepted.
               </div>
             </div>
           </div>
@@ -1289,7 +1289,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
 
           {/* Section 8: Declaration */}
           <fieldset className="join-fieldset">
-            <legend>8. Declaration</legend>
+            <legend>8. Declaration &amp; Photo/Media Release</legend>
 
             <div className="join-declaration-box">
               <label className="join-option-label" style={{ alignItems: 'flex-start', border: 'none', background: 'transparent' }}>
@@ -1302,7 +1302,7 @@ export default function JoinForm({ initialData = null, isUpdateMode = false }) {
                   required
                 />
                 <span style={{ fontSize: '0.88rem', lineHeight: '1.5' }}>
-                  <strong>Declaration:</strong> I hereby confirm that the information I have provided is true and accurate to the best of my knowledge. I understand that my participation in Scouts Emergency Response (SER) activities requires adherence to safety guidelines and that my details may be used for communication, coordination, and emergency response purposes. I agree to actively participate responsibly and uphold the values of SER. <span className="required-star">*</span>
+                  <strong>Declaration &amp; Media Release:</strong> I hereby confirm that the information provided is true and accurate to the best of my knowledge. I understand that participation in Scouts Emergency Response (SER) requires adherence to safety guidelines and that my details may be used for communication, coordination, and emergency response purposes. Furthermore, I grant SER permission to capture, publish, and use photographs, videos, or audio recordings of me taken during SER activities on SER's official website, social media channels, and promotional media. I agree to actively participate responsibly, uphold the values of SER, and abide by the <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'underline', fontWeight: 600 }}>Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'underline', fontWeight: 600 }}>Privacy Policy</a>. <span className="required-star">*</span>
                 </span>
               </label>
             </div>

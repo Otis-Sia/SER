@@ -1460,7 +1460,7 @@ export default function AdminDashboard({ initialData }) {
   } else if (userRole === "Admin") {
     tabs = ["registrations", "blogs", "users", "events", "faq", "gallery"];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "products"];
+    tabs = ["registrations", "blogs", "users", "projects", "events", "faq", "gallery", "products"];
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
