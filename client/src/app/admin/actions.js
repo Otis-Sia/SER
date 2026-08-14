@@ -19,6 +19,7 @@ export async function submitMemberRegistration(memberData) {
     const { data: inserted, error } = await supabaseAdmin
       .from("members")
       .insert([{
+        name: memberData.name || `${memberData.firstName || ""} ${memberData.lastName || ""}`.trim().replace(/\s+/g, ' '),
         id_number: String(memberData.idNumber || ''),
         first_name: memberData.firstName || '',
         middle_name: memberData.middleName || '',
@@ -183,6 +184,7 @@ export async function updateMemberRegistrationStatus(id, flagged, byEmail) {
 export async function updateMemberRegistration(id, dataToUpdate) {
   try {
     const payload = {};
+    if (dataToUpdate.name !== undefined) payload.name = dataToUpdate.name;
     if (dataToUpdate.firstName !== undefined) payload.first_name = dataToUpdate.firstName;
     if (dataToUpdate.middleName !== undefined) payload.middle_name = dataToUpdate.middleName;
     if (dataToUpdate.lastName !== undefined) payload.last_name = dataToUpdate.lastName;
