@@ -6,13 +6,45 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { config } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-const s3Client = new S3Client({
-  region: process.env.APP_AWS_REGION || "eu-north-1",
-  credentials: {
-    accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY || "",
-  },
-});
+function getS3Client() {
+  const accessKeyId = (
+    process.env.APP_AWS_ACCESS_KEY_ID ||
+    process.env.AWS_ACCESS_KEY_ID ||
+    ""
+  ).trim();
+
+  const secretAccessKey = (
+    process.env.APP_AWS_SECRET_ACCESS_KEY ||
+    process.env.AWS_SECRET_ACCESS_KEY ||
+    ""
+  ).trim();
+
+  const region = (
+    process.env.APP_AWS_REGION ||
+    process.env.AWS_REGION ||
+    "eu-north-1"
+  ).trim();
+
+  const bucketName = (
+    process.env.APP_AWS_S3_BUCKET_NAME ||
+    process.env.AWS_S3_BUCKET_NAME ||
+    "juj4-shop-assets-2026"
+  ).trim();
+
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error("AWS credentials are missing. Please configure APP_AWS_ACCESS_KEY_ID and APP_AWS_SECRET_ACCESS_KEY in your environment variables.");
+  }
+
+  const client = new S3Client({
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
+
+  return { client, bucketName, region };
+}
 
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
 
@@ -705,6 +737,8 @@ export async function uploadImage(formData) {
       return { success: false, message: 'No image file provided' };
     }
 
+    const { client, bucketName, region } = getS3Client();
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
@@ -712,9 +746,6 @@ export async function uploadImage(formData) {
     const ext = path.extname(originalName) || '.jpg';
     const cleanExt = ext.toLowerCase();
     const key = `uploads/${randomUUID()}${cleanExt}`;
-    
-    const bucketName = process.env.APP_AWS_S3_BUCKET_NAME || 'juj4-shop-assets-2026';
-    const region = process.env.APP_AWS_REGION || 'eu-north-1';
 
     const command = new PutObjectCommand({
       Bucket: bucketName,
@@ -723,7 +754,7 @@ export async function uploadImage(formData) {
       ContentType: file.type || 'image/jpeg',
     });
 
-    await s3Client.send(command);
+    await client.send(command);
 
     const url = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
     return { success: true, url, key };
