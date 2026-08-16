@@ -34,10 +34,17 @@ export async function generateMetadata() {
   };
 }
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Projects() {
   const siteContent = await getSiteContent();
   const projects = await getProjects(true);
   const galleryItems = await getGalleryItems(true);
+
+  const visibleGallery = (galleryItems || []).filter(
+    (item) => !item.hidden && !item.flagged && (item.imageUrl || item.image || item.image_url)
+  );
 
   return (
     <>
@@ -72,36 +79,48 @@ export default async function Projects() {
 
       <section className="gallery-section" style={{ marginTop: '4rem' }} id="gallery">
         <h2 className="text-center" style={{ marginBottom: '2rem' }}>Project Gallery</h2>
-        <div className="gallery-grid">
-          {galleryItems.filter(item => !item.hidden && (item.imageUrl || item.image || item.image_url)).map((item, index) => {
-            const imgSrc = item.imageUrl || item.image || item.image_url;
-            return (
-            <div className="gallery-item" key={item.id || index}>
-              <a href={imgSrc} title={item.title} style={{ position: 'relative', display: 'block', width: '100%', height: '100%', minHeight: '240px' }}>
-                <Image 
-                  src={imgSrc} 
-                  alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
-                  fill
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 350px"
-                  quality={75}
-                  style={{ objectFit: 'cover' }}
-                />
-                <div className="overlay">
-                  <span className="overlay-title">{item.title}</span>
-                  {item.description && (
-                    <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
-                      {item.description}
-                    </p>
-                  )}
-                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
-                    View Image
-                  </span>
+        {visibleGallery.length === 0 ? (
+          <p className="intro-text text-center" style={{ opacity: 0.7 }}>
+            No gallery items uploaded yet.
+          </p>
+        ) : (
+          <div className="gallery-grid">
+            {visibleGallery.map((item, index) => {
+              const imgSrc = item.imageUrl || item.image || item.image_url;
+              return (
+                <div className="gallery-item" key={item.id || index}>
+                  <a
+                    href={imgSrc}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={item.title}
+                    style={{ position: 'relative', display: 'block', width: '100%', height: '100%', minHeight: '240px' }}
+                  >
+                    <Image 
+                      src={imgSrc} 
+                      alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
+                      fill
+                      unoptimized
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 350px"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <div className="overlay">
+                      <span className="overlay-title">{item.title}</span>
+                      {item.description && (
+                        <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
+                          {item.description}
+                        </p>
+                      )}
+                      <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
+                        View Image
+                      </span>
+                    </div>
+                  </a>
                 </div>
-              </a>
-            </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="project-cta text-center">

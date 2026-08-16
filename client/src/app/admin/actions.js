@@ -2,6 +2,7 @@
 
 import path from "path";
 import { randomUUID } from "crypto";
+import { revalidatePath } from "next/cache";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { config } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -685,6 +686,22 @@ export async function getPublicCmsCollection(collectionName, orderByField, order
   }
 }
 
+function revalidateCmsPaths(collectionName) {
+  try {
+    if (collectionName === 'gallery' || collectionName === 'projects') {
+      revalidatePath('/projects');
+    } else if (collectionName === 'products') {
+      revalidatePath('/shop');
+    } else if (collectionName === 'events') {
+      revalidatePath('/events');
+    }
+    revalidatePath('/admin');
+    revalidatePath('/');
+  } catch (e) {
+    // Ignore outside request context
+  }
+}
+
 export async function saveCmsDocument(collectionName, id, data) {
   try {
     const payload = mapCmsPayload(collectionName, data);
@@ -698,6 +715,7 @@ export async function saveCmsDocument(collectionName, id, data) {
       if (error) throw error;
       docId = inserted.id;
     }
+    revalidateCmsPaths(collectionName);
     return { success: true, id: docId };
   } catch (error) {
     console.error(`Error saving document in ${collectionName}:`, error);
@@ -713,6 +731,7 @@ export async function flagCmsDocument(collectionName, id, flagged, byEmail) {
     };
     const { error } = await supabaseAdmin.from(collectionName).update(payload).eq("id", id);
     if (error) throw error;
+    revalidateCmsPaths(collectionName);
     return { success: true };
   } catch (error) {
     console.error(`Error flagging document in ${collectionName}:`, error);
@@ -728,6 +747,7 @@ export async function hideCmsDocument(collectionName, id, hidden, byEmail) {
     };
     const { error } = await supabaseAdmin.from(collectionName).update(payload).eq("id", id);
     if (error) throw error;
+    revalidateCmsPaths(collectionName);
     return { success: true };
   } catch (error) {
     console.error(`Error hiding document in ${collectionName}:`, error);
@@ -739,6 +759,7 @@ export async function deleteCmsDocument(collectionName, id) {
   try {
     const { error } = await supabaseAdmin.from(collectionName).delete().eq("id", id);
     if (error) throw error;
+    revalidateCmsPaths(collectionName);
     return { success: true };
   } catch (error) {
     console.error(`Error deleting document from ${collectionName}:`, error);
