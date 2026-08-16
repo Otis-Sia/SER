@@ -6,33 +6,54 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { config } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+function cleanEnv(val) {
+  if (!val) return "";
+  let s = String(val).trim();
+  // Strip surrounding double or single quotes if present
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
 function getS3Client() {
-  const accessKeyId = (
+  const accessKeyId = cleanEnv(
     process.env.APP_AWS_ACCESS_KEY_ID ||
     process.env.AWS_ACCESS_KEY_ID ||
-    ""
-  ).trim();
+    process.env.AWS_KEY_ID ||
+    process.env.S3_ACCESS_KEY_ID ||
+    process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID
+  );
 
-  const secretAccessKey = (
+  const secretAccessKey = cleanEnv(
     process.env.APP_AWS_SECRET_ACCESS_KEY ||
     process.env.AWS_SECRET_ACCESS_KEY ||
-    ""
-  ).trim();
+    process.env.AWS_SECRET_KEY ||
+    process.env.S3_SECRET_ACCESS_KEY ||
+    process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY
+  );
 
-  const region = (
+  const region = cleanEnv(
     process.env.APP_AWS_REGION ||
     process.env.AWS_REGION ||
+    process.env.AWS_DEFAULT_REGION ||
+    process.env.S3_REGION ||
     "eu-north-1"
-  ).trim();
+  );
 
-  const bucketName = (
+  const bucketName = cleanEnv(
     process.env.APP_AWS_S3_BUCKET_NAME ||
     process.env.AWS_S3_BUCKET_NAME ||
+    process.env.AWS_BUCKET_NAME ||
+    process.env.S3_BUCKET_NAME ||
+    process.env.AWS_BUCKET ||
     "juj4-shop-assets-2026"
-  ).trim();
+  );
 
   if (!accessKeyId || !secretAccessKey) {
-    throw new Error("AWS credentials are missing. Please configure APP_AWS_ACCESS_KEY_ID and APP_AWS_SECRET_ACCESS_KEY in your environment variables.");
+    throw new Error(
+      "AWS credentials missing. Please set APP_AWS_ACCESS_KEY_ID and APP_AWS_SECRET_ACCESS_KEY in your Vercel Project Settings > Environment Variables, and ensure you trigger a new deployment for changes to take effect."
+    );
   }
 
   const client = new S3Client({
