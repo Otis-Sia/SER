@@ -1,7 +1,19 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { FiCamera, FiUploadCloud, FiTrash2, FiMaximize2, FiX, FiLink, FiLoader, FiAlertCircle, FiCheck } from 'react-icons/fi';
+import { 
+  FiCamera, 
+  FiFolder, 
+  FiUploadCloud, 
+  FiTrash2, 
+  FiMaximize2, 
+  FiX, 
+  FiLink, 
+  FiLoader, 
+  FiAlertCircle, 
+  FiCheck,
+  FiUpload
+} from 'react-icons/fi';
 import { uploadImage } from '@/app/admin/actions';
 
 export default function MobileImageUploader({
@@ -16,8 +28,11 @@ export default function MobileImageUploader({
   const [uploadError, setUploadError] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
   const [imgLoadError, setImgLoadError] = useState(false);
+
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -42,9 +57,8 @@ export default function MobileImageUploader({
     } finally {
       setIsUploading(false);
       // Reset input value so the same file can be re-selected if desired
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
   };
 
@@ -53,6 +67,16 @@ export default function MobileImageUploader({
     onChange('');
     setImgLoadError(false);
     setUploadError('');
+  };
+
+  const openCamera = () => {
+    setIsSourceModalOpen(false);
+    cameraInputRef.current?.click();
+  };
+
+  const openFilePicker = () => {
+    setIsSourceModalOpen(false);
+    fileInputRef.current?.click();
   };
 
   const hasImage = typeof value === 'string' && value.trim().length > 0;
@@ -85,16 +109,23 @@ export default function MobileImageUploader({
           position: 'relative',
         }}
       >
-        {/* Hidden File Input */}
+        {/* Hidden File Inputs: One for Camera, One for File Manager / Gallery */}
         <input
           ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={isUploading}
+          style={{ display: 'none' }}
+        />
+        <input
+          ref={cameraInputRef}
           type="file"
           accept="image/*"
           capture="environment"
           onChange={handleFileChange}
           disabled={isUploading}
           style={{ display: 'none' }}
-          id={`mobile-uploader-${label.replace(/\s+/g, '-').toLowerCase()}`}
         />
 
         {/* State 1: An image exists */}
@@ -191,7 +222,7 @@ export default function MobileImageUploader({
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => setIsSourceModalOpen(true)}
                     disabled={isUploading}
                     style={{
                       display: 'inline-flex',
@@ -216,8 +247,8 @@ export default function MobileImageUploader({
                       </>
                     ) : (
                       <>
-                        <FiCamera size={13} />
-                        <span>Replace</span>
+                        <FiUpload size={13} />
+                        <span>Upload</span>
                       </>
                     )}
                   </button>
@@ -276,7 +307,7 @@ export default function MobileImageUploader({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setIsSourceModalOpen(true)}
               disabled={isUploading}
               style={{
                 width: '100%',
@@ -304,8 +335,8 @@ export default function MobileImageUploader({
                 </>
               ) : (
                 <>
-                  <FiCamera size={18} />
-                  <span>Choose Image / Take Photo</span>
+                  <FiUpload size={18} />
+                  <span>Upload</span>
                 </>
               )}
             </button>
@@ -322,7 +353,7 @@ export default function MobileImageUploader({
               }}
             >
               <FiUploadCloud size={14} />
-              <span>Supports JPG, PNG, WebP, GIF from mobile gallery or camera</span>
+              <span>Tap to take a photo or select from device files</span>
             </div>
           </div>
         )}
@@ -415,6 +446,174 @@ export default function MobileImageUploader({
         <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.75rem', color: '#6b7280' }}>
           {helperText}
         </p>
+      )}
+
+      {/* Image Source Selection Modal (Take Photo vs Device Files) */}
+      {isSourceModalOpen && (
+        <div
+          onClick={() => setIsSourceModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            backdropFilter: 'blur(3px)',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '460px',
+              backgroundColor: 'var(--card-bg, #ffffff)',
+              borderTopLeftRadius: '20px',
+              borderTopRightRadius: '20px',
+              padding: '1.5rem',
+              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              margin: '0 auto',
+              marginBottom: 'env(safe-area-inset-bottom, 0px)',
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-color, #111827)' }}>
+                Upload Image
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsSourceModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <FiX size={22} />
+              </button>
+            </div>
+
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+              Choose how you would like to upload your picture:
+            </p>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.25rem' }}>
+              {/* Option 1: Take Photo */}
+              <button
+                type="button"
+                onClick={openCamera}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  padding: '1rem 1.25rem',
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--primary-color, #129a44)',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(18, 154, 68, 0.25)',
+                  textAlign: 'left',
+                  transition: 'transform 0.1s ease',
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <FiCamera size={22} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: '700' }}>Take a Photo</div>
+                  <div style={{ fontSize: '0.78rem', opacity: 0.9, fontWeight: '400' }}>Use your device camera directly</div>
+                </div>
+              </button>
+
+              {/* Option 2: Choose from Device Files */}
+              <button
+                type="button"
+                onClick={openFilePicker}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  padding: '1rem 1.25rem',
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--background-color, #f9fafb)',
+                  color: 'var(--text-color, #111827)',
+                  border: '1.5px solid #d1d5db',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    color: '#374151',
+                  }}
+                >
+                  <FiFolder size={22} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: '700' }}>Upload Device Files</div>
+                  <div style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: '400' }}>Select from gallery or file manager</div>
+                </div>
+              </button>
+            </div>
+
+            {/* Cancel Button */}
+            <button
+              type="button"
+              onClick={() => setIsSourceModalOpen(false)}
+              style={{
+                marginTop: '0.25rem',
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                backgroundColor: '#f3f4f6',
+                color: '#4b5563',
+                border: 'none',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Lightbox / Full-Screen Modal */}
