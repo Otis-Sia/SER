@@ -27,6 +27,7 @@ import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
 import { supabase } from "@/lib/supabaseClient";
 import { ProjectsManager, EventsManager, GalleryManager, FaqsManager, ProductsManager, ContactsManager, SocialsManager } from "./CollectionManagers";
+import MobileImageUploader from "@/components/MobileImageUploader";
 import UserManual from "./UserManual";
 
 const KENYA_COUNTIES = [
@@ -266,7 +267,7 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
 
       {loading ? (
         <div style={{ padding: "3rem", textAlign: "center", opacity: 0.8 }}>
-          <FiRefreshCw style={{ marginRight: '6px', animation: 'spin 2s linear infinite' }} /> Loading member registration responses from Firestore...
+          <FiRefreshCw style={{ marginRight: '6px', animation: 'spin 2s linear infinite' }} /> Loading member registration responses...
         </div>
       ) : filteredMembers.length === 0 ? (
         <div className={styles.section} style={{ textAlign: "center", padding: "3rem" }}>
@@ -638,138 +639,15 @@ function MemberRegistrationsView({ showToast, currentUserRole, currentUserEmail 
   );
 }
 
-function ImageField({ label, value, onChange, pathStr, onOpenModal }) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [imgError, setImgError] = useState(false);
-
-  const processFile = async (file) => {
-    if (!file) return;
-
-    setIsUploading(true);
-    setImgError(false);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const result = await uploadImage(formData);
-    setIsUploading(false);
-
-    if (result.success) {
-      onChange(result.url);
-    } else {
-      alert("Failed to upload image: " + result.message);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    processFile(file);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processFile(file);
-    }
-  };
-
-  const isPreviewable = typeof value === "string" && value.trim() !== "";
-
+function ImageField({ label, value, onChange, pathStr }) {
   return (
-    <div className={styles.formGroup} key={pathStr}>
-      <label className={styles.label}>{label}</label>
-
-      <div
-        className={`${styles.dropzone} ${isDragging ? styles.dragging : ""}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {isPreviewable && (
-          imgError ? (
-            <div className={styles.imageErrorBadge}>
-              <FiAlertTriangle style={{ marginRight: '6px' }} /> Preview Unavailable (Invalid or Broken Link)
-            </div>
-          ) : (
-            <div
-              className={styles.imagePreviewContainer}
-              onClick={() => onOpenModal && onOpenModal(value)}
-              title="Click to expand full size"
-            >
-              <img
-                src={value}
-                alt="Preview"
-                className={styles.imagePreview}
-                onError={() => setImgError(true)}
-                onLoad={() => setImgError(false)}
-              />
-              <div className={styles.imagePreviewOverlay}>
-                <FiZoomIn style={{ marginRight: '6px' }} /> Expand Preview
-              </div>
-            </div>
-          )
-        )}
-
-        <div>
-          <p className={styles.dropzoneText}>
-            {isUploading
-              ? <><FiLoader style={{ marginRight: '6px', animation: 'spin 1s linear infinite' }} /> Uploading image to S3...</>
-              : isDragging
-              ? <><FiDownload style={{ marginRight: '6px' }} /> Drop image here to upload</>
-              : "Drag & drop an image here, or browse / paste URL:"}
-          </p>
-          <div className={styles.imageInputWrapper}>
-            <input
-              type="text"
-              className={styles.input}
-              value={value}
-              onChange={(e) => {
-                setImgError(false);
-                onChange(e.target.value);
-              }}
-              placeholder="Image URL or upload file..."
-            />
-            {value && (
-              <button
-                type="button"
-                className={styles.clearBtn}
-                onClick={() => {
-                  setImgError(false);
-                  onChange("");
-                }}
-                title="Clear URL"
-              >
-                Clear
-              </button>
-            )}
-            <label className={styles.uploadBtn}>
-              {isUploading ? "Uploading..." : <><FiCamera style={{ marginRight: '6px' }} /> Browse</>}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                disabled={isUploading}
-                style={{ display: "none" }}
-              />
-            </label>
-          </div>
-        </div>
-      </div>
+    <div key={pathStr} style={{ marginBottom: '1.25rem' }}>
+      <MobileImageUploader
+        label={label}
+        value={value}
+        onChange={onChange}
+        placeholder="Image URL or upload from mobile/desktop..."
+      />
     </div>
   );
 }
@@ -1464,9 +1342,13 @@ export default function AdminDashboard({ initialData }) {
   } else if (userRole === "Author") {
     tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
-    tabs = ["contacts", "socials"];
+    tabs = ["contacts", "socials", "gallery"];
   } else if (userRole === "Events") {
-    tabs = ["events", "blogs"];
+    tabs = ["events", "blogs", "gallery"];
+  }
+
+  if (!tabs.includes("gallery")) {
+    tabs.push("gallery");
   }
 
   tabs = ["overview", ...tabs, "manual", "settings"];

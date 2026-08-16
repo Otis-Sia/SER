@@ -37,8 +37,8 @@ This manual covers every role in the system — from a first-time visitor browsi
 | **Frontend** | Next.js (React) | Public website & Admin dashboard |
 | **Backend API** | Express.js (Node) | REST API for blog posts, events, gallery, products, members, uploads |
 | **Database** | PostgreSQL | Stores users, admins, posts, events, products, gallery items, members |
-| **Cloud Database** | Firebase / Firestore | Stores site content, projects, FAQs, gallery, user roles, blog posts |
-| **Authentication** | JWT (server-side) + Firebase Auth (Firestore rules) | Login, token-based sessions (8-hour expiry) |
+| **Cloud Database** | Supabase (PostgreSQL) | Stores site content, projects, FAQs, gallery, user roles, blog posts |
+| **Authentication** | Supabase Auth + Server Actions | Login, token-based sessions |
 | **File Storage** | Cloudinary / AWS S3 | Image uploads for blog posts, gallery, products |
 | **Contact Forms** | SplitForms API | Handles contact form submissions |
 
@@ -119,11 +119,11 @@ SER has **five** distinct roles, each with different levels of access:
 
 - **Public Visitor**: Anyone on the internet. Can browse all public pages, read blog posts, view events, gallery, and products. Can submit the Contact form and the Join/Membership application form.
 - **Registered User**: Has created an account via the Sign Up page. Can log in but has no admin dashboard access. This role is intended for future community features.
-- **Author**: A Firestore-managed role assigned by a Super Admin. Can log into the admin dashboard and manage **blog posts only** — create, edit, publish/unpublish, and delete articles.
-- **Events**: A Firestore-managed role assigned by a Super Admin. In charge of creating, editing, and managing **events** as well as writing **event reports** (via Blog Posts).
-- **Communication**: A Firestore-managed role assigned by a Super Admin. Manages everything social media and Contacts (via the dedicated Contacts and Social Media tabs). Can only hide/flag items (cannot delete).
+- **Author**: A Supabase-managed role assigned by a Super Admin. Can log into the admin dashboard and manage **blog posts only** — create, edit, publish/unpublish, and delete articles.
+- **Events**: A Supabase-managed role assigned by a Super Admin. In charge of creating, editing, and managing **events** as well as writing **event reports** (via Blog Posts).
+- **Communication**: A Supabase-managed role assigned by a Super Admin. Manages everything social media and Contacts (via the dedicated Contacts and Social Media tabs). Can only hide/flag items (cannot delete).
 - **Admin**: Has limited access to manage forms, events, FAQ, and Gallery. Cannot delete content, can only hide/flag.
-- **Project Lead**: A Firestore-managed role assigned by a Super Admin. Has broad management access across the platform. Can delete content including blog posts and gallery pictures.
+- **Project Lead**: A Supabase-managed role assigned by a Super Admin. Has broad management access across the platform. Can delete content including blog posts and gallery pictures.
 - **Super Admin**: Full control over the entire platform. Can manage all content collections, all blog posts, all members, and all admin users including creating new users and assigning roles. Can delete any content.
 
 ---
@@ -330,7 +330,7 @@ Currently, registered users have the same browsing capabilities as public visito
 
 ## 6. Author Guide
 
-Authors are users with the **"Author"** role assigned in Firestore by a Super Admin. This role grants access to the admin dashboard's **Blog Management** section.
+Authors are users with the **"Author"** role assigned in Supabase by a Super Admin. This role grants access to the admin dashboard's **Blog Management** section.
 
 ### 6.1 Accessing the Admin Dashboard
 
@@ -382,7 +382,7 @@ As an Author, you have full control over blog posts:
 2. Click the **Delete** button (trash icon)
 3. **Confirm** the deletion in the confirmation dialog
 
-> ⚠️ **Warning**: Deletion is **permanent**. There is no undo. The post is removed from Firestore entirely.
+> ⚠️ **Warning**: Deletion is **permanent**. There is no undo. The post is removed from Supabase entirely.
 
 #### Uploading Images
 
@@ -403,7 +403,7 @@ As an Author, you have full control over blog posts:
 
 ## 7. Project Lead Guide
 
-Project Leads have the **"Project Lead"** role assigned in Firestore by a Super Admin. Their admin dashboard capabilities are equivalent to the Author role.
+Project Leads have the **"Project Lead"** role assigned in Supabase by a Super Admin. Their admin dashboard capabilities are equivalent to the Author role.
 
 ### 7.1 Capabilities
 
@@ -457,7 +457,7 @@ Super Admins have **complete control** over the entire SER platform. This is the
 The **Site Content** tab manages dynamic content that appears across the public website.
 
 1. Select the **Site Content** tab
-2. Edit the content sections — these are stored in the Firestore `site_content` collection (document: `main`)
+2. Edit the content sections — these are stored in the Supabase `site_content` table
 3. Editable content includes:
    - **Hero section**: Heading, subheading, CTA button text
    - **Feature list**: Service pillar descriptions
@@ -485,7 +485,7 @@ Super Admins have the same blog management capabilities as Authors and Project L
 
 ### 8.5 Managing Events
 
-Events are stored in Firestore and can optionally sync with Google Calendar.
+Events are stored in Supabase and can optionally sync with Google Calendar.
 
 #### Creating an Event
 
@@ -555,7 +555,7 @@ Gallery items are automatically sorted by:
 
 ### 8.7 Managing Projects
 
-Projects are stored in the Firestore `projects` collection.
+Projects are stored in the Supabase `projects` table.
 
 #### Adding a Project
 
@@ -612,7 +612,7 @@ Products are automatically sorted by:
 
 ### 8.9 Managing FAQs
 
-FAQs are stored in the Firestore `faqs` collection and displayed on the public `/faq` page.
+FAQs are stored in the Supabase `faqs` table and displayed on the public `/faq` page.
 
 #### Adding a FAQ Entry
 
@@ -658,7 +658,7 @@ The **Members** tab shows all membership/volunteer applications submitted throug
 - Goals and recommendations
 - Declaration acceptance
 
-> **Security Note**: Only Super Admins can view member applications. This data is protected at both the Firestore rules level and the API middleware level.
+> **Security Note**: Only Super Admins can view member applications. This data is protected at both the Supabase RLS level and the API middleware level.
 
 ---
 
@@ -861,11 +861,9 @@ The login system checks credentials in the following order:
 | `POST` | `/api/products` | ✅ Admin | Add a product |
 | `POST` | `/api/upload` | ✅ Admin | Upload an image (max 10 MB) |
 
-*\* These endpoints are currently public but are intended for admin use. Firestore rules provide additional protection on the database layer.*
+*\* These endpoints are currently public but are intended for admin use. Supabase RLS policies provide additional protection on the database layer.*
 
----
-
-### Firestore Security Rules Summary
+### Supabase Security & RLS Summary
 
 | Collection | Public Read | Write Access |
 |-----------|:----------:|:------------:|

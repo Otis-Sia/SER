@@ -224,7 +224,7 @@ function SuperAdminManual() {
           <li><strong>Flag / Unflag</strong> — Mark members as flagged (restricted) or clear a flag.</li>
           <li><strong>Delete</strong> — Permanently remove a registration.</li>
           <li><strong>Export to CSV</strong> — Download all filtered results as a CSV file for Excel.</li>
-          <li><strong>Refresh</strong> — Reload data from Firestore.</li>
+          <li><strong>Refresh</strong> — Reload data from Supabase.</li>
         </ul>
         <Callout type="info">Only Super Admins and Project Leads can delete member registrations and see who flagged a member.</Callout>
       </Section>
@@ -247,8 +247,8 @@ function SuperAdminManual() {
             ["Super Admin", "Full access to all tabs and features (including JSON site content)"],
             ["Project Lead", "Form Responses, Blog, Users, Events, Gallery, Projects, Products"],
             ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery"],
-            ["Communication", "Contacts, Social Media"],
-            ["Events", "Events, Blog Posts (Event Reports)"],
+            ["Communication", "Contacts, Social Media, Gallery"],
+            ["Events", "Events, Blog Posts (Event Reports), Gallery"],
             ["Author", "Blog Posts, Gallery"],
           ]}
         />
@@ -262,7 +262,7 @@ function SuperAdminManual() {
       </Section>
 
       <Section title="Managing Events" defaultOpen={false}>
-        <p>Events are stored in Firestore and can sync with Google Calendar.</p>
+        <p>Events are stored in Supabase and can sync with Google Calendar.</p>
         <h4 style={{ margin: '0.75rem 0 0.5rem 0' }}>Creating an Event</h4>
         <StepList steps={[
           'Navigate to the "Events" tab.',
@@ -326,7 +326,7 @@ function SuperAdminManual() {
       </Section>
 
       <Section title="Site Content Management" defaultOpen={false}>
-        <p>Additional tabs (like Home, Contact, Footer, etc.) let you edit dynamic site content stored as JSON in Firestore.</p>
+        <p>Additional tabs (like Home, Contact, Footer, etc.) let you edit dynamic site content stored as JSON in Supabase.</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li><strong>Hero Section</strong> — Heading, subheading, CTA button text</li>
           <li><strong>Features</strong> — Service pillar descriptions</li>

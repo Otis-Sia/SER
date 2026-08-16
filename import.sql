@@ -1,4 +1,4 @@
--- Firestore Dump
+-- SQL Initial Data Seed
 
 -- Data for products
 INSERT INTO products (name, price_kes, image_url, description, featured, created_at, updated_at) VALUES ('Official SER First Aid Kit', 2500, 'https://placehold.net/product-400x400.png', 'Compact emergency response first aid kit containing essential medical supplies.', TRUE, '2026-07-22T21:50:28.722Z', '2026-08-10T11:09:17.010Z');

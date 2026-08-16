@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 import CommunityClient from './CommunityClient';
 
-import { getAdminDb } from "@/lib/firebaseAdmin";
 import { getSiteContent } from '../admin/actions';
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";

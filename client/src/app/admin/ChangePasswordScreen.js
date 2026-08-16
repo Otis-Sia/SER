@@ -51,7 +51,7 @@ export default function ChangePasswordScreen({ user, initialName, initialUsernam
       const { error: updateError } = await supabase.auth.updateUser(updatePayload);
       if (updateError) throw updateError;
       
-      // Clear flag in Firestore and save name/username/email
+      // Clear flag in Supabase and save name/username/email
       const res = await clearMustChangePassword(user.email, email || user.email, name, username);
       if (!res.success) {
         throw new Error(res.message);

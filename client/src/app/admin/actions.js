@@ -1,8 +1,18 @@
 "use server";
 
 import path from "path";
+import { randomUUID } from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { config } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+
+const s3Client = new S3Client({
+  region: process.env.APP_AWS_REGION || "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY || "",
+  },
+});
 
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
 
@@ -691,9 +701,35 @@ export async function deleteCmsDocument(collectionName, id) {
 export async function uploadImage(formData) {
   try {
     const file = formData ? formData.get('file') : null;
-    return { success: true, url: 'https://via.placeholder.com/800x600?text=Uploaded+Image' };
+    if (!file || typeof file === 'string') {
+      return { success: false, message: 'No image file provided' };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const originalName = file.name || 'upload.jpg';
+    const ext = path.extname(originalName) || '.jpg';
+    const cleanExt = ext.toLowerCase();
+    const key = `uploads/${randomUUID()}${cleanExt}`;
+    
+    const bucketName = process.env.APP_AWS_S3_BUCKET_NAME || 'juj4-shop-assets-2026';
+    const region = process.env.APP_AWS_REGION || 'eu-north-1';
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || 'image/jpeg',
+    });
+
+    await s3Client.send(command);
+
+    const url = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+    return { success: true, url, key };
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error("S3 Upload Error:", error);
+    return { success: false, message: error.message || 'Failed to upload image to S3' };
   }
 }
 

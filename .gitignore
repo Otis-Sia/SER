@@ -27,7 +27,6 @@ Thumbs.db
 !package-lock.json
 !jsconfig.json
 !tsconfig.json
-!firebase.json
 
 
 # Debug logs

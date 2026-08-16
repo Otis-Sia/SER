@@ -10,7 +10,6 @@ dotenv.config({ path: path.resolve(__dirname, '../server/.env') });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['firebase-admin'],
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
@@ -34,10 +33,6 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'tse3.mm.bing.net',
-      },
-      {
-        protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
       },
       {
         protocol: 'https',

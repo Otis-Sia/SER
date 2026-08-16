@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import styles from "./admin.module.css";
 import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost, flagPost } from "./actions";
 import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader, FiEyeOff, FiEye, FiFlag } from "react-icons/fi";
+import MobileImageUploader from "@/components/MobileImageUploader";
 import 'react-quill-new/dist/quill.snow.css';
 
 const ReactQuill = dynamic(
@@ -235,30 +236,12 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Cover Image</label>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <input
-              className={styles.input}
-              type="text"
-              value={formData.cover_url}
-              onChange={(e) => setFormData({ ...formData, cover_url: e.target.value })}
-              placeholder="https://..."
-              style={{ flex: 1 }}
-            />
-            <label className={styles.actionBtn}>
-              <FiImage /> {uploadingImage ? "Uploading..." : "Upload"}
-              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploadingImage} />
-            </label>
-          </div>
-          {formData.cover_url && (
-            <div style={{ marginTop: '1rem', width: '100%', maxHeight: '200px', borderRadius: '8px', overflow: 'hidden', background: 'var(--light-gray-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img
-                src={formData.cover_url}
-                alt="Cover Preview"
-                style={{ maxWidth: '100%', maxHeight: '200px', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '6px', display: 'block' }}
-              />
-            </div>
-          )}
+          <MobileImageUploader
+            label="Cover Image"
+            value={formData.cover_url || ''}
+            onChange={(url) => setFormData({ ...formData, cover_url: url })}
+            placeholder="Image URL or upload from mobile/desktop..."
+          />
         </div>
 
         <div className={styles.formGroup}>

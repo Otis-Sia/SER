@@ -42,16 +42,4 @@ export const config = {
   defaultEventDurationMs:
     Number(process.env.DEFAULT_EVENT_DURATION_MS) || 60 * 60 * 1000,
   googleCredentialsPath: process.env.GOOGLE_CREDENTIALS_PATH || undefined,
-
-  // Firestore collection names
-  firestoreCollections: {
-    posts: process.env.FIRESTORE_POSTS_COLLECTION || "posts",
-    siteContent:
-      process.env.FIRESTORE_SITE_CONTENT_COLLECTION || "site_content",
-    projects: process.env.FIRESTORE_PROJECTS_COLLECTION || "projects",
-    events: process.env.FIRESTORE_EVENTS_COLLECTION || "events",
-    gallery: process.env.FIRESTORE_GALLERY_COLLECTION || "gallery",
-    faqs: process.env.FIRESTORE_FAQS_COLLECTION || "faqs",
-    products: process.env.FIRESTORE_PRODUCTS_COLLECTION || "products",
-  },
 };
