@@ -14,7 +14,57 @@ import {
   FiCheck,
   FiUpload
 } from 'react-icons/fi';
-import { uploadImage } from '@/app/admin/actions';
+// In-browser mobile optimization: Resizes high-res phone pictures and converts to modern WebP
+async function compressImageForMobile(file, maxDimension = 1600, quality = 0.85) {
+  if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const cleanName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.webp';
+            const compressedFile = new File([blob], cleanName, { type: 'image/webp' });
+            resolve(compressedFile);
+          },
+          'image/webp',
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function MobileImageUploader({
   value = '',
@@ -35,28 +85,37 @@ export default function MobileImageUploader({
   const cameraInputRef = useRef(null);
 
   const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
 
     setIsUploading(true);
     setUploadError('');
     setImgLoadError(false);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      // Step 1: Optimize and compress on mobile client
+      const optimizedFile = await compressImageForMobile(rawFile);
 
-      const result = await uploadImage(formData);
-      if (result.success && result.url) {
+      // Step 2: Upload via API Route
+      const formData = new FormData();
+      formData.append('file', optimizedFile);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success && result.url) {
         onChange(result.url);
       } else {
-        setUploadError(result.message || 'Failed to upload image. Please try again.');
+        setUploadError(result.message || 'Failed to upload image. Please check your credentials.');
       }
     } catch (err) {
       setUploadError(err.message || 'An error occurred during upload.');
     } finally {
       setIsUploading(false);
-      // Reset input value so the same file can be re-selected if desired
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
