@@ -20,6 +20,9 @@ export default async function sitemap() {
     ['/blog', 'weekly', 0.8],
     ['/contact', 'monthly', 0.7],
     ['/shop', 'weekly', 0.5],
+    ['/donate', 'monthly', 0.8],
+    ['/privacy', 'yearly', 0.3],
+    ['/terms', 'yearly', 0.3],
   ].map(([path, changeFrequency, priority]) => ({
     url: `${baseUrl}${path}`,
     lastModified: currentDate,

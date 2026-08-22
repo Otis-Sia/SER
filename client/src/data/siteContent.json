@@ -2,15 +2,15 @@
   "siteMeta": {
     "title": "Scouts Emergency Response",
     "description": "Compassion in Action - Scouts Emergency Response",
-    "contactEmail": "info@scoutsemergencyresponse.org",
+    "contactEmail": "info@seresponse.org",
     "homeHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-03148c21-6662-417f-97c9-f65b5ac72350.png",
-    "aboutHeroBgImage": "https://placehold.net/2-800x600.png",
+    "aboutHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
     "communityHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-20ac0a3a-ff9b-4bf3-a60a-6518e049310e.jpg",
-    "contactHeroBgImage": "https://placehold.net/2-800x600.png",
-    "eventsHeroBgImage": "https://placehold.net/2-800x600.png",
-    "loginHeroBgImage": "https://placehold.net/2-800x600.png",
+    "contactHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
+    "eventsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
+    "loginHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
     "projectsHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
-    "shopHeroBgImage": "https://placehold.net/2-800x600.png",
+    "shopHeroBgImage": "https://juj4-shop-assets-2026.s3.eu-north-1.amazonaws.com/SER-334f73f8-94b2-4cd9-9aae-5f93445c1431.jpg",
     "socialProfiles": [
       {
         "name": "Facebook",
@@ -400,17 +400,13 @@
       {
         "q": "Are there age restrictions to join?",
         "a": "No. SER welcomes people of all ages who want to contribute to safer communities. Some activities may be organized by age group for training purposes."
-      },
-      {
-        "q": "Mike Test",
-        "a": "1234"
       }
     ]
   },
   "contact": {
     "title": "Contact Us",
     "description": "Want to partner, volunteer, request training, or ask a question? Reach out and the SER team will respond as soon as possible.",
-    "email": "info@scoutsemergencyresponse.org",
+    "email": "info@seresponse.org",
     "phone": "0742435314",
     "phoneInternational": "+254 742 435 314",
     "whatsappLink": "https://wa.me/254742435314",

@@ -829,7 +829,7 @@ function CommonSections() {
       <Section title="Need Help?" defaultOpen={false}>
         <p>If you encounter issues not covered here, contact your Super Admin or reach out:</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li><strong>Email:</strong> <a href="mailto:admin@Seresponse.org" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>admin@Seresponse.org</a></li>
+          <li><strong>Email:</strong> <a href="mailto:admin@seresponse.org" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>admin@seresponse.org</a></li>
           <li><strong>WhatsApp:</strong> <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>+254 742 435 314</a>, <a href="https://wa.me/254718612549" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>+254 718 612 549</a></li>
         </ul>
       </Section>

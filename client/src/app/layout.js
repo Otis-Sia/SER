@@ -88,8 +88,13 @@ export async function generateMetadata() {
       },
     },
     icons: {
-      icon: '/icon.png',
-      apple: '/icon.png',
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+        { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
     },
   };
 }
@@ -106,9 +111,17 @@ export default async function RootLayout({ children }) {
     name: 'Scouts Emergency Response',
     alternateName: 'SER',
     url: baseUrl,
+    email: 'info@seresponse.org',
     logo: `${baseUrl}/icon.png`,
     image: `${baseUrl}/og-image.jpg`,
     description,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'info@seresponse.org',
+      contactType: 'customer service',
+      areaServed: 'KE',
+      availableLanguage: ['en', 'sw'],
+    },
     areaServed: {
       '@type': 'Country',
       name: 'Kenya',

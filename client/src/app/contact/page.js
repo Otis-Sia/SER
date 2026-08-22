@@ -75,12 +75,14 @@ export default async function Contact() {
       <section className="contact-info">
         <h2>Other Ways to Reach Us</h2>
         <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
-          {contactData.email && (
-            <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-              <strong>Email:</strong>{' '}
-              <a href={`mailto:${contactData.email}`}>{contactData.email}</a>
-            </li>
-          )}
+          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+            <strong>Email (General):</strong>{' '}
+            <a href="mailto:info@seresponse.org">info@seresponse.org</a>
+          </li>
+          <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+            <strong>Email (Admin):</strong>{' '}
+            <a href="mailto:admin@seresponse.org">admin@seresponse.org</a>
+          </li>
           {contactData.phoneInternational && (
             <li style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
               <strong>Phone:</strong>{' '}
