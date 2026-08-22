@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { getSiteContent } from '../../admin/actions';
 import { ArrowLeft, Users, Briefcase, ChevronRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function toSlug(name) {
   return name
     .trim()
@@ -200,8 +203,8 @@ export default async function MemberProfilePage({ params }) {
                       src={other.image} 
                       alt={other.name || "Team member"} 
                       fill
+                      unoptimized
                       sizes="100px"
-                      quality={75}
                       style={{ objectFit: 'cover' }}
                     />
                   ) : (

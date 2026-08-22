@@ -4,6 +4,9 @@ import Script from 'next/script';
 import { getSiteContent } from '../admin/actions';
 import { ArrowRight, UserPlus } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
   const title = 'About Us | Scouts Emergency Response';
@@ -37,6 +40,8 @@ export async function generateMetadata() {
 
 export default async function About() {
   const siteContent = await getSiteContent();
+  const about = siteContent.about || {};
+  const team = about.team || [];
 
   return (
     <>
@@ -117,7 +122,7 @@ We experienced the gap firsthand. We decided to do something about it.
           </div>
 
           <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
-            {siteContent.about.team
+            {team
               .slice()
               .sort((a, b) => {
                 const posA = a.position !== undefined && a.position !== "" ? Number(a.position) : 999;
@@ -137,8 +142,8 @@ We experienced the gap firsthand. We decided to do something about it.
                           src={member.image} 
                           alt={member.name || "Team member"} 
                           fill
+                          unoptimized
                           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 280px"
-                          quality={75}
                           className="grayscale hover:grayscale-0 transition-all duration-500" 
                           style={{ objectFit: 'cover' }} 
                         />

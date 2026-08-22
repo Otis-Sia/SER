@@ -663,6 +663,9 @@ function mapCmsDoc(doc) {
 export async function getCmsCollection(collectionName, orderByField, orderDirection = "asc") {
   try {
     let query = supabaseAdmin.from(collectionName).select("*");
+    if (collectionName === 'contacts') {
+      query = query.neq('contact_type', '__SITE_CONTENT__');
+    }
     if (orderByField) {
       const dbOrderField = CMS_FIELD_MAP[orderByField] || orderByField;
       query = query.order(dbOrderField, { ascending: orderDirection === "asc" });
@@ -807,7 +810,57 @@ export async function uploadImage(formData) {
 }
 
 export async function updateSiteContent(content) {
-  return { success: true };
+  try {
+    if (!content || typeof content !== 'object') {
+      return { success: false, message: 'Invalid site content provided' };
+    }
+
+    const jsonStr = JSON.stringify(content, null, 2);
+
+    // 1. Save to Supabase contacts row '__SITE_CONTENT__'
+    const { data: existing } = await supabaseAdmin
+      .from('contacts')
+      .select('id')
+      .eq('contact_type', '__SITE_CONTENT__')
+      .maybeSingle();
+
+    if (existing?.id) {
+      const { error } = await supabaseAdmin
+        .from('contacts')
+        .update({ contact_value: jsonStr, updated_at: new Date().toISOString() })
+        .eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabaseAdmin
+        .from('contacts')
+        .insert({ contact_type: '__SITE_CONTENT__', contact_value: jsonStr, sort_order: 99999 });
+      if (error) throw error;
+    }
+
+    // 2. Try writing to local file if accessible
+    try {
+      const fs = require('fs');
+      fs.writeFileSync(contentFilePath, jsonStr, 'utf8');
+    } catch (fsErr) {
+      // Ephemeral on serverless, ignore
+    }
+
+    // 3. Revalidate affected paths
+    try {
+      revalidatePath('/about');
+      revalidatePath('/about/[slug]', 'page');
+      revalidatePath('/');
+      revalidatePath('/projects');
+      revalidatePath('/community');
+      revalidatePath('/contact');
+      revalidatePath('/admin');
+    } catch (e) {}
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating site content:", error);
+    return { success: false, message: error.message };
+  }
 }
 
 export async function getDashboardStats() {
@@ -926,11 +979,30 @@ export async function deleteSocialMedia(id) { return deleteCmsDocument('social_m
 
 export async function getSiteContent() {
   try {
+    const { data: dbRow } = await supabaseAdmin
+      .from('contacts')
+      .select('contact_value')
+      .eq('contact_type', '__SITE_CONTENT__')
+      .maybeSingle();
+
+    if (dbRow?.contact_value) {
+      try {
+        const parsed = JSON.parse(dbRow.contact_value);
+        if (parsed && typeof parsed === 'object') {
+          return parsed;
+        }
+      } catch (err) {
+        console.error("Error parsing site_content from db:", err);
+      }
+    }
+
     const fs = require('fs');
     if (fs.existsSync(contentFilePath)) {
       return JSON.parse(fs.readFileSync(contentFilePath, 'utf8'));
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error fetching site content:", e);
+  }
   return {};
 }
 
