@@ -11,9 +11,10 @@ import {
   FiLink, 
   FiLoader, 
   FiAlertCircle, 
-  FiCheck,
-  FiUpload
+  FiUpload,
+  FiDownload
 } from 'react-icons/fi';
+
 // In-browser mobile optimization: Resizes high-res phone pictures and converts to modern WebP
 async function compressImageForMobile(file, maxDimension = 1600, quality = 0.85) {
   if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') {
@@ -79,21 +80,26 @@ export default function MobileImageUploader({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [imgLoadError, setImgLoadError] = useState(false);
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
-  const handleFileChange = async (e) => {
-    const rawFile = e.target.files?.[0];
+  const processAndUploadFile = async (rawFile) => {
     if (!rawFile) return;
+
+    if (!rawFile.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (JPG, PNG, WebP, GIF).');
+      return;
+    }
 
     setIsUploading(true);
     setUploadError('');
     setImgLoadError(false);
 
     try {
-      // Step 1: Optimize and compress on mobile client
+      // Step 1: Optimize and compress client-side
       const optimizedFile = await compressImageForMobile(rawFile);
 
       // Step 2: Upload via API Route
@@ -118,6 +124,40 @@ export default function MobileImageUploader({
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (cameraInputRef.current) cameraInputRef.current.value = '';
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const rawFile = e.target.files?.[0];
+    if (rawFile) processAndUploadFile(rawFile);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file) {
+      processAndUploadFile(file);
     }
   };
 
@@ -156,19 +196,52 @@ export default function MobileImageUploader({
         </label>
       )}
 
-      {/* Main Upload Card */}
+      {/* Main Upload Card & Dropzone */}
       <div
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         style={{
-          border: '1.5px solid var(--border-color, #e5e7eb)',
+          border: isDragging
+            ? '2px dashed var(--primary-color, #129a44)'
+            : '1.5px solid var(--border-color, #e5e7eb)',
           borderRadius: '12px',
           padding: compact ? '0.75rem' : '1rem',
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-          transition: 'border-color 0.2s, box-shadow 0.2s',
+          backgroundColor: isDragging
+            ? 'rgba(18, 154, 68, 0.06)'
+            : 'var(--card-bg, #ffffff)',
+          boxShadow: isDragging
+            ? '0 0 0 4px rgba(18, 154, 68, 0.15)'
+            : '0 1px 3px rgba(0,0,0,0.04)',
+          transition: 'all 0.2s ease',
           position: 'relative',
         }}
       >
-        {/* Hidden File Inputs: One for Camera, One for File Manager / Gallery */}
+        {/* Active Drag Overlay */}
+        {isDragging && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 10,
+              backgroundColor: 'rgba(255, 255, 255, 0.92)',
+              borderRadius: '11px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              color: 'var(--primary-color, #129a44)',
+              pointerEvents: 'none',
+            }}
+          >
+            <FiDownload size={32} style={{ animation: 'bounce 1s infinite' }} />
+            <div style={{ fontWeight: '700', fontSize: '1rem' }}>Drop image here to upload</div>
+          </div>
+        )}
+
+        {/* Hidden File Inputs: Camera & File Picker */}
         <input
           ref={fileInputRef}
           type="file"
@@ -307,7 +380,7 @@ export default function MobileImageUploader({
                     ) : (
                       <>
                         <FiUpload size={13} />
-                        <span>Upload</span>
+                        <span>Upload / Replace</span>
                       </>
                     )}
                   </button>
@@ -360,6 +433,22 @@ export default function MobileImageUploader({
                 </div>
               </div>
             </div>
+
+            {/* Drop hint under image */}
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: '#9ca3af',
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <FiDownload size={12} />
+              <span>You can also drag &amp; drop a new image here to replace</span>
+            </div>
           </div>
         ) : (
           /* State 2: No image uploaded yet */
@@ -395,7 +484,7 @@ export default function MobileImageUploader({
               ) : (
                 <>
                   <FiUpload size={18} />
-                  <span>Upload</span>
+                  <span>Upload Image</span>
                 </>
               )}
             </button>
@@ -403,16 +492,20 @@ export default function MobileImageUploader({
             <div
               style={{
                 textAlign: 'center',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 color: '#6b7280',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem',
+                gap: '0.25rem',
               }}
             >
-              <FiUploadCloud size={14} />
-              <span>Tap to take a photo or select from device files</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <FiUploadCloud size={15} style={{ color: 'var(--primary-color, #129a44)' }} />
+                <span><strong>Drag &amp; drop an image</strong> here, or tap <strong>Upload</strong></span>
+              </div>
+              <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Supports JPG, PNG, WebP, GIF (Auto-optimized)</span>
             </div>
           </div>
         )}
