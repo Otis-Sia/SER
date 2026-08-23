@@ -15,6 +15,7 @@ import {
   getSocialMedia, addSocialMedia, updateSocialMedia, deleteSocialMedia,
   flagCmsDocument, hideCmsDocument
 } from "./actions";
+import MilestonesManager from "./MilestonesManager";
 
 // Generic Collection Manager Component
 function CollectionManager({ 
@@ -337,7 +338,67 @@ const renderProductFields = (data, onChange, readOnly = false) => {
 
 // Export individual managers
 export const ProjectsManager = (props) => <CollectionManager collectionName="projects" title="Projects" fetchAction={getProjects} addAction={addProject} updateAction={updateProject} deleteAction={deleteProject} defaultItem={{ title: '', focus: '', description: '', link: '', linkText: '' }} renderFields={renderProjectFields} {...props} />;
-export const EventsManager = (props) => <CollectionManager collectionName="events" title="Events" fetchAction={getEvents} addAction={addEvent} updateAction={updateEvent} deleteAction={deleteEvent} defaultItem={{ title: '', eventDate: '', time: '', location: '', description: '' }} renderFields={renderEventFields} {...props} />;
+export const EventsManager = (props) => {
+  const [subTab, setSubTab] = useState("events");
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Sub-Navigation Pill Tabs */}
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color, #e5e7eb)', paddingBottom: '0.75rem' }}>
+        <button
+          type="button"
+          onClick={() => setSubTab("events")}
+          style={{
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: subTab === "events" ? 'var(--primary-color, #129a44)' : 'rgba(0,0,0,0.05)',
+            color: subTab === "events" ? '#ffffff' : 'var(--text-color, #374151)',
+            fontWeight: '600',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          📅 Upcoming &amp; Past Events
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubTab("milestones")}
+          style={{
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: subTab === "milestones" ? 'var(--primary-color, #129a44)' : 'rgba(0,0,0,0.05)',
+            color: subTab === "milestones" ? '#ffffff' : 'var(--text-color, #374151)',
+            fontWeight: '600',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          🏛️ Historic Milestones &amp; Timeline
+        </button>
+      </div>
+
+      {subTab === "events" ? (
+        <CollectionManager
+          collectionName="events"
+          title="Events"
+          fetchAction={getEvents}
+          addAction={addEvent}
+          updateAction={updateEvent}
+          deleteAction={deleteEvent}
+          defaultItem={{ title: '', eventDate: '', time: '', location: '', description: '' }}
+          renderFields={renderEventFields}
+          {...props}
+        />
+      ) : (
+        <MilestonesManager {...props} />
+      )}
+    </div>
+  );
+};
 export const GalleryManager = (props) => <CollectionManager collectionName="gallery" title="Gallery Items" fetchAction={getGalleryItems} addAction={addGalleryItem} updateAction={updateGalleryItem} deleteAction={deleteGalleryItem} defaultItem={{ title: '', imageUrl: '', alt: '', description: '' }} renderFields={renderGalleryFields} {...props} />;
 export const FaqsManager = (props) => <CollectionManager collectionName="faqs" title="FAQs" fetchAction={getFaqs} addAction={addFaq} updateAction={updateFaq} deleteAction={deleteFaq} defaultItem={{ question: '', answer: '', order: 0 }} renderFields={renderFaqFields} {...props} />;
 export const ProductsManager = (props) => <CollectionManager collectionName="products" title="Products" fetchAction={getProducts} addAction={addProduct} updateAction={updateProduct} deleteAction={deleteProduct} defaultItem={{ name: '', priceKes: 0, imageUrl: '', description: '', featured: false }} renderFields={renderProductFields} {...props} />;

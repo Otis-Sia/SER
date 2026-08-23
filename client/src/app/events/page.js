@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { MapPin, Siren } from '../../components/Icons';
-import { getSiteContent } from '../admin/actions';
+import { getSiteContent, getHistoricMilestones } from '../admin/actions';
 import EventCard from '../../components/EventCard';
 import { config } from '@/lib/config';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
@@ -61,6 +64,7 @@ async function fetchPastGoogleEvents() {
 
 export default async function Events() {
   const siteContent = await getSiteContent();
+  const milestones = await getHistoricMilestones();
   const events = await fetchGoogleEvents();
   const pastEvents = await fetchPastGoogleEvents();
 
@@ -76,14 +80,95 @@ export default async function Events() {
         </p>
       </section>
 
-      <section className="events-milestones">
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin /> Historic Milestones</h2>
-        <ul className="intro-text list-indent">
-          <li><strong>1907:</strong> First Scout Camp (Brownsea Island)</li>
-          <li><strong>1908:</strong> First Scout Handbook published</li>
-          <li><strong>1920:</strong> First World Scout Jamboree</li>
-          <li><strong>February 22:</strong> Founder&apos;s Day (Baden-Powell&apos;s Birthday)</li>
-        </ul>
+      <section className="events-milestones" id="events-milestones" style={{ scrollMarginTop: '6rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+            <MapPin /> Historic Milestones
+          </h2>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-color, #666)', opacity: 0.85 }}>
+            Key moments in Scouting and SER history
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {milestones.map((item, index) => {
+            const isActive = !!item.active;
+            return (
+              <div
+                key={index}
+                className={`milestone-item ${isActive ? 'milestone-item--active' : ''}`}
+                style={{
+                  position: 'relative',
+                  padding: '1.25rem 1.5rem',
+                  borderRadius: '12px',
+                  backgroundColor: isActive ? 'rgba(18, 154, 68, 0.05)' : 'var(--card-bg, #ffffff)',
+                  border: isActive ? '2px solid var(--primary-color, #129a44)' : '1px solid var(--border-color, #e5e7eb)',
+                  boxShadow: isActive ? '0 4px 20px rgba(18, 154, 68, 0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '6px',
+                        backgroundColor: isActive ? 'var(--primary-color, #129a44)' : 'rgba(0,0,0,0.06)',
+                        color: isActive ? '#ffffff' : 'var(--text-color, #111827)',
+                        fontWeight: '700',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {item.year}
+                    </span>
+
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-color, #111827)' }}>
+                      {item.title}
+                    </h3>
+                  </div>
+
+                  {isActive && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '999px',
+                        backgroundColor: '#dcfce7',
+                        color: '#166534',
+                        fontSize: '0.78rem',
+                        fontWeight: '700',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: '#16a34a',
+                          display: 'inline-block',
+                        }}
+                      />
+                      <span>Active Milestone</span>
+                    </span>
+                  )}
+                </div>
+
+                {item.description && (
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.92rem', color: 'var(--text-color, #4b5563)', opacity: 0.9, lineHeight: 1.6 }}>
+                    {item.description}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <section className="events-upcoming">

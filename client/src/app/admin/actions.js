@@ -1006,6 +1006,70 @@ export async function getSiteContent() {
   return {};
 }
 
+export async function getHistoricMilestones() {
+  try {
+    const siteContent = await getSiteContent();
+    if (siteContent?.events?.milestones && Array.isArray(siteContent.events.milestones) && siteContent.events.milestones.length > 0) {
+      return siteContent.events.milestones;
+    }
+  } catch (e) {
+    console.error("Error fetching historic milestones:", e);
+  }
+  return [
+    {
+      year: "1907",
+      title: "First Scout Camp (Brownsea Island)",
+      description: "Baden-Powell led the experimental camp on Brownsea Island, marking the birth of the Scout Movement.",
+      active: false
+    },
+    {
+      year: "1908",
+      title: "First Scout Handbook published",
+      description: "'Scouting for Boys' was published, igniting a worldwide youth movement.",
+      active: false
+    },
+    {
+      year: "1920",
+      title: "First World Scout Jamboree",
+      description: "8,000 Scouts from 34 nations gathered at Olympia, London.",
+      active: false
+    },
+    {
+      year: "February 22",
+      title: "Founder's Day (Baden-Powell's Birthday)",
+      description: "Scouts worldwide celebrate the vision and legacy of Robert and Olave Baden-Powell.",
+      active: false
+    },
+    {
+      year: "2024",
+      title: "SER Emergency Response Initiative",
+      description: "Scouts Emergency Response expands youth-led preparedness and community resilience programs across Kenya.",
+      active: true
+    }
+  ];
+}
+
+export async function saveHistoricMilestones(milestones) {
+  try {
+    const siteContent = await getSiteContent();
+    if (!siteContent.events) {
+      siteContent.events = {
+        title: "Scouting Milestones & SER Events",
+        description: "Scouts Emergency Response (SER) honors key Scouting moments and organizes community-centered preparedness events. Join us to learn, serve, and strengthen local readiness."
+      };
+    }
+    siteContent.events.milestones = milestones;
+    const res = await updateSiteContent(siteContent);
+    try {
+      revalidatePath('/events');
+    } catch (e) {}
+    return res;
+  } catch (e) {
+    console.error("Error saving historic milestones:", e);
+    return { success: false, message: e.message };
+  }
+}
+
 
 export async function checkDuplicateMember(field, value) {
   try {
