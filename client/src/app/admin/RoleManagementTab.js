@@ -224,11 +224,6 @@ export default function RoleManagementTab({ showToast }) {
           )}
         </div>
       )}
-
-      <div style={{ marginTop: "2rem", padding: "0.75rem 1rem", borderRadius: "6px", background: "#fff3cd", color: "#856404", border: "1px solid #ffeeba", fontSize: "0.85rem" }}>
-        <strong>Requires Supabase migration:</strong>{" "}
-        <code>ALTER TABLE public.admin_users ADD COLUMN IF NOT EXISTS custom_tabs JSONB;</code>
-      </div>
     </div>
   );
 }
