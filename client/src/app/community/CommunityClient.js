@@ -8,6 +8,8 @@ import JoinForm from './JoinForm';
 
 export default function CommunityClient({ posts }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [viewingPdfUrl, setViewingPdfUrl] = useState(null);
+  const [viewingPdfTitle, setViewingPdfTitle] = useState("");
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -109,24 +111,73 @@ export default function CommunityClient({ posts }) {
             {posts.length === 0 ? (
               <div className={blogStyles.emptyState}>No posts available yet. Check back soon!</div>
             ) : (
-              posts.map((post) => (
-                <Link href={`/blog/${post.slug}`} key={post.id} className={blogStyles.card}>
-                  {post.cover_url && (
-                    <div className={blogStyles.imageWrapper}>
-                      <img src={post.cover_url} alt={post.title} className={blogStyles.image} />
+              posts.map((post) => {
+                const isPdf = post.body_md && post.body_md.startsWith('pdf:');
+                const cardContent = (
+                  <>
+                    {post.cover_url && (
+                      <div className={blogStyles.imageWrapper}>
+                        <img src={post.cover_url} alt={post.title} className={blogStyles.image} />
+                      </div>
+                    )}
+                    <div className={blogStyles.content}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                        <h2 className={blogStyles.postTitle}>{post.title}</h2>
+                        {isPdf && (
+                          <span style={{
+                            fontSize: '0.75rem',
+                            backgroundColor: '#fee2e2',
+                            color: '#ef4444',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap'
+                          }}>
+                            PDF
+                          </span>
+                        )}
+                      </div>
+                      <div className={blogStyles.meta}>
+                        <FiCalendar /> {new Date(post.published_at).toLocaleDateString()}
+                      </div>
+                      <div className={blogStyles.readMore}>
+                        {isPdf ? 'View PDF' : 'Read article'} <FiArrowRight />
+                      </div>
                     </div>
-                  )}
-                  <div className={blogStyles.content}>
-                    <h2 className={blogStyles.postTitle}>{post.title}</h2>
-                    <div className={blogStyles.meta}>
-                      <FiCalendar /> {new Date(post.published_at).toLocaleDateString()}
-                    </div>
-                    <div className={blogStyles.readMore}>
-                      Read article <FiArrowRight />
-                    </div>
-                  </div>
-                </Link>
-              ))
+                  </>
+                );
+
+                if (isPdf) {
+                  return (
+                    <button 
+                      onClick={() => {
+                        setViewingPdfUrl(post.body_md.substring(4));
+                        setViewingPdfTitle(post.title);
+                      }} 
+                      key={post.id} 
+                      className={blogStyles.card}
+                      style={{ 
+                        display: 'block', 
+                        width: '100%', 
+                        textAlign: 'left', 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontFamily: 'inherit'
+                      }}
+                    >
+                      {cardContent}
+                    </button>
+                  );
+                }
+
+                return (
+                  <Link href={`/blog/${post.slug}`} key={post.id} className={blogStyles.card}>
+                    {cardContent}
+                  </Link>
+                );
+              })
             )}
           </div>
         </section>
@@ -161,6 +212,96 @@ export default function CommunityClient({ posts }) {
             </div>
           </section>
         </>
+      )}
+
+      {viewingPdfUrl && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          zIndex: 9999,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{
+            backgroundColor: 'var(--white-color, #fff)',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '1000px',
+            height: '90%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: '#f8fafc'
+            }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>{viewingPdfTitle}</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <a 
+                  href={viewingPdfUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn"
+                  style={{ 
+                    fontSize: '0.85rem', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.25rem', 
+                    padding: '0.4rem 0.8rem',
+                    margin: 0,
+                    textDecoration: 'none',
+                    background: '#f1f5f9',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    color: '#334155',
+                    fontWeight: 500
+                  }}
+                >
+                  Open in New Tab
+                </a>
+                <button 
+                  onClick={() => setViewingPdfUrl(null)}
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    fontSize: '1.75rem',
+                    cursor: 'pointer',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    lineHeight: 1
+                  }}
+                  title="Close"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
+            <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%', backgroundColor: '#f1f5f9' }}>
+              <iframe 
+                src={`${viewingPdfUrl}#toolbar=0&navpanes=0`}
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none' }}
+                title={viewingPdfTitle}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

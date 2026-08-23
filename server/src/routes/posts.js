@@ -12,7 +12,7 @@ router.get("/", async (_req, res) => {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .select('id, title, slug, cover_url, published_at, created_at, updated_at')
+      .select('id, title, slug, cover_url, published_at, created_at, updated_at, body_md')
       .eq('published', true)
       .eq('hidden', false)
       .order('published_at', { ascending: false });

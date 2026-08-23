@@ -144,6 +144,13 @@ CREATE TABLE IF NOT EXISTS donations (
   merchant_reference TEXT,
   notification_type TEXT,
   status TEXT,
+
+CREATE TABLE IF NOT EXISTS donations (
+  id SERIAL PRIMARY KEY,
+  tracking_id TEXT UNIQUE NOT NULL,
+  merchant_reference TEXT,
+  notification_type TEXT,
+  status TEXT,
   amount NUMERIC,
   currency TEXT,
   payment_method TEXT,
@@ -151,4 +158,15 @@ CREATE TABLE IF NOT EXISTS donations (
   raw_response JSONB,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Event reports
+CREATE TABLE IF NOT EXISTS event_reports (
+  id SERIAL PRIMARY KEY,
+  google_event_id TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  content_md TEXT NOT NULL,
+  author TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

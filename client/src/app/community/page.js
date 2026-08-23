@@ -10,7 +10,7 @@ async function getPosts() {
   try {
     const { data: docs, error } = await supabaseAdmin
       .from("posts")
-      .select("id, title, slug, cover_url, published_at")
+      .select("id, title, slug, cover_url, published_at, body_md")
       .eq("published", true)
       .order("published_at", { ascending: false });
       
@@ -22,6 +22,7 @@ async function getPosts() {
       slug: doc.slug,
       cover_url: doc.cover_url,
       published_at: doc.published_at,
+      body_md: doc.body_md,
     }));
   } catch (error) {
     console.error("Failed to fetch blog posts:", error);

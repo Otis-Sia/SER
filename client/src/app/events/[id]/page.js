@@ -52,6 +52,16 @@ export async function generateMetadata({ params }) {
   };
 }
 
+async function fetchReport(googleEventId) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    return null;
+  }
+}
+
 export default async function EventPage({ params }) {
   const { id } = await params;
   const event = await fetchEvent(id);
@@ -77,6 +87,8 @@ export default async function EventPage({ params }) {
   const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
   const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
 
+  const report = await fetchReport(event.google_event_id || event.id);
+
   return (
     <div style={{ backgroundColor: 'var(--light-gray-color)', minHeight: '100vh', padding: '8rem 1rem 4rem 1rem' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
@@ -88,6 +100,20 @@ export default async function EventPage({ params }) {
           isLive={isLive} 
           googleCalUrl={googleCalUrl} 
         />
+        
+        {report && (
+          <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: 'var(--white-color)', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+            <h2 style={{ marginBottom: '1rem', color: 'var(--primary-color)', fontSize: '1.5rem', fontWeight: 'bold' }}>{report.title}</h2>
+            <div style={{ fontSize: '1.1rem', lineHeight: '1.6', color: 'var(--text-color)', whiteSpace: 'pre-wrap' }}>
+              {report.content_md}
+            </div>
+            {report.author && (
+              <p style={{ marginTop: '2rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                Report by: {report.author}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

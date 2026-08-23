@@ -13,6 +13,7 @@ import galleryRouter from "./routes/gallery.js";
 import authRouter from "./routes/auth.js";
 import membersRouter from "./routes/members.js";
 import uploadRouter from "./routes/upload.js";
+import reportsRouter from "./routes/reports.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use("/api/posts", postsRouter);
 app.use("/api/gallery", galleryRouter);
 app.use("/api/members", membersRouter);
 app.use("/api/upload", uploadRouter);
+app.use("/api/reports", reportsRouter);
 
 // Global error handler for async errors
 app.use((err, req, res, next) => {

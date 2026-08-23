@@ -146,10 +146,11 @@ function CollectionManager({
 
           {items.map(item => {
             const isOwner = Boolean(item.created_by_email && currentUserEmail && item.created_by_email.toLowerCase() === currentUserEmail.toLowerCase());
+            const isGrandpa = currentUserEmail?.toLowerCase() === "grandpa@seresponse.org";
             const canDelete = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
             const canFlag = !isOwner || ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
             const canHide = ["Super Admin", "Admin", "Project Lead"].includes(currentUserRole);
-            const canEdit = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole);
+            const canEdit = isOwner || ["Super Admin", "Project Lead"].includes(currentUserRole) || isGrandpa;
 
             return (
               <div key={item.id} className={styles.collectionCard}>

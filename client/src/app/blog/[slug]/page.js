@@ -98,10 +98,22 @@ export default async function BlogPostPage({ params }) {
           </div>
         )}
 
-        <div 
-          className={styles.postBody} 
-          dangerouslySetInnerHTML={{ __html: post.body_md?.replace(/&nbsp;/g, ' ') || '' }} 
-        />
+        {post.body_md && post.body_md.startsWith('pdf:') ? (
+          <div style={{ width: '100%', height: '800px', marginTop: '2rem', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+            <iframe 
+              src={`${post.body_md.substring(4)}#toolbar=0&navpanes=0`} 
+              width="100%" 
+              height="100%" 
+              style={{ border: 'none' }}
+              title={post.title}
+            />
+          </div>
+        ) : (
+          <div 
+            className={styles.postBody} 
+            dangerouslySetInnerHTML={{ __html: post.body_md?.replace(/&nbsp;/g, ' ') || '' }} 
+          />
+        )}
       </article>
     </div>
   );

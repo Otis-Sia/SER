@@ -809,6 +809,40 @@ export async function uploadImage(formData) {
   }
 }
 
+export async function uploadFile(formData) {
+  try {
+    const file = formData ? formData.get('file') : null;
+    if (!file || typeof file === 'string') {
+      return { success: false, message: 'No file provided' };
+    }
+
+    const { client, bucketName, region } = getS3Client();
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const originalName = file.name || 'upload.pdf';
+    const ext = path.extname(originalName) || '.pdf';
+    const cleanExt = ext.toLowerCase();
+    const key = `uploads/${randomUUID()}${cleanExt}`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || 'application/pdf',
+    });
+
+    await client.send(command);
+
+    const url = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+    return { success: true, url, key };
+  } catch (error) {
+    console.error("S3 Upload Error:", error);
+    return { success: false, message: error.message || 'Failed to upload file to S3' };
+  }
+}
+
 export async function updateSiteContent(content) {
   try {
     if (!content || typeof content !== 'object') {
@@ -1120,3 +1154,122 @@ export async function resolveEmailFromUsername(input) {
   return trimmed;
 }
 
+// -------------------------------------------------------------
+// ROLE MANAGEMENT — per-user custom tab overrides
+// -------------------------------------------------------------
+
+export async function getUserCustomTabs(email) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("admin_users")
+      .select("custom_tabs")
+      .eq("email", email)
+      .maybeSingle();
+    if (error) throw error;
+    if (data?.custom_tabs && Array.isArray(data.custom_tabs)) {
+      return data.custom_tabs;
+    }
+    return null; // null = use role defaults
+  } catch (error) {
+    console.error("Error fetching custom tabs:", error);
+    return null;
+  }
+}
+
+export async function setUserCustomTabs(email, tabs) {
+  try {
+    const { error } = await supabaseAdmin
+      .from("admin_users")
+      .update({ custom_tabs: tabs })
+      .eq("email", email);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving custom tabs:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function clearUserCustomTabs(email) {
+  try {
+    const { error } = await supabaseAdmin
+      .from("admin_users")
+      .update({ custom_tabs: null })
+      .eq("email", email);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error clearing custom tabs:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+// -------------------------------------------------------------
+// EVENT REPORTS
+// -------------------------------------------------------------
+
+export async function getAdminPastEvents() {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/events?past=true`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function getAdminReport(googleEventId) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function saveEventReport(reportData) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/reports`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      body: JSON.stringify(reportData),
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error || "Failed to save report" };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error("saveEventReport error:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deleteEventReport(googleEventId) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${getAdminToken()}`
+      }
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error || "Failed to delete report" };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("deleteEventReport error:", error);
+    return { success: false, message: error.message };
+  }
+}

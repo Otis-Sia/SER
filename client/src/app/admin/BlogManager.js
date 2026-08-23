@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from 'next/dynamic';
 import styles from "./admin.module.css";
-import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost, flagPost } from "./actions";
+import { getAdminPosts, createPost, updatePost, deletePost, uploadImage, toggleHidePost, flagPost, uploadFile } from "./actions";
 import { FiEdit, FiTrash2, FiPlus, FiImage, FiLoader, FiEyeOff, FiEye, FiFlag } from "react-icons/fi";
 import MobileImageUploader from "@/components/MobileImageUploader";
 import 'react-quill-new/dist/quill.snow.css';
@@ -24,6 +24,8 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
   const [editingPost, setEditingPost] = useState(null);
   const [formData, setFormData] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [postType, setPostType] = useState("rich_text"); // "rich_text" or "pdf"
+  const [uploadingPdf, setUploadingPdf] = useState(false);
   const quillRef = useRef(null);
 
   const loadPosts = async () => {
@@ -38,6 +40,7 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
   }, []);
 
   const handleCreateNew = () => {
+    setPostType("rich_text");
     setEditingPost("new");
     setFormData({
       title: "",
@@ -51,6 +54,8 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
   };
 
   const handleEdit = (post) => {
+    const isPdf = post.body_md && post.body_md.startsWith("pdf:");
+    setPostType(isPdf ? "pdf" : "rich_text");
     setEditingPost(post.id);
     setFormData({
       title: post.title,
@@ -117,6 +122,30 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
     }
   };
 
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      return showToast("Please upload a valid PDF file", "error");
+    }
+
+    setUploadingPdf(true);
+    const form = new FormData();
+    form.append("file", file);
+
+    showToast("Uploading PDF to S3...");
+    const res = await uploadFile(form);
+    setUploadingPdf(false);
+
+    if (res.success) {
+      setFormData((prev) => ({ ...prev, body_md: `pdf:${res.url}` }));
+      showToast("PDF uploaded successfully");
+    } else {
+      showToast("Upload failed: " + res.message, "error");
+    }
+  };
+
   const imageHandler = useCallback(() => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
@@ -169,8 +198,14 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
   ];
 
   const handleSave = async () => {
-    if (!formData.title || !formData.body_md) {
-      return showToast("Title and Body are required", "error");
+    if (!formData.title) {
+      return showToast("Title is required", "error");
+    }
+    if (postType === "pdf" && (!formData.body_md || !formData.body_md.startsWith("pdf:"))) {
+      return showToast("Please upload a PDF file", "error");
+    }
+    if (postType === "rich_text" && !formData.body_md) {
+      return showToast("Content body is required", "error");
     }
 
     let res;
@@ -245,19 +280,100 @@ export default function BlogManager({ showToast, currentUserEmail, currentUserRo
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Blog Content</label>
-          <div style={{ background: '#fff', color: '#000', borderRadius: '4px', overflow: 'hidden' }}>
-            <ReactQuill 
-              forwardedRef={quillRef}
-              theme="snow" 
-              value={formData.body_md} 
-              onChange={(val) => setFormData({ ...formData, body_md: val })} 
-              modules={quillModules}
-              formats={quillFormats}
-              style={{ height: '300px', paddingBottom: '42px' }}
-            />
+          <label className={styles.label}>Post Type</label>
+          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: '500' }}>
+              <input 
+                type="radio" 
+                name="post_type" 
+                value="rich_text" 
+                checked={postType === "rich_text"} 
+                onChange={() => {
+                  setPostType("rich_text");
+                  if (formData.body_md && formData.body_md.startsWith("pdf:")) {
+                    setFormData(prev => ({ ...prev, body_md: "" }));
+                  }
+                }} 
+              />
+              Standard Blog Post (Rich Text)
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: '500' }}>
+              <input 
+                type="radio" 
+                name="post_type" 
+                value="pdf" 
+                checked={postType === "pdf"} 
+                onChange={() => {
+                  setPostType("pdf");
+                  if (formData.body_md && !formData.body_md.startsWith("pdf:")) {
+                    setFormData(prev => ({ ...prev, body_md: "" }));
+                  }
+                }} 
+              />
+              PDF Document
+            </label>
           </div>
         </div>
+
+        {postType === "rich_text" ? (
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Blog Content</label>
+            <div style={{ background: '#fff', color: '#000', borderRadius: '4px', overflow: 'hidden' }}>
+              <ReactQuill 
+                forwardedRef={quillRef}
+                theme="snow" 
+                value={formData.body_md} 
+                onChange={(val) => setFormData({ ...formData, body_md: val })} 
+                modules={quillModules}
+                formats={quillFormats}
+                style={{ height: '300px', paddingBottom: '42px' }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Upload PDF Document</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <input 
+                type="file" 
+                accept=".pdf,application/pdf" 
+                onChange={handlePdfUpload}
+                style={{ display: 'none' }}
+                id="pdf-file-upload"
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <label 
+                  htmlFor="pdf-file-upload" 
+                  className={styles.actionBtn} 
+                  style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', margin: 0, padding: '0.5rem 1rem', background: '#3b82f6', color: '#fff', borderRadius: '4px', border: 'none' }}
+                >
+                  {uploadingPdf ? <FiLoader className={styles.spin} /> : <FiPlus />}
+                  {formData.body_md && formData.body_md.startsWith("pdf:") ? "Change PDF File" : "Choose PDF File"}
+                </label>
+                {formData.body_md && formData.body_md.startsWith("pdf:") && (
+                  <span style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: '500' }}>
+                    ✓ PDF Uploaded
+                  </span>
+                )}
+              </div>
+              {formData.body_md && formData.body_md.startsWith("pdf:") && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', marginTop: '0.5rem' }}>
+                  <span style={{ fontSize: '0.85rem', wordBreak: 'break-all', color: '#64748b' }}>
+                    <strong>URL:</strong> {formData.body_md.substring(4)}
+                  </span>
+                  <a 
+                    href={formData.body_md.substring(4)} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    style={{ fontSize: '0.85rem', color: '#2563eb', textDecoration: 'underline', width: 'fit-content' }}
+                  >
+                    Preview Uploaded PDF (Opens in new tab)
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
           <input

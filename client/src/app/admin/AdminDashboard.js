@@ -18,11 +18,14 @@ import {
   updateMemberRegistration,
   updateAdminProfile,
   updateAdminEmail,
-  resolveEmailFromUsername
+  resolveEmailFromUsername,
+  getUserCustomTabs
 } from "./actions";
-import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle, FiSun, FiMoon, FiUser, FiChevronDown } from "react-icons/fi";
+import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle, FiSun, FiMoon, FiUser, FiChevronDown, FiShield } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
+import EventReportsManager from "./EventReportsManager";
+import RoleManagementTab from "./RoleManagementTab";
 import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
 import { supabase } from "@/lib/supabaseClient";
@@ -688,13 +691,17 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
     if (tab === "registrations") return "Form Responses";
     if (tab === "blogs") return "Blog Posts";
     if (tab === "users") return "Users";
+    if (tab === "reports") return "Event Reports";
+    if (tab === "rolemgmt") return "Role Management";
     return tab.charAt(0).toUpperCase() + tab.slice(1);
   };
 
   const getTabIcon = (tab) => {
     if (tab === "registrations") return <FiClipboard />;
     if (tab === "blogs") return <FiBookOpen />;
+    if (tab === "reports") return <FiBookOpen />;
     if (tab === "users") return <FiUsers />;
+    if (tab === "rolemgmt") return <FiShield />;
     return <FiEye />; // generic icon
   };
 
@@ -893,6 +900,7 @@ export default function AdminDashboard({ initialData }) {
   const [loginError, setLoginError] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
+  const [customTabs, setCustomTabs] = useState(null); // null = use role defaults
 
   const toggleSection = (sectionPath) => {
     setExpandedSections(prev => ({
@@ -956,11 +964,15 @@ export default function AdminDashboard({ initialData }) {
             setUserUsername(userData.username || userData.name || "");
             setUserName(userData.name || "");
             setMustChangePassword(userData.mustChangePassword === true);
+            // Load per-user custom tab overrides
+            const custom = await getUserCustomTabs(currentUser.email).catch(() => null);
+            setCustomTabs(custom);
           } else {
             setUserRole("Admin");
             setUserUsername("");
             setUserName("");
             setMustChangePassword(false);
+            setCustomTabs(null);
           }
         } else {
           setUserRole(null);
@@ -1328,23 +1340,34 @@ export default function AdminDashboard({ initialData }) {
   };
 
   // Filter tabs based on user role
-  const allDataTabs = Object.keys(initialData).filter(t => !["projects", "events", "gallery", "faq"].includes(t));
+  const allDataKeys = Array.from(new Set([...Object.keys(initialData || {}), "history"]));
+  const allDataTabs = allDataKeys.filter(t => !["projects", "events", "gallery", "faq"].includes(t));
   let tabs = [];
   
-  const nonJsonTabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", "contacts", "socials"];
+  const nonJsonTabs = ["registrations", "blogs", "reports", "users", "projects", "events", "gallery", "faq", "products", "contacts", "socials"];
 
-  if (userRole === "Super Admin") {
-    tabs = [...nonJsonTabs, ...allDataTabs];
+  const isGrandpa = adminUsername?.toLowerCase() === "grandpa@seresponse.org" || user?.email?.toLowerCase() === "grandpa@seresponse.org";
+
+  // Apply custom tab overrides if set for this user (Super Admin manages via Role Management tab)
+  if (customTabs && Array.isArray(customTabs) && userRole !== "Super Admin") {
+    tabs = [...customTabs];
+  } else if (userRole === "Super Admin") {
+    tabs = [...nonJsonTabs, ...allDataTabs, "rolemgmt"];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery"];
+    tabs = ["registrations", "blogs", "reports", "users", "events", "faq", "gallery"];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", "users", "projects", "events", "faq", "gallery", "products"];
+    tabs = ["registrations", "blogs", "reports", "users", "projects", "events", "faq", "gallery", "products"];
   } else if (userRole === "Author") {
-    tabs = ["blogs", "gallery"];
+    tabs = ["blogs", "reports", "gallery"];
   } else if (userRole === "Communication") {
     tabs = ["contacts", "socials", "gallery"];
   } else if (userRole === "Events") {
-    tabs = ["events", "blogs", "gallery"];
+    tabs = ["events", "reports", "blogs", "gallery"];
+  }
+
+  if (isGrandpa) {
+    if (!tabs.includes("events")) tabs.push("events");
+    if (!tabs.includes("history")) tabs.push("history");
   }
 
   if (!tabs.includes("gallery")) {
@@ -1509,6 +1532,7 @@ export default function AdminDashboard({ initialData }) {
             {activeTab === "overview" ? "Dashboard Overview"
             : activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
+            : activeTab === "reports" ? "Event Reports Management"
             : activeTab === "users" ? "User Management"
             : activeTab === "manual" ? "User Manual"
             : activeTab === "settings" ? "Personal Account Settings"
@@ -1532,6 +1556,8 @@ export default function AdminDashboard({ initialData }) {
             <MemberRegistrationsView showToast={showToast} currentUserRole={userRole} currentUserEmail={adminUsername} />
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
+          ) : activeTab === "reports" ? (
+            <EventReportsManager showToast={showToast} currentUserUsername={userUsername} />
           ) : activeTab === "users" ? (
             <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "projects" ? (
@@ -1548,6 +1574,8 @@ export default function AdminDashboard({ initialData }) {
             <ContactsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "socials" ? (
             <SocialsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
+          ) : activeTab === "rolemgmt" ? (
+            <RoleManagementTab showToast={showToast} />
           ) : activeTab === "manual" ? (
             <UserManual userRole={userRole} />
           ) : activeTab === "settings" ? (
