@@ -39,7 +39,7 @@ This manual covers every role in the system — from a first-time visitor browsi
 | **Frontend** | Next.js (React) | Public website & Admin dashboard |
 | **Backend API** | Express.js (Node) | REST API for blog posts, events, gallery, products, members, uploads |
 | **Database** | PostgreSQL | Stores users, admins, posts, events, products, gallery items, members |
-| **Cloud Database** | Supabase (PostgreSQL) | Stores site content, projects, FAQs, gallery, user roles, blog posts, event reports |
+| **Cloud Database** | Supabase (PostgreSQL) | Stores site content, projects, FAQs, gallery, user roles, blog posts |
 | **Authentication** | Supabase Auth + Server Actions | Login, token-based sessions (8-hour expiry) |
 | **File Storage** | Cloudinary / AWS S3 | Image uploads for blog posts, gallery, products |
 | **Contact Forms** | SplitForms API | Handles contact form submissions |
@@ -69,16 +69,16 @@ This manual covers every role in the system — from a first-time visitor browsi
 
 SER supports **role-based access control** and **custom tab overrides** managed by Super Admins:
 
-| Role | Login Required | Admin Dashboard | Blog Posts | Event Reports | Form Responses | Site Content & Collections | User & Role Management |
-|------|:-------------:|:---------------:|:----------:|:-------------:|:--------------:|:--------------------------:|:----------------------:|
-| **Public Visitor** | ❌ | ❌ | Read only | Read only | Submit only | Read only | ❌ |
-| **Registered User** | ✅ | ❌ | Read only | Read only | Submit only | Read only | ❌ |
-| **Author** | ✅ | ✅ | ✅ Create / Edit | ✅ Write | ❌ | ❌ | ❌ |
-| **Events** | ✅ | ✅ | ✅ Write / Edit | ✅ Write | ❌ | ❌ (Events only) | ❌ |
-| **Communication** | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ Socials & Contacts | ❌ |
-| **Admin** | ✅ | ✅ | ✅ Create / Edit | ✅ Write | ✅ View / Flag | ✅ Limited | ❌ View only |
-| **Project Lead** | ✅ | ✅ | ✅ Full CRUD | ✅ Write | ✅ View / Delete / Flag | ✅ Most collections | ❌ View only |
-| **Super Admin** | ✅ | ✅ Full access | ✅ Full CRUD | ✅ Full CRUD | ✅ Full CRUD / Edit | ✅ Full CRUD | ✅ Full CRUD + Custom Tabs |
+| Role | Login Required | Admin Dashboard | Blog Posts | Form Responses | Site Content & Collections | User & Role Management |
+|------|:-------------:|:---------------:|:----------:|:--------------:|:--------------------------:|:----------------------:|
+| **Public Visitor** | ❌ | ❌ | Read only | Submit only | Read only | ❌ |
+| **Registered User** | ✅ | ❌ | Read only | Submit only | Read only | ❌ |
+| **Author** | ✅ | ✅ | ✅ Create / Edit | ❌ | ❌ | ❌ |
+| **Events** | ✅ | ✅ | ✅ Write / Edit | ❌ | ❌ (Events only) | ❌ |
+| **Communication** | ✅ | ✅ | ❌ | ❌ | ✅ Socials & Contacts | ❌ |
+| **Admin** | ✅ | ✅ | ✅ Create / Edit | ✅ View / Flag | ✅ Limited | ❌ View only |
+| **Project Lead** | ✅ | ✅ | ✅ Full CRUD | ✅ View / Delete / Flag | ✅ Most collections | ❌ View only |
+| **Super Admin** | ✅ | ✅ Full access | ✅ Full CRUD | ✅ Full CRUD / Edit | ✅ Full CRUD | ✅ Full CRUD + Custom Tabs |
 
 ### Role Hierarchy
 
@@ -97,9 +97,9 @@ SER supports **role-based access control** and **custom tab overrides** managed 
 │       │                   • Create / Edit / Delete content     │
 │       │                   • Manage member registrations        │
 │       │                                                       │
-│  Events ───────────────── Event & report management           │
+│  Events ───────────────── Event management                    │
 │       │                   • Create / Edit Events               │
-│       │                   • Write Event Reports                │
+│       │                   • Manage Historic Milestones         │
 │       │                                                       │
 │  Communication ────────── Communication & media               │
 │       │                   • Social media embeds & handles      │
@@ -107,7 +107,7 @@ SER supports **role-based access control** and **custom tab overrides** managed 
 │       │                                                       │
 │  Author ───────────────── Blog post management                │
 │       │                   • Create / Edit / Delete posts       │
-│       │                   • Write event reports                │
+│       │                   • Upload gallery media               │
 │       │                                                       │
 │  Registered User ──────── Browse + Future features            │
 │       │                   • Same as visitor + account          │
@@ -154,7 +154,7 @@ Registered users create accounts via `/login/signup` or `/login`.
 
 ## 6. Author Guide
 
-Authors manage **blog posts**, draft **event reports**, and upload **gallery** media.
+Authors manage **blog posts** and upload **gallery** media.
 
 ### 6.1 Blog Post Management
 1. Click **Blog Posts** in the sidebar.
@@ -163,19 +163,14 @@ Authors manage **blog posts**, draft **event reports**, and upload **gallery** m
 4. Toggle **Published** to publish immediately or save as draft.
 5. Click **Save**.
 
-### 6.2 Event Reports
-1. Navigate to **Event Reports**.
-2. Select a past event.
-3. Write the report summary in Markdown format and click **Save Report**.
-
 ---
 
 ## 7. Events Manager Guide
 
-Events managers handle event scheduling, write event write-ups, and manage gallery photos.
+Events managers handle event scheduling, historic milestones, and manage gallery photos.
 
 1. **Creating Events**: Go to **Events** tab $\rightarrow$ **Add Event** $\rightarrow$ Enter Title, Date, Location, Description. Auto-syncs to Google Calendar.
-2. **Event Reports**: Go to **Event Reports** tab $\rightarrow$ Select past event $\rightarrow$ Write summary $\rightarrow$ Save.
+2. **Historic Milestones**: Go to **Events** tab $\rightarrow$ **Historic Milestones & Timeline** $\rightarrow$ Add or edit milestones and toggle Active status $\rightarrow$ Save.
 
 ---
 
@@ -190,7 +185,7 @@ Communication managers manage public media, social links, contact info, and gall
 
 ## 9. Project Lead Guide
 
-Project Leads oversee platform operations across form responses, blog posts, event reports, events, gallery, projects, products, and FAQs.
+Project Leads oversee platform operations across form responses, blog posts, events, gallery, projects, products, and FAQs.
 
 - **Form Responses**: View, filter by county, export to CSV, flag restricted members, or delete responses.
 - **Projects & Shop**: Create/edit projects and featured products.
@@ -206,7 +201,7 @@ Super Admins have full administrative authority over the entire platform.
 Super Admins can grant custom tab visibility to individual users:
 1. Navigate to **Role Management**.
 2. Click **Edit Tabs** next to a user.
-3. Select/deselect tabs (Form Responses, Blogs, Reports, Users, Projects, Events, Gallery, FAQ, Products, Contacts, Socials, History).
+3. Select/deselect tabs (Form Responses, Blogs, Users, Projects, Events, Gallery, FAQ, Products, Contacts, Socials, History).
 4. Click **Save Custom Tabs**.
 
 ### 10.2 User Account Management

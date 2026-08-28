@@ -8,7 +8,6 @@ import { getAdminUsers, getUserCustomTabs, setUserCustomTabs, clearUserCustomTab
 const ALL_TABS = [
   { id: "registrations", label: "Form Responses" },
   { id: "blogs", label: "Blog Posts" },
-  { id: "reports", label: "Event Reports" },
   { id: "users", label: "Users" },
   { id: "projects", label: "Projects" },
   { id: "events", label: "Events" },
@@ -22,11 +21,11 @@ const ALL_TABS = [
 
 const ROLE_DEFAULT_TABS = {
   "Super Admin": ALL_TABS.map(t => t.id),
-  "Admin": ["registrations", "blogs", "reports", "users", "events", "faq", "gallery"],
-  "Project Lead": ["registrations", "blogs", "reports", "users", "projects", "events", "faq", "gallery", "products"],
-  "Author": ["blogs", "reports", "gallery"],
+  "Admin": ["registrations", "blogs", "users", "events", "faq", "gallery"],
+  "Project Lead": ["registrations", "blogs", "users", "projects", "events", "faq", "gallery", "products"],
+  "Author": ["blogs", "gallery"],
   "Communication": ["contacts", "socials", "gallery"],
-  "Events": ["events", "reports", "blogs", "gallery"],
+  "Events": ["events", "blogs", "gallery"],
 };
 
 export default function RoleManagementTab({ showToast }) {

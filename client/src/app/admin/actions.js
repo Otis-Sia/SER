@@ -903,15 +903,22 @@ export async function getDashboardStats() {
   try {
     const { count: postsCount } = await supabaseAdmin.from("posts").select("*", { count: 'exact', head: true });
     const { count: flaggedPostsCount } = await supabaseAdmin.from("posts").select("*", { count: 'exact', head: true }).eq("flagged", true);
-    const { count: eventsCount } = await supabaseAdmin.from("events").select("*", { count: 'exact', head: true });
     const { count: projectsCount } = await supabaseAdmin.from("projects").select("*", { count: 'exact', head: true });
     const { count: membersCount } = await supabaseAdmin.from("members").select("*", { count: 'exact', head: true });
     const { count: flaggedMembersCount } = await supabaseAdmin.from("members").select("*", { count: 'exact', head: true }).eq("flagged", true);
     const { count: adminUsersCount } = await supabaseAdmin.from("admin_users").select("*", { count: 'exact', head: true });
 
+    let eventsCount = 0;
+    try {
+      const upcomingEvents = await getEvents(true);
+      eventsCount = upcomingEvents.length;
+    } catch (err) {
+      console.error("Failed to fetch upcoming events for stats:", err);
+    }
+
     return {
       blogs: postsCount || 0,
-      events: eventsCount || 0,
+      events: eventsCount,
       projects: projectsCount || 0,
       member_registrations: membersCount || 0,
       admin_users: adminUsersCount || 0,

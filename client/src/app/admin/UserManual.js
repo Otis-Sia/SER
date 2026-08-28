@@ -150,14 +150,13 @@ function SuperAdminManual() {
       <Section title="Your Role — Super Admin" icon={<FiBookOpen />}>
         <p>
           As a <strong>Super Admin</strong>, you have <strong>complete control</strong> over the entire SER platform. 
-          You can manage all content, users, member applications, custom tab access, event reports, and system settings.
+          You can manage all content, users, member applications, custom tab access, and system settings.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview & Stats", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
-            ["Event Reports — Write & Manage Reports for Past Events", <PermBadge allowed />],
             ["Role Management — Assign Custom Tabs per User", <PermBadge allowed />],
             ["Member Form Responses — View / Edit / Delete / Export", <PermBadge allowed />],
             ["User Management — Create / Edit / Delete admin users", <PermBadge allowed />],
@@ -186,21 +185,10 @@ function SuperAdminManual() {
           'Navigate to the "Role Management" tab.',
           'Find the user account in the list.',
           'Click "Edit Tabs" next to the user.',
-          'Check or uncheck individual tabs (Form Responses, Blogs, Reports, Users, Projects, Events, Gallery, FAQ, Products, Contacts, Socials, History).',
+          'Check or uncheck individual tabs (Form Responses, Blogs, Users, Projects, Events, Gallery, FAQ, Products, Contacts, Socials, History).',
           'Click "Save Custom Tabs" to apply, or "Reset to Default" to restore standard role-based tab access.',
         ]} />
         <Callout type="info">Custom tab overrides allow you to grant granular tab access to a user without changing their primary role.</Callout>
-      </Section>
-
-      <Section title="Managing Event Reports" defaultOpen={false}>
-        <p>The <strong>Event Reports</strong> tab allows writing summaries and official reports for past events.</p>
-        <StepList steps={[
-          'Navigate to the "Event Reports" tab.',
-          'Select a past event from the list.',
-          'Click "Edit Report" or "Add Report".',
-          'Enter the Report Title and Content in Markdown format.',
-          'Click "Save Report". The report is automatically saved and linked to the event.',
-        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -269,11 +257,11 @@ function SuperAdminManual() {
           headers={["Role", "Default Dashboard Access"]}
           rows={[
             ["Super Admin", "Full access to all tabs, role management, and JSON site content"],
-            ["Project Lead", "Form Responses, Blog, Event Reports, Users, Projects, Events, FAQ, Gallery, Products"],
-            ["Admin", "Form Responses, Blog, Event Reports, Users, Events, FAQ, Gallery"],
-            ["Events", "Events, Event Reports, Blog Posts, Gallery"],
+            ["Project Lead", "Form Responses, Blog, Users, Projects, Events, FAQ, Gallery, Products"],
+            ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery"],
+            ["Events", "Events, Blog Posts, Gallery"],
             ["Communication", "Contacts, Social Media, Gallery"],
-            ["Author", "Blog Posts, Event Reports, Gallery"],
+            ["Author", "Blog Posts, Gallery"],
           ]}
         />
 
@@ -384,14 +372,13 @@ function ProjectLeadManual() {
       <Section title="Your Role — Project Lead" icon={<FiBookOpen />}>
         <p>
           As a <strong>Project Lead</strong>, you have broad management access across the platform. 
-          You can manage blog posts, event reports, member applications, events, gallery, projects, products, FAQs, and view user accounts.
+          You can manage blog posts, member applications, events, gallery, projects, products, FAQs, and view user accounts.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview & Stats", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
-            ["Event Reports — Write & Manage Past Event Summaries", <PermBadge allowed />],
             ["Member Form Responses — View / Delete / Flag / Export", <PermBadge allowed />],
             ["User Management — View users", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
@@ -405,16 +392,6 @@ function ProjectLeadManual() {
             ["Account Settings", <PermBadge allowed />],
           ]}
         />
-      </Section>
-
-      <Section title="Managing Event Reports" defaultOpen={false}>
-        <p>The <strong>Event Reports</strong> tab allows you to write, edit, and publish reports for past events.</p>
-        <StepList steps={[
-          'Navigate to the "Event Reports" tab.',
-          'Select a past event from the list.',
-          'Click "Edit Report".',
-          'Enter the title and content in Markdown format, then save.',
-        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -524,7 +501,7 @@ function AuthorManual() {
     <>
       <Section title="Your Role — Author" icon={<FiBookOpen />}>
         <p>
-          As an <strong>Author</strong>, your primary responsibility is creating and managing <strong>blog posts</strong> and <strong>event reports</strong> for the SER platform. 
+          As an <strong>Author</strong>, your primary responsibility is creating and managing <strong>blog posts</strong> for the SER platform. 
           You also have access to the gallery for uploading images.
         </p>
         <Table
@@ -532,7 +509,6 @@ function AuthorManual() {
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
-            ["Event Reports — Write Event Summaries", <PermBadge allowed />],
             ["Gallery — Upload images", <PermBadge allowed />],
             ["Member Form Responses", <PermBadge allowed={false} />],
             ["User Management", <PermBadge allowed={false} />],
@@ -544,15 +520,6 @@ function AuthorManual() {
             ["Account Settings", <PermBadge allowed />],
           ]}
         />
-      </Section>
-
-      <Section title="Managing Event Reports" defaultOpen={false}>
-        <p>Use the <strong>Event Reports</strong> tab to draft and edit summaries for past events.</p>
-        <StepList steps={[
-          'Go to the "Event Reports" tab.',
-          'Select a past event.',
-          'Write the event report title and Markdown content, then save.',
-        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -640,14 +607,13 @@ function AdminRoleManual() {
     <>
       <Section title="Your Role — Admin" icon={<FiBookOpen />}>
         <p>
-          As an <strong>Admin</strong>, you have access to form responses, blog management, event reports, user viewing, events, FAQs, and gallery.
+          As an <strong>Admin</strong>, you have access to form responses, blog management, user viewing, events, FAQs, and gallery.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
-            ["Event Reports — Write Event Summaries", <PermBadge allowed />],
             ["Member Form Responses — View / Flag / Export", <PermBadge allowed />],
             ["User Management — View users", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
@@ -662,10 +628,10 @@ function AdminRoleManual() {
         />
       </Section>
 
-      <Section title="Managing Blog Posts & Event Reports" defaultOpen={false}>
+      <Section title="Managing Blog Posts" defaultOpen={false}>
         <StepList steps={[
-          'Navigate to "Blog Posts" or "Event Reports" in the sidebar.',
-          'Create and edit blog articles or write summaries for past events.',
+          'Navigate to "Blog Posts" in the sidebar.',
+          'Create and edit blog articles.',
           'Toggle "Published" to control public visibility.',
         ]} />
         <Callout type="info">Image uploads support drag-and-drop and are limited to <strong>10 MB</strong>.</Callout>
@@ -788,14 +754,13 @@ function EventsRoleManual() {
       <Section title="Your Role — Events" icon={<FiBookOpen />}>
         <p>
           As an <strong>Events</strong> manager, you are in charge of creating, editing, and scheduling <strong>events</strong>, 
-          writing <strong>event reports</strong>, managing <strong>blog posts</strong>, and maintaining the <strong>gallery</strong>.
+          managing <strong>blog posts</strong>, and maintaining the <strong>gallery</strong>.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
-            ["Event Reports — Write & Edit Event Summaries", <PermBadge allowed />],
             ["Blog Posts — Write & Publish Articles", <PermBadge allowed />],
             ["Gallery — Upload & Manage Event Media", <PermBadge allowed />],
             ["Member Form Responses", <PermBadge allowed={false} />],
@@ -814,16 +779,6 @@ function EventsRoleManual() {
           'Click "+ Add Event".',
           'Fill in Title, Date, Location, and Description.',
           'Save to publish the event live.',
-        ]} />
-      </Section>
-
-      <Section title="Writing Event Reports" defaultOpen={false}>
-        <p>You can publish event write-ups, summaries, and reports through the <strong>Event Reports</strong> tab.</p>
-        <StepList steps={[
-          'Navigate to the "Event Reports" tab.',
-          'Select a past event.',
-          'Write the event report content using Markdown and upload cover media.',
-          'Save to publish.',
         ]} />
       </Section>
 

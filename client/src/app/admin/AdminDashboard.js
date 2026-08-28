@@ -24,7 +24,6 @@ import {
 import { FiRefreshCw, FiDownload, FiAlertTriangle, FiZoomIn, FiCamera, FiClipboard, FiEye, FiX, FiLoader, FiBookOpen, FiLogOut, FiUsers, FiTrash2, FiSettings, FiHelpCircle, FiSun, FiMoon, FiUser, FiChevronDown, FiShield } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import BlogManager from "./BlogManager";
-import EventReportsManager from "./EventReportsManager";
 import RoleManagementTab from "./RoleManagementTab";
 import AdminUsersTab from "./AdminUsersTab";
 import ChangePasswordScreen from "./ChangePasswordScreen";
@@ -691,7 +690,6 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
     if (tab === "registrations") return "Form Responses";
     if (tab === "blogs") return "Blog Posts";
     if (tab === "users") return "Users";
-    if (tab === "reports") return "Event Reports";
     if (tab === "rolemgmt") return "Role Management";
     return tab.charAt(0).toUpperCase() + tab.slice(1);
   };
@@ -699,7 +697,6 @@ function OverviewDashboard({ userName, userRole, tabs, setActiveTab }) {
   const getTabIcon = (tab) => {
     if (tab === "registrations") return <FiClipboard />;
     if (tab === "blogs") return <FiBookOpen />;
-    if (tab === "reports") return <FiBookOpen />;
     if (tab === "users") return <FiUsers />;
     if (tab === "rolemgmt") return <FiShield />;
     return <FiEye />; // generic icon
@@ -1344,7 +1341,7 @@ export default function AdminDashboard({ initialData }) {
   const allDataTabs = allDataKeys.filter(t => !["projects", "events", "gallery", "faq"].includes(t));
   let tabs = [];
   
-  const nonJsonTabs = ["registrations", "blogs", "reports", "users", "projects", "events", "gallery", "faq", "products", "contacts", "socials"];
+  const nonJsonTabs = ["registrations", "blogs", "users", "projects", "events", "gallery", "faq", "products", "contacts", "socials"];
 
   const isGrandpa = adminUsername?.toLowerCase() === "grandpa@seresponse.org" || user?.email?.toLowerCase() === "grandpa@seresponse.org";
 
@@ -1354,15 +1351,15 @@ export default function AdminDashboard({ initialData }) {
   } else if (userRole === "Super Admin") {
     tabs = [...nonJsonTabs, ...allDataTabs, "rolemgmt"];
   } else if (userRole === "Admin") {
-    tabs = ["registrations", "blogs", "reports", "users", "events", "faq", "gallery"];
+    tabs = ["registrations", "blogs", "users", "events", "faq", "gallery"];
   } else if (userRole === "Project Lead") {
-    tabs = ["registrations", "blogs", "reports", "users", "projects", "events", "faq", "gallery", "products"];
+    tabs = ["registrations", "blogs", "users", "projects", "events", "faq", "gallery", "products"];
   } else if (userRole === "Author") {
-    tabs = ["blogs", "reports", "gallery"];
+    tabs = ["blogs", "gallery"];
   } else if (userRole === "Communication") {
     tabs = ["contacts", "socials", "gallery"];
   } else if (userRole === "Events") {
-    tabs = ["events", "reports", "blogs", "gallery"];
+    tabs = ["events", "blogs", "gallery"];
   }
 
   if (isGrandpa) {
@@ -1532,7 +1529,6 @@ export default function AdminDashboard({ initialData }) {
             {activeTab === "overview" ? "Dashboard Overview"
             : activeTab === "registrations" ? "Membership Form Responses" 
             : activeTab === "blogs" ? "Blog Posts Management"
-            : activeTab === "reports" ? "Event Reports Management"
             : activeTab === "users" ? "User Management"
             : activeTab === "manual" ? "User Manual"
             : activeTab === "settings" ? "Personal Account Settings"
@@ -1556,8 +1552,6 @@ export default function AdminDashboard({ initialData }) {
             <MemberRegistrationsView showToast={showToast} currentUserRole={userRole} currentUserEmail={adminUsername} />
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
-          ) : activeTab === "reports" ? (
-            <EventReportsManager showToast={showToast} currentUserUsername={userName || userUsername || adminUsername} currentUserName={userName || userUsername || adminUsername} />
           ) : activeTab === "users" ? (
             <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "projects" ? (
