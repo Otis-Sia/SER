@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { config } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import jwt from "jsonwebtoken";
 
 function cleanEnv(val) {
   if (!val) return "";
@@ -71,7 +72,8 @@ function getS3Client() {
 const contentFilePath = path.join(process.cwd(), "src", "data", "siteContent.json");
 
 function getAdminToken() {
-  return process.env.ADMIN_API_TOKEN || "default-secret-token-change-me";
+  const secret = process.env.JWT_SECRET || config.jwtSecret || "change-me-please";
+  return jwt.sign({ role: "admin", username: "admin" }, secret, { expiresIn: "1h" });
 }
 
 // -------------------------------------------------------------
@@ -974,11 +976,125 @@ export async function addProject(data) { return saveCmsDocument('projects', null
 export async function updateProject(id, data) { return saveCmsDocument('projects', id, data); }
 export async function deleteProject(id) { return deleteCmsDocument('projects', id); }
 
-export async function getEvents(isPublic = false) { return isPublic ? getPublicCmsCollection('events') : getCmsCollection('events'); }
-export async function getPublicEvents() { return getPublicCmsCollection('events'); }
-export async function addEvent(data) { return saveCmsDocument('events', null, data); }
-export async function updateEvent(id, data) { return saveCmsDocument('events', id, data); }
-export async function deleteEvent(id) { return deleteCmsDocument('events', id); }
+export async function getEvents(isPublic = false) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/events`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const events = await res.json();
+    return events.map(e => ({
+      ...e,
+      eventDate: e.event_date ? e.event_date.split('T')[0] : '',
+      time: e.event_date && e.event_date.includes('T') ? e.event_date.split('T')[1].substring(0, 5) : '',
+    }));
+  } catch (error) {
+    console.error("getEvents error:", error);
+    return [];
+  }
+}
+export async function getPublicEvents() { return getEvents(true); }
+
+export async function getPastEvents() {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/events?past=true`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const events = await res.json();
+    return events.map(e => ({
+      ...e,
+      eventDate: e.event_date ? e.event_date.split('T')[0] : '',
+      time: e.event_date && e.event_date.includes('T') ? e.event_date.split('T')[1].substring(0, 5) : '',
+    }));
+  } catch (error) {
+    console.error("getPastEvents error:", error);
+    return [];
+  }
+}
+
+export async function addEvent(data) {
+  try {
+    let event_date = data.event_date || data.eventDate;
+    if (data.eventDate && data.time) {
+      event_date = `${data.eventDate}T${data.time}:00`;
+    }
+    const payload = {
+      title: data.title,
+      event_date,
+      location: data.location || '',
+      description: data.description || ''
+    };
+    const res = await fetch(`${config.apiUrl}/api/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error || "Failed to create event in Google Calendar" };
+    }
+    const created = await res.json();
+    return { success: true, data: created };
+  } catch (error) {
+    console.error("addEvent error:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateEvent(id, data) {
+  try {
+    let event_date = data.event_date || data.eventDate;
+    if (data.eventDate && data.time) {
+      event_date = `${data.eventDate}T${data.time}:00`;
+    }
+    const payload = {
+      title: data.title,
+      event_date,
+      location: data.location || '',
+      description: data.description || '',
+      google_event_id: data.google_event_id || id
+    };
+    const res = await fetch(`${config.apiUrl}/api/events/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error || "Failed to update event in Google Calendar" };
+    }
+    const updated = await res.json();
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("updateEvent error:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deleteEvent(id) {
+  try {
+    const res = await fetch(`${config.apiUrl}/api/events/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${getAdminToken()}`
+      },
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error || "Failed to delete event from Google Calendar" };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("deleteEvent error:", error);
+    return { success: false, message: error.message };
+  }
+}
 
 export async function getGalleryItems(isPublic = false) { return isPublic ? getPublicCmsCollection('gallery') : getCmsCollection('gallery'); }
 export async function getPublicGalleryItems() { return getPublicCmsCollection('gallery'); }
@@ -1220,17 +1336,62 @@ export async function getAdminPastEvents() {
 }
 
 export async function getAdminReport(googleEventId) {
+  if (!googleEventId) return null;
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('event_reports')
+      .select('*')
+      .eq('google_event_id', googleEventId)
+      .maybeSingle();
+
+    if (!error && data) return data;
+  } catch (err) {
+    console.error("Direct supabase getAdminReport failed, trying API:", err.message);
+  }
+
   try {
     const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
-    console.error(error);
+    console.error("getAdminReport API error:", error);
     return null;
   }
 }
 
 export async function saveEventReport(reportData) {
+  const { google_event_id, title, content_md, author } = reportData;
+  if (!google_event_id || !title || !content_md) {
+    return { success: false, message: "google_event_id, title, and content_md are required" };
+  }
+
+  // 1. Try Direct Supabase Upsert first (fast, reliable, no network hop)
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('event_reports')
+      .upsert({
+        google_event_id,
+        title,
+        content_md,
+        author: author || "Admin",
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'google_event_id' })
+      .select()
+      .single();
+
+    if (!error && data) {
+      revalidatePath(`/events/${google_event_id}`);
+      revalidatePath("/events");
+      return { success: true, data };
+    }
+    if (error) {
+      console.warn("Direct Supabase save error, falling back to API:", error.message);
+    }
+  } catch (err) {
+    console.warn("Direct Supabase save exception, falling back to API:", err.message);
+  }
+
+  // 2. Fallback to Node API
   try {
     const res = await fetch(`${config.apiUrl}/api/reports`, {
       method: "POST",
@@ -1243,10 +1404,12 @@ export async function saveEventReport(reportData) {
     });
     
     if (!res.ok) {
-      const err = await res.json();
-      return { success: false, message: err.error || "Failed to save report" };
+      const err = await res.json().catch(() => ({}));
+      return { success: false, message: err.error || `HTTP error ${res.status}` };
     }
     const data = await res.json();
+    revalidatePath(`/events/${google_event_id}`);
+    revalidatePath("/events");
     return { success: true, data };
   } catch (error) {
     console.error("saveEventReport error:", error);
@@ -1255,6 +1418,25 @@ export async function saveEventReport(reportData) {
 }
 
 export async function deleteEventReport(googleEventId) {
+  if (!googleEventId) return { success: false, message: "google_event_id is required" };
+
+  // 1. Try Direct Supabase Delete first
+  try {
+    const { error } = await supabaseAdmin
+      .from('event_reports')
+      .delete()
+      .eq('google_event_id', googleEventId);
+
+    if (!error) {
+      revalidatePath(`/events/${google_event_id}`);
+      revalidatePath("/events");
+      return { success: true };
+    }
+  } catch (err) {
+    console.warn("Direct Supabase delete failed, trying API:", err.message);
+  }
+
+  // 2. Fallback to Node API
   try {
     const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, {
       method: "DELETE",
@@ -1264,9 +1446,11 @@ export async function deleteEventReport(googleEventId) {
     });
     
     if (!res.ok) {
-      const err = await res.json();
-      return { success: false, message: err.error || "Failed to delete report" };
+      const err = await res.json().catch(() => ({}));
+      return { success: false, message: err.error || `HTTP error ${res.status}` };
     }
+    revalidatePath(`/events/${google_event_id}`);
+    revalidatePath("/events");
     return { success: true };
   } catch (error) {
     console.error("deleteEventReport error:", error);

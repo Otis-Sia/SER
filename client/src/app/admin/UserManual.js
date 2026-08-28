@@ -1,6 +1,6 @@
 "use client";
 
-import { FiBookOpen, FiCheck, FiX, FiAlertTriangle, FiInfo, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FiBookOpen, FiCheck, FiX, FiAlertTriangle, FiInfo, FiChevronDown, FiChevronRight, FiShield, FiFileText } from "react-icons/fi";
 import { useState } from "react";
 import styles from "./admin.module.css";
 
@@ -129,7 +129,7 @@ function GuestManual() {
         If you are an administrator, project lead, author, or have another assigned role within the SER platform, you must sign in to access your dashboard.
       </p>
       <StepList steps={[
-        'Enter your registered Email Address in the form above.',
+        'Enter your registered Email Address or Username in the form above.',
         'Enter your Password.',
         'Click the "Sign In" button.',
       ]} />
@@ -150,14 +150,15 @@ function SuperAdminManual() {
       <Section title="Your Role — Super Admin" icon={<FiBookOpen />}>
         <p>
           As a <strong>Super Admin</strong>, you have <strong>complete control</strong> over the entire SER platform. 
-          You can manage all content, users, member applications, and system settings. This is the most powerful role 
-          and should only be assigned to trusted administrators.
+          You can manage all content, users, member applications, custom tab access, event reports, and system settings.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview & Stats", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
+            ["Event Reports — Write & Manage Reports for Past Events", <PermBadge allowed />],
+            ["Role Management — Assign Custom Tabs per User", <PermBadge allowed />],
             ["Member Form Responses — View / Edit / Delete / Export", <PermBadge allowed />],
             ["User Management — Create / Edit / Delete admin users", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
@@ -177,6 +178,29 @@ function SuperAdminManual() {
           <li><strong>Quick Stats</strong> — Total blogs, upcoming events, active projects, member registrations, admin users, and shop products.</li>
           <li><strong>Quick Actions</strong> — One-click shortcuts to jump to any management section.</li>
         </ul>
+      </Section>
+
+      <Section title="Managing Role & Custom Tabs (Role Management)" defaultOpen={false}>
+        <p>The <strong>Role Management</strong> tab allows Super Admins to customize individual tab visibility for any user in the system.</p>
+        <StepList steps={[
+          'Navigate to the "Role Management" tab.',
+          'Find the user account in the list.',
+          'Click "Edit Tabs" next to the user.',
+          'Check or uncheck individual tabs (Form Responses, Blogs, Reports, Users, Projects, Events, Gallery, FAQ, Products, Contacts, Socials, History).',
+          'Click "Save Custom Tabs" to apply, or "Reset to Default" to restore standard role-based tab access.',
+        ]} />
+        <Callout type="info">Custom tab overrides allow you to grant granular tab access to a user without changing their primary role.</Callout>
+      </Section>
+
+      <Section title="Managing Event Reports" defaultOpen={false}>
+        <p>The <strong>Event Reports</strong> tab allows writing summaries and official reports for past events.</p>
+        <StepList steps={[
+          'Navigate to the "Event Reports" tab.',
+          'Select a past event from the list.',
+          'Click "Edit Report" or "Add Report".',
+          'Enter the Report Title and Content in Markdown format.',
+          'Click "Save Report". The report is automatically saved and linked to the event.',
+        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -219,12 +243,12 @@ function SuperAdminManual() {
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li><strong>Search</strong> — Filter by name, email, county, crew, or phone number.</li>
           <li><strong>County Filter</strong> — Dropdown to filter by county.</li>
-          <li><strong>View Details</strong> — Click "Details" on any row to see the full 8-section application.</li>
+          <li><strong>View Details</strong> — Click "Details" on any row to see the full application.</li>
           <li><strong>Edit Details</strong> — As Super Admin, click "Edit Details" inside the modal to modify any field.</li>
           <li><strong>Flag / Unflag</strong> — Mark members as flagged (restricted) or clear a flag.</li>
           <li><strong>Delete</strong> — Permanently remove a registration.</li>
           <li><strong>Export to CSV</strong> — Download all filtered results as a CSV file for Excel.</li>
-          <li><strong>Refresh</strong> — Reload data from Supabase.</li>
+          <li><strong>Refresh</strong> — Reload data from the database.</li>
         </ul>
         <Callout type="info">Only Super Admins and Project Leads can delete member registrations and see who flagged a member.</Callout>
       </Section>
@@ -242,14 +266,14 @@ function SuperAdminManual() {
 
         <h4 style={{ margin: '1rem 0 0.5rem 0' }}>Available Roles</h4>
         <Table
-          headers={["Role", "Dashboard Access"]}
+          headers={["Role", "Default Dashboard Access"]}
           rows={[
-            ["Super Admin", "Full access to all tabs and features (including JSON site content)"],
-            ["Project Lead", "Form Responses, Blog, Users, Events, Gallery, Projects, Products"],
-            ["Admin", "Form Responses, Blog, Users, Events, FAQ, Gallery"],
+            ["Super Admin", "Full access to all tabs, role management, and JSON site content"],
+            ["Project Lead", "Form Responses, Blog, Event Reports, Users, Projects, Events, FAQ, Gallery, Products"],
+            ["Admin", "Form Responses, Blog, Event Reports, Users, Events, FAQ, Gallery"],
+            ["Events", "Events, Event Reports, Blog Posts, Gallery"],
             ["Communication", "Contacts, Social Media, Gallery"],
-            ["Events", "Events, Blog Posts (Event Reports), Gallery"],
-            ["Author", "Blog Posts, Gallery"],
+            ["Author", "Blog Posts, Event Reports, Gallery"],
           ]}
         />
 
@@ -262,7 +286,7 @@ function SuperAdminManual() {
       </Section>
 
       <Section title="Managing Events" defaultOpen={false}>
-        <p>Events are stored in Supabase and can sync with Google Calendar.</p>
+        <p>Events are stored in the database and can sync with Google Calendar.</p>
         <h4 style={{ margin: '0.75rem 0 0.5rem 0' }}>Creating an Event</h4>
         <StepList steps={[
           'Navigate to the "Events" tab.',
@@ -326,7 +350,7 @@ function SuperAdminManual() {
       </Section>
 
       <Section title="Site Content Management" defaultOpen={false}>
-        <p>Additional tabs (like Home, Contact, Footer, etc.) let you edit dynamic site content stored as JSON in Supabase.</p>
+        <p>Additional tabs (like Home, Contact, Footer, etc.) let you edit dynamic site content stored as JSON in the database.</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li><strong>Hero Section</strong> — Heading, subheading, CTA button text</li>
           <li><strong>Features</strong> — Service pillar descriptions</li>
@@ -360,25 +384,37 @@ function ProjectLeadManual() {
       <Section title="Your Role — Project Lead" icon={<FiBookOpen />}>
         <p>
           As a <strong>Project Lead</strong>, you have broad management access across the platform. 
-          You can manage blog posts, member applications, events, gallery, projects, products, and view user accounts.
+          You can manage blog posts, event reports, member applications, events, gallery, projects, products, FAQs, and view user accounts.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview & Stats", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
+            ["Event Reports — Write & Manage Past Event Summaries", <PermBadge allowed />],
             ["Member Form Responses — View / Delete / Flag / Export", <PermBadge allowed />],
             ["User Management — View users", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
             ["Gallery — Upload / Hide images", <PermBadge allowed />],
             ["Projects — Create / Edit / Delete", <PermBadge allowed />],
             ["Products (Shop) — Create / Edit / Delete", <PermBadge allowed />],
-            ["FAQs — Manage", <PermBadge allowed={false} />],
+            ["FAQs — Create / Edit / Delete", <PermBadge allowed />],
+            ["Role Management (Custom Tab Assignment)", <PermBadge allowed={false} />],
             ["Site Content — Edit hero, about, social links", <PermBadge allowed={false} />],
             ["User Management — Create / Delete users", "Limited"],
             ["Account Settings", <PermBadge allowed />],
           ]}
         />
+      </Section>
+
+      <Section title="Managing Event Reports" defaultOpen={false}>
+        <p>The <strong>Event Reports</strong> tab allows you to write, edit, and publish reports for past events.</p>
+        <StepList steps={[
+          'Navigate to the "Event Reports" tab.',
+          'Select a past event from the list.',
+          'Click "Edit Report".',
+          'Enter the title and content in Markdown format, then save.',
+        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -470,7 +506,7 @@ function ProjectLeadManual() {
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit site content (hero section, about page text, social links, etc.) — Super Admin only.</li>
-          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage FAQs — Super Admin only.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Customize tab permissions for other users — Super Admin only via Role Management.</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit member application details — Super Admin only.</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Assign the Super Admin role — Super Admin only.</li>
         </ul>
@@ -488,7 +524,7 @@ function AuthorManual() {
     <>
       <Section title="Your Role — Author" icon={<FiBookOpen />}>
         <p>
-          As an <strong>Author</strong>, your primary responsibility is creating and managing <strong>blog posts</strong> for the SER platform. 
+          As an <strong>Author</strong>, your primary responsibility is creating and managing <strong>blog posts</strong> and <strong>event reports</strong> for the SER platform. 
           You also have access to the gallery for uploading images.
         </p>
         <Table
@@ -496,6 +532,7 @@ function AuthorManual() {
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
+            ["Event Reports — Write Event Summaries", <PermBadge allowed />],
             ["Gallery — Upload images", <PermBadge allowed />],
             ["Member Form Responses", <PermBadge allowed={false} />],
             ["User Management", <PermBadge allowed={false} />],
@@ -507,6 +544,15 @@ function AuthorManual() {
             ["Account Settings", <PermBadge allowed />],
           ]}
         />
+      </Section>
+
+      <Section title="Managing Event Reports" defaultOpen={false}>
+        <p>Use the <strong>Event Reports</strong> tab to draft and edit summaries for past events.</p>
+        <StepList steps={[
+          'Go to the "Event Reports" tab.',
+          'Select a past event.',
+          'Write the event report title and Markdown content, then save.',
+        ]} />
       </Section>
 
       <Section title="Managing Blog Posts" defaultOpen={false}>
@@ -594,20 +640,20 @@ function AdminRoleManual() {
     <>
       <Section title="Your Role — Admin" icon={<FiBookOpen />}>
         <p>
-          As an <strong>Admin</strong>, you have access to form responses, blog management, user viewing, events, FAQs, gallery, 
-          and contact-related site content.
+          As an <strong>Admin</strong>, you have access to form responses, blog management, event reports, user viewing, events, FAQs, and gallery.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Blog Posts — Create / Edit / Delete", <PermBadge allowed />],
+            ["Event Reports — Write Event Summaries", <PermBadge allowed />],
             ["Member Form Responses — View / Flag / Export", <PermBadge allowed />],
             ["User Management — View users", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
             ["Gallery — Upload / Hide images", <PermBadge allowed />],
             ["FAQs — Create / Edit / Delete", <PermBadge allowed />],
-            ["Contact Site Content — Edit", <PermBadge allowed />],
+            ["Contact Site Content — Edit", <PermBadge allowed={false} />],
             ["Projects", <PermBadge allowed={false} />],
             ["Products (Shop)", <PermBadge allowed={false} />],
             ["Full Site Content", <PermBadge allowed={false} />],
@@ -616,11 +662,10 @@ function AdminRoleManual() {
         />
       </Section>
 
-      <Section title="Managing Blog Posts" defaultOpen={false}>
+      <Section title="Managing Blog Posts & Event Reports" defaultOpen={false}>
         <StepList steps={[
-          'Navigate to "Blog Posts" in the sidebar.',
-          'Create new posts with Title, Slug, Cover Image, and Markdown Body.',
-          'Edit or delete existing posts.',
+          'Navigate to "Blog Posts" or "Event Reports" in the sidebar.',
+          'Create and edit blog articles or write summaries for past events.',
           'Toggle "Published" to control public visibility.',
         ]} />
         <Callout type="info">Image uploads support drag-and-drop and are limited to <strong>10 MB</strong>.</Callout>
@@ -660,7 +705,7 @@ function AdminRoleManual() {
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Manage projects or products.</li>
-          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit full site content (hero, about, partners, etc.) — only contact section.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Edit site content (hero, about, partners, etc.).</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or delete admin users.</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Delete or edit member applications.</li>
         </ul>
@@ -679,42 +724,41 @@ function CommunicationManual() {
       <Section title="Your Role — Communication" icon={<FiBookOpen />}>
         <p>
           As a <strong>Communication</strong> team member, you manage the public-facing content — social media links, 
-          homepage text, footer details, and contact information.
+          homepage text, footer details, contact information, and gallery media.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
-            ["Site Content — Home, Contact, Social, Footer", <PermBadge allowed />],
+            ["Site Content — Contacts, Socials, Gallery", <PermBadge allowed />],
+            ["Social Media Embeds — Add TikTok, Instagram, FB embeds", <PermBadge allowed />],
             ["Blog Posts", <PermBadge allowed={false} />],
             ["Member Form Responses", <PermBadge allowed={false} />],
             ["User Management", <PermBadge allowed={false} />],
-            ["Events / Gallery / Projects / Products / FAQs", <PermBadge allowed={false} />],
+            ["Events / Projects / Products / FAQs", <PermBadge allowed={false} />],
             ["Account Settings", <PermBadge allowed />],
           ]}
         />
       </Section>
 
       <Section title="Editing Site Content" defaultOpen={false}>
-        <p>Your available tabs depend on the site content structure, but typically include:</p>
+        <p>Your available tabs include:</p>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li><strong>Home</strong> — Hero section text, feature descriptions, partner names.</li>
-          <li><strong>Communications</strong> — Social media embed URLs (Instagram, TikTok, Facebook).</li>
-          <li><strong>Contact</strong> — Email, phone numbers, WhatsApp link.</li>
-          <li><strong>Social / Socials</strong> — Social media profile links and handles.</li>
-          <li><strong>Footer</strong> — Footer content and quick links.</li>
+          <li><strong>Contacts</strong> — Email, phone numbers, WhatsApp link.</li>
+          <li><strong>Socials</strong> — Social media profile links and handles.</li>
+          <li><strong>Gallery</strong> — Media uploads and photo gallery management.</li>
         </ul>
         <Callout type="warning">After editing, always click <strong>"Save Changes"</strong> (the green floating button). Changes go live immediately.</Callout>
       </Section>
 
       <Section title="Adding Social Media Embeds" defaultOpen={false}>
-        <p>You can embed social media posts directly onto the public site via the <strong>Communications</strong> tab.</p>
+        <p>You can embed social media posts directly onto the public site via the <strong>Socials</strong> tab.</p>
         <StepList steps={[
-          'Navigate to the "Communications" tab in the admin panel.',
+          'Navigate to the "Socials" tab in the admin panel.',
           'Find the relevant field (e.g., TikTok Embed, Instagram Embed).',
           'Go to the social media platform (TikTok, Instagram, etc.), find the post you want to feature, and look for the "Embed" or "Share" option.',
           'Copy the provided Embed Code (it usually starts with <blockquote...> or <iframe...).',
-          'Paste the entire Embed Code into the corresponding field in the Communications tab.',
+          'Paste the entire Embed Code into the corresponding field in the Socials tab.',
           'Click the green "Save Changes" button.',
         ]} />
         <Callout type="info">Ensure you paste the full HTML embed code provided by the platform, not just the URL of the post.</Callout>
@@ -728,7 +772,7 @@ function CommunicationManual() {
 
       <Section title="What You Cannot Do" defaultOpen={false}>
         <ul style={{ paddingLeft: '1.5rem' }}>
-          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or manage blog posts, events, gallery, projects, products, or FAQs.</li>
+          <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or manage blog posts, events, projects, products, or FAQs.</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> View member form responses.</li>
           <li><FiX size={14} style={{ color: '#dc2626', marginRight: '6px', verticalAlign: 'middle' }} /> Create or manage admin users.</li>
         </ul>
@@ -744,17 +788,19 @@ function EventsRoleManual() {
       <Section title="Your Role — Events" icon={<FiBookOpen />}>
         <p>
           As an <strong>Events</strong> manager, you are in charge of creating, editing, and scheduling <strong>events</strong>, 
-          as well as writing <strong>event reports</strong> (published via Blog Posts).
+          writing <strong>event reports</strong>, managing <strong>blog posts</strong>, and maintaining the <strong>gallery</strong>.
         </p>
         <Table
           headers={["Capability", "Access"]}
           rows={[
             ["Dashboard Overview", <PermBadge allowed />],
             ["Events — Create / Edit / Delete", <PermBadge allowed />],
-            ["Blog Posts — Write & Edit Event Reports", <PermBadge allowed />],
+            ["Event Reports — Write & Edit Event Summaries", <PermBadge allowed />],
+            ["Blog Posts — Write & Publish Articles", <PermBadge allowed />],
+            ["Gallery — Upload & Manage Event Media", <PermBadge allowed />],
             ["Member Form Responses", <PermBadge allowed={false} />],
             ["User Management", <PermBadge allowed={false} />],
-            ["Gallery / Projects / Products / FAQs", <PermBadge allowed={false} />],
+            ["Projects / Products / FAQs", <PermBadge allowed={false} />],
             ["Site Content & Settings", <PermBadge allowed={false} />],
             ["Account Settings", <PermBadge allowed />],
           ]}
@@ -772,13 +818,12 @@ function EventsRoleManual() {
       </Section>
 
       <Section title="Writing Event Reports" defaultOpen={false}>
-        <p>You can publish event write-ups, summaries, and reports through the <strong>Blog Posts</strong> tab.</p>
+        <p>You can publish event write-ups, summaries, and reports through the <strong>Event Reports</strong> tab.</p>
         <StepList steps={[
-          'Navigate to the "Blog Posts" tab.',
-          'Click "New Post".',
-          'Title your post (e.g. "Event Report: Emergency Prep Hub Drill").',
+          'Navigate to the "Event Reports" tab.',
+          'Select a past event.',
           'Write the event report content using Markdown and upload cover media.',
-          'Toggle Published to make it live.',
+          'Save to publish.',
         ]} />
       </Section>
 
@@ -804,7 +849,7 @@ function CommonSections() {
       <Section title="Logging In" defaultOpen={false}>
         <StepList steps={[
           'Navigate to the admin page (/admin).',
-          'Enter your email address and password in the sign-in form.',
+          'Enter your email address or username and password in the sign-in form.',
           'Click "Sign In".',
           'If this is your first login, you may be prompted to change your password.',
         ]} />
@@ -816,7 +861,7 @@ function CommonSections() {
           headers={["Issue", "Solution"]}
           rows={[
             ['"Invalid email or password"', 'Double-check your credentials. Emails are case-insensitive. Contact a Super Admin if you forgot your password.'],
-            ["Can't see certain tabs", "Your role determines which tabs are visible. Contact a Super Admin to change your role."],
+            ["Can't see certain tabs", "Your role determines which tabs are visible. Super Admins can also grant custom tab access via Role Management."],
             ["Blog post not showing on the site", "Ensure 'Published' is toggled ON and the post isn't hidden. Blog cache refreshes every ~60 seconds."],
             ["Image upload fails", "Check: file must be an image type, max 10 MB. Try a different format."],
             ['"Your account has been restricted"', "Your account was flagged by an admin. Contact a Super Admin."],

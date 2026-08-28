@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { MapPin, Siren } from '../../components/Icons';
+import { FiClock } from 'react-icons/fi';
 import { getSiteContent, getHistoricMilestones } from '../admin/actions';
 import EventCard from '../../components/EventCard';
+import PastEventsList from '../../components/PastEventsList';
 import { config } from '@/lib/config';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -62,11 +65,31 @@ async function fetchPastGoogleEvents() {
   }
 }
 
+async function fetchAllEventReports() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('event_reports')
+      .select('*');
+    if (error || !data) return {};
+    const map = {};
+    for (const r of data) {
+      map[r.google_event_id] = r;
+    }
+    return map;
+  } catch (err) {
+    console.error("Failed to fetch all event reports:", err);
+    return {};
+  }
+}
+
 export default async function Events() {
-  const siteContent = await getSiteContent();
-  const milestones = await getHistoricMilestones();
-  const events = await fetchGoogleEvents();
-  const pastEvents = await fetchPastGoogleEvents();
+  const [siteContent, milestones, events, pastEvents, reports] = await Promise.all([
+    getSiteContent(),
+    getHistoricMilestones(),
+    fetchGoogleEvents(),
+    fetchPastGoogleEvents(),
+    fetchAllEventReports(),
+  ]);
 
   return (
     <>
@@ -212,28 +235,17 @@ export default async function Events() {
       </section>
 
       {pastEvents.length > 0 && (
-        <section className="events-upcoming" style={{ backgroundColor: 'var(--light-gray-color)' }}>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Past Events</h2>
-          <div className="product-grid grid-spaced">
-            {pastEvents.map((event) => {
-              const startDate = new Date(event.event_date || event.eventDate || new Date());
-              const endDate = event.end_date 
-                ? new Date(event.end_date) 
-                : new Date(startDate.getTime() + 60 * 60 * 1000);
-
-              const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
-              const datesStr = `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
-              const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${datesStr}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || '')}`;
-
-              return (
-                <EventCard 
-                  key={event.id}
-                  event={event}
-                  isLive={false}
-                  googleCalUrl={googleCalUrl}
-                />
-              );
-            })}
+        <section className="events-past" style={{ backgroundColor: 'var(--light-gray-color)', padding: '5rem 1.5rem' }}>
+          <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+            <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
+              <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', margin: '0 0 0.5rem 0', fontSize: '2.2rem' }}>
+                <FiClock size={28} /> Past Events &amp; Reports
+              </h2>
+              <p style={{ color: 'var(--text-color, #666)', fontSize: '1.05rem', margin: 0 }}>
+                Browse past training sessions and drills. Tap any event to read its report and key outcomes.
+              </p>
+            </div>
+            <PastEventsList pastEvents={pastEvents} reports={reports} />
           </div>
         </section>
       )}

@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react";
 import styles from "./admin.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiSave, FiX } from "react-icons/fi";
+import RichTextEditor from "../../components/RichTextEditor";
 import { getAdminPastEvents, getAdminReport, saveEventReport, deleteEventReport } from "./actions";
 
-export default function EventReportsManager({ showToast, currentUserUsername }) {
+export default function EventReportsManager({ showToast, currentUserUsername, currentUserName }) {
   const [events, setEvents] = useState([]);
   const [reports, setReports] = useState({});
   const [loading, setLoading] = useState(true);
   const [editingEventId, setEditingEventId] = useState(null);
-  const [formData, setFormData] = useState({ title: "", content_md: "" });
+  const [formData, setFormData] = useState({ title: "", content_md: "", author: "" });
+
+  const defaultAuthorName = currentUserName || (currentUserUsername && !currentUserUsername.includes('@') ? currentUserUsername : (currentUserUsername ? currentUserUsername.split('@')[0] : 'Admin'));
 
   const loadData = async () => {
     setLoading(true);
@@ -41,9 +44,14 @@ export default function EventReportsManager({ showToast, currentUserUsername }) 
     const eventId = event.google_event_id || event.id;
     setEditingEventId(eventId);
     const existingReport = reports[eventId];
+    const initialAuthor = existingReport?.author 
+      ? (existingReport.author.includes('@') ? existingReport.author.split('@')[0] : existingReport.author)
+      : defaultAuthorName;
+
     setFormData({
       title: existingReport ? existingReport.title : `${event.title} - Report`,
-      content_md: existingReport ? existingReport.content_md : ""
+      content_md: existingReport ? existingReport.content_md : "",
+      author: initialAuthor
     });
   };
 
@@ -53,7 +61,7 @@ export default function EventReportsManager({ showToast, currentUserUsername }) 
       google_event_id: editingEventId,
       title: formData.title,
       content_md: formData.content_md,
-      author: currentUserUsername || "Admin"
+      author: formData.author?.trim() || defaultAuthorName || "Admin"
     });
     
     if (res.success) {
@@ -98,14 +106,21 @@ export default function EventReportsManager({ showToast, currentUserUsername }) 
             />
           </div>
           <div className={styles.formGroup}>
-            <label>Content (Markdown supported)</label>
-            <textarea 
-              value={formData.content_md} 
-              onChange={e => setFormData({...formData, content_md: e.target.value})} 
-              required 
-              rows={10}
+            <label>Report Author (Name)</label>
+            <input 
+              type="text" 
+              value={formData.author || ""} 
+              onChange={e => setFormData({...formData, author: e.target.value})} 
+              placeholder="e.g. Sia, Grandpa, Lead Trainer"
               className={styles.input}
-              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Report Content (WYSIWYG Editor)</label>
+            <RichTextEditor 
+              value={formData.content_md} 
+              onChange={val => setFormData({...formData, content_md: val})} 
+              placeholder="Write the event report, highlights, key outcomes, photos, or quotes here..."
             />
           </div>
           <div className={styles.formActions}>

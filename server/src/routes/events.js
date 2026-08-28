@@ -43,20 +43,20 @@ router.get("/:id", async (req, res) => {
 // Admin: create event
 router.post("/", requireAdmin, async (req, res) => {
   const { title, event_date, location, description } = req.body;
-  if (!title || !event_date || !location) {
-    return res.status(400).json({ error: "title, event_date, and location are required" });
+  if (!title || !event_date) {
+    return res.status(400).json({ error: "title and event_date are required" });
   }
 
   try {
-    const gEvent = await createCalendarEvent({ title, event_date, location, description });
+    const gEvent = await createCalendarEvent({ title, event_date, location: location || "", description: description || "" });
     if (!gEvent || !gEvent.id) throw new Error("Google API returned null event");
     
     res.status(201).json({
       id: gEvent.id,
       title,
       event_date,
-      location,
-      description,
+      location: location || "",
+      description: description || "",
       google_event_id: gEvent.id
     });
   } catch (error) {
@@ -70,14 +70,14 @@ router.put("/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { title, event_date, location, description, google_event_id } = req.body;
   
-  if (!title || !event_date || !location) {
-    return res.status(400).json({ error: "title, event_date, and location are required" });
+  if (!title || !event_date) {
+    return res.status(400).json({ error: "title and event_date are required" });
   }
 
   const targetGoogleId = google_event_id || id;
   try {
-    await updateCalendarEvent(targetGoogleId, { title, event_date, location, description });
-    res.json({ id: targetGoogleId, title, event_date, location, description, google_event_id: targetGoogleId });
+    await updateCalendarEvent(targetGoogleId, { title, event_date, location: location || "", description: description || "" });
+    res.json({ id: targetGoogleId, title, event_date, location: location || "", description: description || "", google_event_id: targetGoogleId });
   } catch (error) {
     console.error("Failed to update event in Google Calendar", error);
     res.status(500).json({ error: "Failed to update event" });

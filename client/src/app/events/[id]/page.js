@@ -1,6 +1,7 @@
 import { config } from '@/lib/config';
 import EventCard from '../../../components/EventCard';
 import Link from 'next/link';
+import { getAdminReport } from '../../admin/actions';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
@@ -54,12 +55,22 @@ export async function generateMetadata({ params }) {
 
 async function fetchReport(googleEventId) {
   try {
-    const res = await fetch(`${config.apiUrl}/api/reports/${googleEventId}`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return await res.json();
+    return await getAdminReport(googleEventId);
   } catch (error) {
     return null;
   }
+}
+
+function formatAuthorName(author) {
+  if (!author) return "";
+  if (author.includes("@")) {
+    const raw = author.split("@")[0].replace(/[._-]/g, " ");
+    return raw
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+  return author;
 }
 
 export default async function EventPage({ params }) {
@@ -103,13 +114,15 @@ export default async function EventPage({ params }) {
         
         {report && (
           <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: 'var(--white-color)', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-            <h2 style={{ marginBottom: '1rem', color: 'var(--primary-color)', fontSize: '1.5rem', fontWeight: 'bold' }}>{report.title}</h2>
-            <div style={{ fontSize: '1.1rem', lineHeight: '1.6', color: 'var(--text-color)', whiteSpace: 'pre-wrap' }}>
-              {report.content_md}
-            </div>
+            <h2 style={{ marginBottom: '1.25rem', color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: 'bold' }}>{report.title}</h2>
+            <div 
+              style={{ fontSize: '1.05rem', lineHeight: '1.7', color: 'var(--text-color)' }}
+              dangerouslySetInnerHTML={{ __html: report.content_md }}
+            />
+
             {report.author && (
-              <p style={{ marginTop: '2rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-                Report by: {report.author}
+              <p style={{ marginTop: '2rem', fontStyle: 'italic', color: 'var(--text-secondary)', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
+                Report by: {formatAuthorName(report.author)}
               </p>
             )}
           </div>

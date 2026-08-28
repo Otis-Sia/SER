@@ -1557,13 +1557,13 @@ export default function AdminDashboard({ initialData }) {
           ) : activeTab === "blogs" ? (
             <BlogManager showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} currentUserUsername={userUsername} />
           ) : activeTab === "reports" ? (
-            <EventReportsManager showToast={showToast} currentUserUsername={userUsername} />
+            <EventReportsManager showToast={showToast} currentUserUsername={userName || userUsername || adminUsername} currentUserName={userName || userUsername || adminUsername} />
           ) : activeTab === "users" ? (
             <AdminUsersTab showToast={showToast} currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "projects" ? (
             <ProjectsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "events" ? (
-            <EventsManager currentUserEmail={adminUsername} currentUserRole={userRole} />
+            <EventsManager currentUserEmail={adminUsername} currentUserRole={userRole} currentUserName={userName || userUsername || adminUsername} showToast={showToast} />
           ) : activeTab === "gallery" ? (
             <GalleryManager currentUserEmail={adminUsername} currentUserRole={userRole} />
           ) : activeTab === "faq" ? (
