@@ -17,7 +17,11 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
   };
 
   // Format date to look like "30 JUL 2026"
-  const rawDate = new Date(event.event_date);
+  const now = new Date();
+  const rawDate = new Date(event.event_date || event.eventDate || now);
+  const rawEndDate = event.end_date ? new Date(event.end_date) : new Date(rawDate.getTime() + 60 * 60 * 1000);
+  const isPast = rawEndDate < now;
+
   const formattedDate = rawDate.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
@@ -31,7 +35,6 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
     timeZone: 'Africa/Nairobi'
   });
   
-  const rawEndDate = new Date(event.end_date);
   const formattedEndTime = rawEndDate.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -85,6 +88,10 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
            {isLive ? (
              <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2 tracking-wide">
                <span className="w-2 h-2 bg-white rounded-full animate-ping"></span> LIVE NOW
+             </span>
+           ) : isPast ? (
+             <span className="bg-gray-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm tracking-widest uppercase">
+               PAST EVENT
              </span>
            ) : (
              <span className="bg-[#052e16] text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm tracking-widest uppercase">
@@ -167,7 +174,7 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
             type="button"
             onClick={handleShare} 
             style={{
-              flex: '1 1 130px',
+              flex: isPast || !googleCalUrl ? '1 1 100%' : '1 1 130px',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -199,36 +206,38 @@ export default function EventCard({ event, isLive, googleCalUrl, compact = false
             )}
           </button>
           
-          <a 
-            href={googleCalUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            style={{
-              flex: '1 1 130px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'var(--background-color, #ffffff)',
-              color: 'var(--text-color, #1f2937)',
-              padding: '0.65rem 1rem',
-              borderRadius: '8px',
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              border: '1px solid rgba(0, 0, 0, 0.18)',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease',
-              whiteSpace: 'nowrap',
-              boxSizing: 'border-box'
-            }}
-          >
-            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span>Add to Calendar</span>
-          </a>
+          {!isPast && googleCalUrl && (
+            <a 
+              href={googleCalUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              style={{
+                flex: '1 1 130px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.4rem',
+                backgroundColor: 'var(--background-color, #ffffff)',
+                color: 'var(--text-color, #1f2937)',
+                padding: '0.65rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                border: '1px solid rgba(0, 0, 0, 0.18)',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box'
+              }}
+            >
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span>Add to Calendar</span>
+            </a>
+          )}
         </div>
         
-        {event.meetLink && (
+        {!isPast && event.meetLink && (
           <div style={{ marginTop: '0.75rem' }}>
              <a 
                href={event.meetLink} 
