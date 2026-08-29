@@ -71,6 +71,11 @@ export default function Footer({ osns = [], siteContent = {} }) {
           <p className="footer-subtitle">Youths &middot; Volunteers &middot; Members</p>
         </div>
       </div>
+
+      {/* Developer Info */}
+      <div style={{ textAlign: 'center', padding: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', backgroundColor: 'rgba(0, 0, 0, 0.2)', fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+        Developed by <a href="https://cepine.com" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'underline' }}>cepine.com</a>
+      </div>
     </footer>
   );
 }
