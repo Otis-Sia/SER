@@ -1106,6 +1106,39 @@ export async function deleteEvent(id) {
 export async function getGalleryItems(isPublic = false) { return isPublic ? getPublicCmsCollection('gallery') : getCmsCollection('gallery'); }
 export async function getPublicGalleryItems() { return getPublicCmsCollection('gallery'); }
 export async function addGalleryItem(data) { return saveCmsDocument('gallery', null, data); }
+export async function addBatchGalleryItems(items, createdByEmail = "") {
+  try {
+    if (!Array.isArray(items) || items.length === 0) {
+      return { success: false, message: "No images provided for batch upload" };
+    }
+    const payloads = items.map((item) => ({
+      image_url: item.imageUrl || item.image_url || "",
+      title: item.title || "",
+      alt: item.alt || item.title || "",
+      description: item.description || "",
+      created_by_email: createdByEmail || item.created_by_email || "",
+      created_at: new Date().toISOString()
+    }));
+
+    const { data: inserted, error } = await supabaseAdmin
+      .from('gallery')
+      .insert(payloads)
+      .select('id');
+
+    if (error) throw error;
+    revalidateCmsPaths('gallery');
+    try {
+      revalidatePath('/projects');
+      revalidatePath('/gallery');
+      revalidatePath('/');
+    } catch (e) {}
+
+    return { success: true, count: inserted?.length || payloads.length };
+  } catch (error) {
+    console.error("Error in addBatchGalleryItems:", error);
+    return { success: false, message: error.message };
+  }
+}
 export async function updateGalleryItem(id, data) { return saveCmsDocument('gallery', id, data); }
 export async function deleteGalleryItem(id) { return deleteCmsDocument('gallery', id); }
 

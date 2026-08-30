@@ -17,6 +17,7 @@ import {
   flagCmsDocument, hideCmsDocument
 } from "./actions";
 import MilestonesManager from "./MilestonesManager";
+import GalleryManagerComponent from "./GalleryManager";
 
 // Generic Collection Manager Component
 function CollectionManager({ 
@@ -764,7 +765,7 @@ export const EventsManager = (props) => {
     </div>
   );
 };
-export const GalleryManager = (props) => <CollectionManager collectionName="gallery" title="Gallery Items" fetchAction={getGalleryItems} addAction={addGalleryItem} updateAction={updateGalleryItem} deleteAction={deleteGalleryItem} defaultItem={{ title: '', imageUrl: '', alt: '', description: '' }} renderFields={renderGalleryFields} {...props} />;
+export const GalleryManager = (props) => <GalleryManagerComponent {...props} />;
 export const FaqsManager = (props) => <CollectionManager collectionName="faqs" title="FAQs" fetchAction={getFaqs} addAction={addFaq} updateAction={updateFaq} deleteAction={deleteFaq} defaultItem={{ question: '', answer: '', order: 0 }} renderFields={renderFaqFields} {...props} />;
 export const ProductsManager = (props) => <CollectionManager collectionName="products" title="Products" fetchAction={getProducts} addAction={addProduct} updateAction={updateProduct} deleteAction={deleteProduct} defaultItem={{ name: '', priceKes: 0, imageUrl: '', description: '', featured: false }} renderFields={renderProductFields} {...props} />;
 
