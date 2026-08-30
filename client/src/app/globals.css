@@ -1,3 +1,4 @@
+@import "tailwindcss";
 
 :root {
   /* Modern Color Palette */
@@ -3436,3 +3437,4 @@ body.dark-mode .member-profile-hero,
     grid-column: 1 / -1;
   }
 }
+
