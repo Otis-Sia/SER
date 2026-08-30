@@ -794,7 +794,8 @@ export async function extractGooglePhotos(url) {
     const html = await res.text();
     
     // Look for image data arrays in the initial data
-    const regex = /(?:\["(https:\/\/lh3\.googleusercontent\.com\/[a-zA-Z0-9\-_]+)",([0-9]+),([0-9]+)\])/g;
+    // Format is typically: ["https://lh3.googleusercontent.com/pw/...", width, height, ...]
+    const regex = /\["(https:\/\/[a-zA-Z0-9\-\.]+\.googleusercontent\.com\/[^"]+)",\d+,\d+/g;
     
     let match;
     const uniqueBaseUrls = new Set();
