@@ -30,7 +30,8 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   flagCmsDocument,
-  hideCmsDocument
+  hideCmsDocument,
+  extractGooglePhotos
 } from "./actions";
 
 // Fast client-side image compression for batch uploading
@@ -104,7 +105,54 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all"); // 'all' | 'untitled' | 'hidden' | 'flagged'
 
+  // Google Photos state
+  const [isGPhotosMode, setIsGPhotosMode] = useState(false);
+  const [gPhotosLink, setGPhotosLink] = useState("");
+  const [isExtractingPhotos, setIsExtractingPhotos] = useState(false);
+  const [gPhotosError, setGPhotosError] = useState("");
+
   const batchFileInputRef = useRef(null);
+
+  const handleExtractGooglePhotos = async () => {
+    if (!gPhotosLink.trim()) {
+      setGPhotosError("Please enter a valid Google Photos link.");
+      return;
+    }
+    
+    setIsExtractingPhotos(true);
+    setGPhotosError("");
+    
+    try {
+      const res = await extractGooglePhotos(gPhotosLink);
+      if (res.success && res.items && res.items.length > 0) {
+        // Prepare records to save immediately
+        const uploadedRecords = res.items.map(url => ({
+          imageUrl: url,
+          title: "",
+          alt: "Google Photos Import",
+          description: "",
+          created_by_email: currentUserEmail || ""
+        }));
+        
+        const dbResult = await addBatchGalleryItems(uploadedRecords, currentUserEmail || "");
+        
+        if (dbResult.success) {
+          if (showToast) showToast(`Successfully imported ${res.items.length} images!`);
+          setGPhotosLink("");
+          setIsGPhotosMode(false);
+          loadItems();
+        } else {
+          setGPhotosError(`Database insert error: ${dbResult.message}`);
+        }
+      } else {
+        setGPhotosError(res.message || "Failed to extract photos. Please ensure the album is public.");
+      }
+    } catch (err) {
+      setGPhotosError(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsExtractingPhotos(false);
+    }
+  };
 
   const loadItems = async () => {
     setLoading(true);
@@ -403,6 +451,7 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
             type="button"
             onClick={() => {
               setIsBatchMode(!isBatchMode);
+              setIsGPhotosMode(false);
               setEditingId(null);
             }}
             style={{
@@ -423,12 +472,42 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
             <FiLayers size={16} />
             <span>{isBatchMode ? "Close Batch Mode" : "⚡ Batch Upload Images"}</span>
           </button>
+          
+          {/* Google Photos Import Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsGPhotosMode(!isGPhotosMode);
+              setIsBatchMode(false);
+              setEditingId(null);
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              padding: "0.65rem 1.15rem",
+              borderRadius: "8px",
+              backgroundColor: isGPhotosMode ? "var(--text-color, #374151)" : "#4285F4", // Google Blue
+              color: "#ffffff",
+              fontWeight: "600",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            }}
+          >
+            <FiImage size={16} />
+            <span>{isGPhotosMode ? "Close G-Photos Import" : "Import Google Photos"}</span>
+          </button>
 
           {/* Add Single Item Button */}
           <button
             className={styles.addButton}
             style={{ width: "auto", marginTop: 0, padding: "0.65rem 1.15rem" }}
-            onClick={handleAddNewSingle}
+            onClick={() => {
+              handleAddNewSingle();
+              setIsGPhotosMode(false);
+            }}
           >
             <FiPlus /> Add Single Item
           </button>
@@ -725,6 +804,93 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Google Photos Import Section */}
+      {isGPhotosMode && (
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1.5rem",
+            backgroundColor: "var(--card-bg, #ffffff)",
+            border: "2px solid #4285F4", // Google Blue
+            borderRadius: "14px",
+            boxShadow: "0 6px 20px rgba(66, 133, 244, 0.12)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem"
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h4 style={{ margin: 0, fontSize: "1.15rem", fontWeight: "700", color: "#4285F4", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <FiImage size={20} />
+                <span>Import from Google Photos Link</span>
+              </h4>
+              <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-color, #666)" }}>
+                Paste a public shared Google Photos album link (e.g. <code>https://photos.app.goo.gl/...</code>). The images will be extracted and imported to your gallery automatically.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsGPhotosMode(false)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#6b7280" }}
+            >
+              <FiX size={22} />
+            </button>
+          </div>
+
+          <div style={{ display: "flex", gap: "0.5rem", flexDirection: "column" }}>
+            <input
+              type="text"
+              placeholder="https://photos.app.goo.gl/..."
+              value={gPhotosLink}
+              onChange={(e) => setGPhotosLink(e.target.value)}
+              className={styles.input}
+              disabled={isExtractingPhotos}
+              style={{ width: "100%", padding: "0.75rem", fontSize: "1rem" }}
+            />
+            {gPhotosError && (
+              <div style={{ color: "#dc2626", fontSize: "0.85rem", marginTop: "0.25rem" }}>
+                {gPhotosError}
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={handleExtractGooglePhotos}
+              disabled={isExtractingPhotos || !gPhotosLink.trim()}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "8px",
+                backgroundColor: "#4285F4",
+                color: "#fff",
+                fontWeight: "600",
+                fontSize: "0.95rem",
+                border: "none",
+                cursor: isExtractingPhotos ? "not-allowed" : "pointer",
+                opacity: (isExtractingPhotos || !gPhotosLink.trim()) ? 0.7 : 1
+              }}
+            >
+              {isExtractingPhotos ? (
+                <>
+                  <FiLoader className={styles.spinner} size={18} />
+                  <span>Extracting & Importing...</span>
+                </>
+              ) : (
+                <>
+                  <FiUploadCloud size={18} />
+                  <span>Extract & Import Photos</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
 

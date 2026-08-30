@@ -774,8 +774,50 @@ export async function deleteCmsDocument(collectionName, id) {
 
 
 // -------------------------------------------------------------
-// EXTRA HELPERS & COMPATIBILITY EXPORTS
+// GOOGLE PHOTOS EXTRACTOR
 // -------------------------------------------------------------
+
+export async function extractGooglePhotos(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
+      },
+      redirect: 'follow',
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      throw new Error(`Failed to fetch Google Photos album: ${res.status}`);
+    }
+    
+    const html = await res.text();
+    
+    // Look for image data arrays in the initial data
+    const regex = /(?:\["(https:\/\/lh3\.googleusercontent\.com\/[a-zA-Z0-9\-_]+)",([0-9]+),([0-9]+)\])/g;
+    
+    let match;
+    const uniqueBaseUrls = new Set();
+    
+    while ((match = regex.exec(html)) !== null) {
+      // match[1] is the base URL without sizing parameters
+      uniqueBaseUrls.add(match[1]);
+    }
+    
+    if (uniqueBaseUrls.size === 0) {
+      return { success: false, message: "No images found in the provided album link. Ensure it is a public shared album." };
+    }
+    
+    // Append a high-res sizing parameter to each base URL (e.g., =w1600 for max 1600px width/height)
+    const items = Array.from(uniqueBaseUrls).map(baseUrl => `${baseUrl}=w1600`);
+    
+    return { success: true, items };
+  } catch (error) {
+    console.error("Error extracting Google Photos:", error);
+    return { success: false, message: error.message };
+  }
+}
+
 
 export async function uploadImage(formData) {
   try {
