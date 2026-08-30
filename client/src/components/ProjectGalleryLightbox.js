@@ -88,48 +88,50 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
           overflowY: 'auto',
           padding: '2rem 0'
         }} onClick={closeLightbox}>
-          <button 
-            onClick={closeLightbox}
-            style={{ position: 'fixed', top: '25px', right: '25px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', zIndex: 10000, borderRadius: '50%', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
-          >
-            <X size={24} />
-          </button>
-          
-          {galleryItems.length > 1 && (
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', zIndex: 10001 }} onClick={(e) => e.stopPropagation()}>
             <button 
-              onClick={prevImage}
-              style={{ position: 'fixed', left: '15px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10000, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+              onClick={closeLightbox}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', zIndex: 10004, borderRadius: '50%', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
             >
-              <ChevronLeft size={32} />
+              <X size={24} />
             </button>
-          )}
-
-          <div style={{ position: 'relative', width: '85%', maxWidth: '800px', margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
+            {galleryItems.length > 1 && (
+              <button 
+                onClick={prevImage}
+                style={{ position: 'absolute', left: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10003, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+              >
+                <ChevronLeft size={32} />
+              </button>
+            )}
+            
             <img 
               src={galleryItems[lightboxIndex].imageUrl || galleryItems[lightboxIndex].image || galleryItems[lightboxIndex].image_url} 
               alt={galleryItems[lightboxIndex].title} 
-              style={{ maxWidth: '100%', maxHeight: '55vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{ maxWidth: '95vw', maxHeight: '70vh', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
             />
+
+            {galleryItems.length > 1 && (
+              <button 
+                onClick={nextImage}
+                style={{ position: 'absolute', right: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10003, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+              >
+                <ChevronRight size={32} />
+              </button>
+            )}
+          </div>
+
+          <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '40px 20px 25px', background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10002 }} onClick={(e) => e.stopPropagation()}>
             {galleryItems[lightboxIndex].title && (
-              <div style={{ color: '#fff', textAlign: 'center', marginTop: '20px', fontSize: '1.25rem', fontWeight: '600', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+              <div style={{ color: '#fff', textAlign: 'center', fontSize: '1.25rem', fontWeight: '600', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                 {galleryItems[lightboxIndex].title}
               </div>
             )}
             {galleryItems[lightboxIndex].description && (
-              <div style={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center', marginTop: '8px', fontSize: '0.95rem', maxWidth: '100%', margin: '8px auto 0', lineHeight: 1.5, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+              <div style={{ color: 'rgba(255,255,255,0.95)', textAlign: 'center', marginTop: '8px', fontSize: '0.95rem', maxWidth: '800px', lineHeight: 1.5, textShadow: '0 1px 2px rgba(0,0,0,0.8)', overflowY: 'auto', maxHeight: '20vh' }}>
                 {galleryItems[lightboxIndex].description}
               </div>
             )}
           </div>
-
-          {galleryItems.length > 1 && (
-            <button 
-              onClick={nextImage}
-              style={{ position: 'absolute', right: '25px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10000, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
-            >
-              <ChevronRight size={32} />
-            </button>
-          )}
         </div>
       )}
     </>
