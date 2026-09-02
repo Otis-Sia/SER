@@ -9,7 +9,7 @@
 | Component | Provider | Live URL |
 | :--- | :--- | :--- |
 | **Frontend Website** | Cloudflare (OpenNext) | [https://seresponse.org](https://seresponse.org) <br> *(Preview: [ser-client.elvissia2.workers.dev](https://ser-client.elvissia2.workers.dev))* |
-| **Backend REST API** | Cloudflare Workers (Hono) | [https://ser-worker.elvissia2.workers.dev](https://ser-worker.elvissia2.workers.dev) |
+| **Backend REST API** | Cloudflare Workers (Hono) | [https://api.seresponse.org](https://api.seresponse.org) <br> *(Preview: [ser-worker.elvissia2.workers.dev](https://ser-worker.elvissia2.workers.dev))* |
 
 ---
 
