@@ -1,14 +1,23 @@
 # Dependencies
 node_modules/
+**/node_modules/
 .pnp
 .pnp.*
 
 # Testing
 coverage/
 
-# Next.js build output
-client/.next/
+# Next.js & OpenNext build output
+.next/
+**/.next/
+.open-next/
+**/.open-next/
+out/
 client/out/
+
+# Cloudflare Wrangler & Workers
+.wrangler/
+**/.wrangler/
 
 # Production/build outputs
 build/
@@ -22,12 +31,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.pem
-*.json
-!package.json
-!package-lock.json
-!jsconfig.json
-!tsconfig.json
-
 
 # Debug logs
 npm-debug.log*

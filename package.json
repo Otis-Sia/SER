@@ -4,12 +4,14 @@
   "private": true,
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "worker"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=ser-server\" \"npm run dev --workspace=ser-client\"",
     "start": "concurrently \"npm run start --workspace=ser-server\" \"npm run start --workspace=ser-client\"",
     "build": "npm run build --workspace=ser-client",
+    "deploy:cf": "./deploy-cloudflare.sh",
     "install:all": "npm install"
   },
   "devDependencies": {

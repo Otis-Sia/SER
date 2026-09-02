@@ -4,7 +4,7 @@ import { useState } from 'react';
 import JoinForm from '../community/JoinForm';
 import { findMemberRegistration } from '../admin/actions';
 import { FiSearch, FiAlertCircle } from "react-icons/fi";
-import { Country } from 'country-state-city';
+import { Country } from '../../lib/countryData';
 import SearchableSelect from '../../components/SearchableSelect';
 
 const ID_TYPES = ['National ID', 'Passport', 'Alien ID', 'Military ID', 'Refugee ID', 'N/A'];

@@ -6,7 +6,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { FiCheckCircle, FiInfo, FiClipboard, FiCheck, FiEdit2, FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { submitMemberRegistration, updateMemberRegistration, checkDuplicateMember } from '../admin/actions';
 import { KENYA_COUNTIES } from '../../lib/kenyaCounties';
-import { Country, City } from 'country-state-city';
+import { Country, City } from '../../lib/countryData';
 import SearchableSelect from '../../components/SearchableSelect';
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'N/A (Don\'t know)'];
