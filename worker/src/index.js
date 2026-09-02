@@ -37,6 +37,23 @@ export function getDb(env) {
   return new pg.Pool({ connectionString });
 }
 
+// Root route
+app.get("/", (c) => {
+  return c.json({
+    name: "SER API Worker",
+    status: "online",
+    endpoints: {
+      health: "/api/health",
+      auth: "/api/auth",
+      posts: "/api/posts",
+      products: "/api/products",
+      gallery: "/api/gallery",
+      members: "/api/members",
+      reports: "/api/reports",
+    },
+  });
+});
+
 // Health check
 app.get("/api/health", (c) => {
   return c.json({ ok: true, timestamp: new Date().toISOString() });
@@ -50,13 +67,18 @@ app.route("/api/gallery", galleryRouter);
 app.route("/api/members", membersRouter);
 app.route("/api/reports", reportsRouter);
 
+// 404 Handler
+app.notFound((c) => {
+  return c.json({ error: "Not Found", path: c.req.path }, 404);
+});
+
 // Global Error Handler
 app.onError((err, c) => {
   console.error("Worker unhandled error:", err);
   return c.json(
     {
       error: "Internal Server Error",
-      message: err.message,
+      message: err?.message || String(err),
     },
     500
   );
