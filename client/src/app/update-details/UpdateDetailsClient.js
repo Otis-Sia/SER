@@ -45,8 +45,13 @@ export default function UpdateDetailsClient() {
     const result = await findMemberRegistration(idNumber, contactStr, nationality, idType);
     
     if (result.success && result.data) {
-      setMemberData(result.data);
-      setSearchState('found');
+      if (result.data.flaggedByEmail === 'self-updated-once') {
+        setErrorMsg('You have already updated your details. Each member is only allowed to update their details once. If you need to make further changes, please contact support.');
+        setSearchState('not-found');
+      } else {
+        setMemberData(result.data);
+        setSearchState('found');
+      }
     } else {
       setErrorMsg(result.message || 'No match found.');
       setSearchState('not-found');
@@ -62,16 +67,26 @@ export default function UpdateDetailsClient() {
   }
 
   if (searchState === 'not-found') {
+    const isAlreadyUpdated = errorMsg.includes('already updated');
     return (
       <section className="community-main" style={{ textAlign: 'center' }}>
-        <div style={{ padding: '2rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', marginBottom: '2rem', display: 'inline-block' }}>
+        <div style={{ padding: '2rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', marginBottom: '2rem', display: 'inline-block', maxWidth: '600px' }}>
           <FiAlertCircle size={32} style={{ marginBottom: '1rem', display: 'block', margin: '0 auto' }} />
-          <h3>No Match Found</h3>
+          <h3>{isAlreadyUpdated ? 'Update Blocked' : 'No Match Found'}</h3>
           <p style={{ marginTop: '0.5rem' }}>{errorMsg}</p>
-          <p style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>Please check your ID and contact details and try again, or fill the form below to register as a new member.</p>
-          <button className="btn" onClick={() => setSearchState('idle')} style={{ background: '#991b1b' }}>
-            Try Again
-          </button>
+          {!isAlreadyUpdated && (
+            <>
+              <p style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>Please check your ID and contact details and try again, or fill the form below to register as a new member.</p>
+              <button className="btn" onClick={() => setSearchState('idle')} style={{ background: '#991b1b' }}>
+                Try Again
+              </button>
+            </>
+          )}
+          {isAlreadyUpdated && (
+            <button className="btn" onClick={() => setSearchState('idle')} style={{ background: '#4a5568', marginTop: '1rem' }}>
+              Back to Search
+            </button>
+          )}
         </div>
         <JoinForm />
       </section>

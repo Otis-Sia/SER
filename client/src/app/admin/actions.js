@@ -165,7 +165,8 @@ export async function findMemberRegistration(idNumber, contactStr, nationality, 
         subCounty: docData.sub_county,
         bloodType: docData.blood_type,
         crew: docData.crew,
-        createdAt: docData.created_at
+        createdAt: docData.created_at,
+        flaggedByEmail: docData.flagged_by_email
       };
 
       const emailMatch = data.email && data.email.toLowerCase().trim() === searchContact;
@@ -251,6 +252,7 @@ export async function updateMemberRegistration(id, dataToUpdate) {
   try {
     const payload = {};
     if (dataToUpdate.name !== undefined) payload.name = dataToUpdate.name;
+    if (dataToUpdate.flaggedByEmail !== undefined) payload.flagged_by_email = dataToUpdate.flaggedByEmail;
     if (dataToUpdate.firstName !== undefined) payload.first_name = dataToUpdate.firstName;
     if (dataToUpdate.middleName !== undefined) payload.middle_name = dataToUpdate.middleName;
     if (dataToUpdate.lastName !== undefined) payload.last_name = dataToUpdate.lastName;
