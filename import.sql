@@ -32,7 +32,7 @@ INSERT INTO projects (title, focus, description, link, link_text, created_at) VA
 -- Data for contacts
 INSERT INTO contacts (contact_type, contact_value, sort_order) VALUES ('Phone', '+254 742 435 314', 3);
 INSERT INTO contacts (contact_type, contact_value, sort_order) VALUES ('Phone', '0742435314', 2);
-INSERT INTO contacts (contact_type, contact_value, sort_order) VALUES ('Email', 'info@scoutsemergencyresponse.org', 1);
+INSERT INTO contacts (contact_type, contact_value, sort_order) VALUES ('Email', 'info@seresponse.org', 1);
 INSERT INTO contacts (contact_type, contact_value, sort_order) VALUES ('WhatsApp', 'https://wa.me/254742435314', 4);
 
 -- Data for social_media

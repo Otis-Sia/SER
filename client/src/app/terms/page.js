@@ -107,10 +107,10 @@ export default async function TermsPage() {
         {/* Section 3 - MEDIA RELEASE (Comprehensive) */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Camera size={22} /> 3. Media, Photo &amp; Video Authorization Release
+            <Camera size={22} /> 3. Media, Photo &amp; Video Authorisation Release
           </h2>
           <p>
-            In order to showcase community impact, raise awareness for emergency response education, document field operations, and recognize volunteer contributions, SER regularly captures photographs, video recordings, audio, and visual stories during activities.
+            In order to showcase community impact, raise awareness for emergency response education, document field operations, and recognise volunteer contributions, SER regularly captures photographs, video recordings, audio, and visual stories during activities.
           </p>
           
           <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginTop: '1rem' }}>
@@ -165,8 +165,8 @@ export default async function TermsPage() {
           <ul style={{ paddingLeft: '1.5rem', marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li><strong>Safety Compliance:</strong> Volunteers must strictly observe all safety directives, wear protective gear when instructed, and refrain from engaging in unauthorized hazardous operations.</li>
             <li><strong>Medical Fitness:</strong> Volunteers are responsible for assessing their own medical fitness before participating in strenuous training or field deployments.</li>
-            <li><strong>Emergency Medical Consent:</strong> In the event of an illness or injury during an SER activity, you authorize SER leaders to seek necessary medical assistance or emergency transportation on your behalf.</li>
-            <li><strong>Limitation of Liability:</strong> SER, its directors, leaders, and partner organizations shall not be held liable for personal injury, property loss, or damage arising out of voluntary participation, except where caused by gross negligence or willful misconduct.</li>
+            <li><strong>Emergency Medical Consent:</strong> In the event of an illness or injury during an SER activity, you authorise SER leaders to seek necessary medical assistance or emergency transportation on your behalf.</li>
+            <li><strong>Limitation of Liability:</strong> SER, its directors, leaders, and partner organisations shall not be held liable for personal injury, property loss, or damage arising out of voluntary participation, except where caused by gross negligence or wilful misconduct.</li>
           </ul>
         </section>
 
