@@ -67,7 +67,7 @@ export default async function TermsPage() {
               Key Highlight: Photo &amp; Media Release Consent
             </h3>
             <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.6' }}>
-              By registering as a volunteer or participating in Scouts Emergency Response (SER) activities, you grant SER explicit authorization to capture and publish photographs, videos, and media content featuring you across our official social media channels, website, press publications, and training materials.
+              By registering as a volunteer or participating in Scouts Emergency Response (SER) activities, you grant SER explicit authorisation to capture and publish photographs, videos, and media content featuring you across our official social media channels, website, press publications, and training materials.
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default async function TermsPage() {
             <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '1.05rem' }}>Scope of Media Release:</h4>
             <ul style={{ paddingLeft: '1.5rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.95rem' }}>
               <li>
-                <strong>Grant of Rights:</strong> You grant SER a perpetual, worldwide, royalty-free, non-exclusive license to take, edit, reproduce, publish, and distribute photographs, video footage, sound recordings, and testimonials in which you appear.
+                <strong>Grant of Rights:</strong> You grant SER a perpetual, worldwide, royalty-free, non-exclusive licence to take, edit, reproduce, publish, and distribute photographs, video footage, sound recordings, and testimonials in which you appear.
               </li>
               <li>
                 <strong>Publishing Channels:</strong> Captured media may be featured across SER's official channels, including:
@@ -135,7 +135,7 @@ export default async function TermsPage() {
                 <strong>Waiver of Inspection:</strong> You waive any right to inspect or approve the finished photo, video, or publication prior to its use.
               </li>
               <li>
-                <strong>Opt-Out / Revocation Procedure:</strong> If you have specific privacy or personal safety concerns regarding media publication, you may submit a written request to <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a> detailing your request. SER will endeavor to honor written opt-out requests for future publications where reasonably practicable.
+                <strong>Opt-Out / Revocation Procedure:</strong> If you have specific privacy or personal safety concerns regarding media publication, you may submit a written request to <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a> detailing your request. SER will endeavour to honour written opt-out requests for future publications where reasonably practicable.
               </li>
             </ul>
           </div>

@@ -75,7 +75,7 @@
     "features": [
       {
         "title": "First Aid Training",
-        "description": "The trainings combines theory, demonstrations, and practical exercises to ensure participants gain real-life emergency response experience. We train schools and organized groups and also hold online trainings."
+        "description": "The trainings combines theory, demonstrations, and practical exercises to ensure participants gain real-life emergency response experience. We train schools and organised groups and also hold online trainings."
       },
       {
         "title": "Emergency Response Services",
@@ -209,7 +209,7 @@
     "title": "About Us",
     "quote": "Prepared youth save lives; showing up, learning, and responding makes all the difference.",
     "vision": "To create a generation of empowered and prepared youth who can respond confidently, responsibly, and effectively to emergencies within their communities.",
-    "mission": "To equip young people with practical emergency preparedness skills, knowledge, and leadership through training, awareness programs, and community engagement, enabling them to respond effectively and support their communities during emergencies and disasters.",
+    "mission": "To equip young people with practical emergency preparedness skills, knowledge, and leadership through training, awareness programmes, and community engagement, enabling them to respond effectively and support their communities during emergencies and disasters.",
     "goal": "To build resilience, enhance the preparedness & response capability of young people & community emergency",
     "objective": "To increase awareness among young people and communities on emergency preparedness",
     "team": [
@@ -289,13 +289,13 @@
   },
   "projects": {
     "title": "Our Work in the Field",
-    "description": "Scouts Emergency Response (SER) runs practical programs that build safety skills, strengthen preparedness, and support communities during emergencies.",
+    "description": "Scouts Emergency Response (SER) runs practical programmes that build safety skills, strengthen preparedness, and support communities during emergencies.",
     "items": [
       {
         "id": "p1",
         "title": "ClickSafe Initiative",
         "focus": "Cybersecurity & Online Safety",
-        "description": "A youth-led program training students and communities on safe internet use, digital responsibility, and protection from online risks.",
+        "description": "A youth-led programme training students and communities on safe internet use, digital responsibility, and protection from online risks.",
         "link": "/contact",
         "linkText": "Partner / Join"
       },
@@ -335,7 +335,7 @@
   },
   "events": {
     "title": "Scouting Milestones & SER Events",
-    "description": "Scouts Emergency Response (SER) honors key Scouting moments and organizes community-centered preparedness events. Join us to learn, serve, and strengthen local readiness.",
+    "description": "Scouts Emergency Response (SER) honours key Scouting moments and organises community-centred preparedness events. Join us to learn, serve, and strengthen local readiness.",
     "items": [
       {
         "id": "e1",
@@ -399,7 +399,7 @@
       },
       {
         "q": "Are there age restrictions to join?",
-        "a": "No. SER welcomes people of all ages who want to contribute to safer communities. Some activities may be organized by age group for training purposes."
+        "a": "No. SER welcomes people of all ages who want to contribute to safer communities. Some activities may be organised by age group for training purposes."
       }
     ]
   },

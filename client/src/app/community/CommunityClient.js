@@ -74,7 +74,7 @@ export default function CommunityClient({ posts }) {
                 <div className="product-card-info">
                   <h3>Volunteer Engagement</h3>
                   <p>
-                    Connect with like-minded volunteers and take part in SER trainings, drills, and outreach programs.
+                    Connect with like-minded volunteers and take part in SER trainings, drills, and outreach programmes.
                   </p>
                 </div>
               </div>
@@ -207,7 +207,7 @@ export default function CommunityClient({ posts }) {
               <div className="join-step">
                 <span className="join-step-number">3</span>
                 <h3>Welcome</h3>
-                <p>You&apos;ll be welcomed into SER as an active member of the organization.</p>
+                <p>You&apos;ll be welcomed into SER as an active member of the organisation.</p>
               </div>
             </div>
           </section>

@@ -180,7 +180,7 @@ function SuperAdminManual() {
       </Section>
 
       <Section title="Managing Role & Custom Tabs (Role Management)" defaultOpen={false}>
-        <p>The <strong>Role Management</strong> tab allows Super Admins to customize individual tab visibility for any user in the system.</p>
+        <p>The <strong>Role Management</strong> tab allows Super Admins to customise individual tab visibility for any user in the system.</p>
         <StepList steps={[
           'Navigate to the "Role Management" tab.',
           'Find the user account in the list.',
@@ -212,7 +212,7 @@ function SuperAdminManual() {
         <h4 style={{ margin: '1rem 0 0.5rem 0' }}>Deleting a Post</h4>
         <StepList steps={[
           'Click the "Delete" (trash) button on the post.',
-          'Confirm the deletion in the dialog.',
+          'Confirm the deletion in the dialogue.',
         ]} />
         <Callout type="danger">Deletion is <strong>permanent</strong>. There is no undo.</Callout>
 
@@ -343,7 +343,7 @@ function SuperAdminManual() {
           <li><strong>Hero Section</strong> — Heading, subheading, CTA button text</li>
           <li><strong>Features</strong> — Service pillar descriptions</li>
           <li><strong>Social Media Posts</strong> — Instagram, TikTok, Facebook embed URLs</li>
-          <li><strong>Partners</strong> — Partner organization names (shown in the marquee)</li>
+          <li><strong>Partners</strong> — Partner organisation names (shown in the marquee)</li>
           <li><strong>Team Members</strong> — Leader profiles (name, role, photo)</li>
           <li><strong>Contact Info</strong> — Email, phone numbers, WhatsApp, social links</li>
         </ul>
@@ -403,7 +403,7 @@ function ProjectLeadManual() {
           'Toggle "Published" to publish or save as draft.',
           'Click "Save" to create the post.',
         ]} />
-        <Callout type="info">Slugs must be unique. The system auto-generates one from the title, but you can customize it.</Callout>
+        <Callout type="info">Slugs must be unique. The system auto-generates one from the title, but you can customise it.</Callout>
 
         <h4 style={{ margin: '1rem 0 0.5rem 0' }}>Editing & Deleting Posts</h4>
         <ul style={{ paddingLeft: '1.5rem' }}>
@@ -528,7 +528,7 @@ function AuthorManual() {
           'From the sidebar, click "Blog Posts".',
           'Click "New Post" or the "+" button.',
           'Fill in the required fields: Title and Body (Markdown).',
-          'Optionally add a cover image and customize the slug.',
+          'Optionally add a cover image and customise the slug.',
           'Toggle "Published" to go live, or leave off to save as draft.',
           'Click "Save".',
         ]} />

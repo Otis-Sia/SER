@@ -505,7 +505,7 @@ export default function MobileImageUploader({
                 <FiUploadCloud size={15} style={{ color: 'var(--primary-color, #129a44)' }} />
                 <span><strong>Drag &amp; drop an image</strong> here, or tap <strong>Upload</strong></span>
               </div>
-              <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Supports JPG, PNG, WebP, GIF (Auto-optimized)</span>
+              <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Supports JPG, PNG, WebP, GIF (Auto-optimised)</span>
             </div>
           </div>
         )}

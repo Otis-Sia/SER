@@ -30,7 +30,7 @@ export default async function Donate() {
       <section className="intro-text text-center" style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1rem' }}>
         <h2 style={{ marginBottom: '1.5rem' }}>Support Our Mission</h2>
         <p style={{ fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-          Scouts Emergency Response (SER) runs practical programs that build safety skills, strengthen preparedness, and support communities during emergencies. By donating, you ensure our volunteers have the kits, training, and resources needed to respond effectively.
+          Scouts Emergency Response (SER) runs practical programmes that build safety skills, strengthen preparedness, and support communities during emergencies. By donating, you ensure our volunteers have the kits, training, and resources needed to respond effectively.
         </p>
 
         <div style={{ backgroundColor: 'var(--white-color)', padding: '2rem', borderRadius: '8px', boxShadow: 'var(--box-shadow)', border: '1px solid var(--border-color, #eaeaea)' }}>

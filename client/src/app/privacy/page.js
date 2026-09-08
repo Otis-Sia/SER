@@ -140,7 +140,7 @@ export default async function PrivacyPage() {
             <Lock size={22} /> 5. Data Security &amp; Storage
           </h2>
           <p>
-            We implement administrative, technical, and physical safeguards to protect your personal data against unauthorized access, loss, or misuse. Access to volunteer databases is restricted strictly to authorized SER administrative personnel.
+            We implement administrative, technical, and physical safeguards to protect your personal data against unauthorised access, loss, or misuse. Access to volunteer databases is restricted strictly to authorised SER administrative personnel.
           </p>
         </section>
 

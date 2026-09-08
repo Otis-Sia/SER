@@ -55,7 +55,7 @@ export default async function Projects() {
       >
         <h1>{siteContent.projects?.title || "Our Projects"}</h1>
         <p className="intro-text">
-          {siteContent.projects?.description || "Explore community emergency initiatives and programs led by Scouts Emergency Response."}
+          {siteContent.projects?.description || "Explore community emergency initiatives and programmes led by Scouts Emergency Response."}
         </p>
       </section>
 
@@ -86,7 +86,7 @@ export default async function Projects() {
       <section className="project-cta text-center">
         <h2>Want SER in Your School or Community?</h2>
         <p className="intro-text">
-          SER works with schools, Scout groups, and community partners to run trainings, workshops, and preparedness programs. Tell us what you need and we&apos;ll plan together.
+          SER works with schools, Scout groups, and community partners to run trainings, workshops, and preparedness programmes. Tell us what you need and we&apos;ll plan together.
         </p>
 
         <div className="cta-actions">

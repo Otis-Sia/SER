@@ -1278,7 +1278,7 @@ export async function getHistoricMilestones() {
     {
       year: "2024",
       title: "SER Emergency Response Initiative",
-      description: "Scouts Emergency Response expands youth-led preparedness and community resilience programs across Kenya.",
+      description: "Scouts Emergency Response expands youth-led preparedness and community resilience programmes across Kenya.",
       active: true
     }
   ];
@@ -1290,7 +1290,7 @@ export async function saveHistoricMilestones(milestones) {
     if (!siteContent.events) {
       siteContent.events = {
         title: "Scouting Milestones & SER Events",
-        description: "Scouts Emergency Response (SER) honors key Scouting moments and organizes community-centered preparedness events. Join us to learn, serve, and strengthen local readiness."
+        description: "Scouts Emergency Response (SER) honours key Scouting moments and organises community-centred preparedness events. Join us to learn, serve, and strengthen local readiness."
       };
     }
     siteContent.events.milestones = milestones;
