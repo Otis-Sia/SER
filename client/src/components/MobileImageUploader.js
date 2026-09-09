@@ -304,6 +304,7 @@ export default function MobileImageUploader({
                     <img
                       src={value}
                       alt="Preview"
+                      referrerPolicy="no-referrer"
                       onError={() => setImgLoadError(true)}
                       onLoad={() => setImgLoadError(false)}
                       style={{
@@ -819,6 +820,7 @@ export default function MobileImageUploader({
             <img
               src={value}
               alt="Full Preview"
+              referrerPolicy="no-referrer"
               style={{
                 maxWidth: '100%',
                 maxHeight: '80vh',

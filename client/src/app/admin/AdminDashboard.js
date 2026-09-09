@@ -1263,6 +1263,7 @@ export default function AdminDashboard({ initialData }) {
                         <img
                           src={itemImage}
                           alt="Thumbnail"
+                          referrerPolicy="no-referrer"
                           className={styles.cardThumbnail}
                           onClick={() => setPreviewModalUrl(itemImage)}
                           style={{ cursor: "pointer" }}
@@ -1594,7 +1595,7 @@ export default function AdminDashboard({ initialData }) {
         <div className={styles.modalOverlay} onClick={() => setPreviewModalUrl(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button className={styles.modalCloseBtn} onClick={() => setPreviewModalUrl(null)}>X</button>
-            <img src={previewModalUrl} alt="Enlarged Preview" className={styles.modalImage} />
+            <img src={previewModalUrl} alt="Enlarged Preview" referrerPolicy="no-referrer" className={styles.modalImage} />
           </div>
         </div>
       )}

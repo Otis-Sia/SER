@@ -80,6 +80,7 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
         <img 
           src={galleryItems[lightboxIndex].imageUrl || galleryItems[lightboxIndex].image || galleryItems[lightboxIndex].image_url} 
           alt={galleryItems[lightboxIndex].title} 
+          referrerPolicy="no-referrer"
           style={{ maxWidth: '95vw', maxHeight: '70vh', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
         />
 
@@ -119,12 +120,14 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
                 href={imgSrc}
                 onClick={(e) => openLightbox(index, e)}
                 title={item.title}
+                rel="noreferrer"
                 style={{ position: 'relative', display: 'block', width: '100%' }}
               >
                 <img 
                   src={imgSrc} 
                   alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
                   loading="lazy"
+                  referrerPolicy="no-referrer"
                   style={{ display: 'block', width: '100%', height: 'auto' }}
                 />
                 <div className="overlay">

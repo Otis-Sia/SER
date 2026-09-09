@@ -1151,6 +1151,7 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
                       <img
                         src={item.imageUrl}
                         alt={item.alt || item.title || "Gallery thumbnail"}
+                        referrerPolicy="no-referrer"
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     </div>
@@ -1328,6 +1329,7 @@ export default function GalleryManager({ currentUserEmail, currentUserRole, show
             <img
               src={previewModalUrl}
               alt="Enlarged gallery preview"
+              referrerPolicy="no-referrer"
               style={{ maxWidth: "100%", maxHeight: "85vh", objectFit: "contain", borderRadius: "8px" }}
             />
           </div>
