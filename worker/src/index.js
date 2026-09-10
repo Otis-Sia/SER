@@ -9,6 +9,7 @@ import productsRouter from "./routes/products.js";
 import galleryRouter from "./routes/gallery.js";
 import membersRouter from "./routes/members.js";
 import reportsRouter from "./routes/reports.js";
+import eventsRouter from "./routes/events.js";
 
 const app = new Hono();
 
@@ -50,6 +51,7 @@ app.get("/", (c) => {
       gallery: "/api/gallery",
       members: "/api/members",
       reports: "/api/reports",
+      events: "/api/events",
     },
   });
 });
@@ -66,6 +68,7 @@ app.route("/api/products", productsRouter);
 app.route("/api/gallery", galleryRouter);
 app.route("/api/members", membersRouter);
 app.route("/api/reports", reportsRouter);
+app.route("/api/events", eventsRouter);
 
 // 404 Handler
 app.notFound((c) => {
