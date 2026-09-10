@@ -126,8 +126,8 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
                 <img 
                   src={imgSrc} 
                   alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
+                  loading="lazy"
                   referrerPolicy="no-referrer"
-                  style={{ display: 'block', width: '100%', height: 'auto' }}
                 />
                 <div className="overlay">
                   <span className="overlay-title">{item.title}</span>

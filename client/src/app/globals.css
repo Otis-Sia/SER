@@ -936,13 +936,12 @@ footer a:focus-visible {
 /* Gallery */
 
 .gallery-grid {
-    columns: 3 280px;
-    column-gap: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
 }
 
 .gallery-item {
-    break-inside: avoid;
-    margin-bottom: 1.25rem;
     background-color: var(--secondary-color);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -963,9 +962,9 @@ footer a:focus-visible {
 
 .gallery-item img {
     width: 100%;
-    height: auto;
+    aspect-ratio: 4 / 3;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     transition: transform 0.5s var(--ease-out-quart);
 }
 
@@ -1028,9 +1027,6 @@ footer a:focus-visible {
 }
 
 @media (max-width: 900px) {
-    .gallery-grid {
-        columns: 2 200px;
-    }
     /* Show overlay always on touch devices */
     .gallery-item .overlay {
         opacity: 1;
@@ -1039,9 +1035,7 @@ footer a:focus-visible {
 }
 
 @media (max-width: 600px) {
-    .gallery-grid {
-        columns: 1;
-    }
+    /* CSS Grid handles the responsive columns now */
 }
 
 /* Simple FAQ block styling */
