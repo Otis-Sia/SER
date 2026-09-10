@@ -1035,7 +1035,9 @@ footer a:focus-visible {
 }
 
 @media (max-width: 600px) {
-    /* CSS Grid handles the responsive columns now */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Simple FAQ block styling */
