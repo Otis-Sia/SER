@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { ShieldCheck, Lock, Database, Eye, Share2, UserCheck, Mail } from 'lucide-react';
+import { ShieldCheck, Lock, Database, Eye, Share2, UserCheck, Mail, HeartHandshake } from 'lucide-react';
 import { getSiteContent } from '../admin/actions';
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
-  const title = 'Privacy Policy | Scouts Emergency Response';
-  const description = 'Privacy Policy for Scouts Emergency Response (SER). Learn how we collect, protect, and handle volunteer information, media content, and personal data.';
+  const title = 'Privacy Policy & Child Protection | Scouts Emergency Response';
+  const description = 'Privacy Policy and Child Protection Statement for Scouts Emergency Response (SER). Learn how we collect, protect, and handle volunteer information, child safeguarding, media content, and personal data.';
 
   return {
     title,
@@ -44,7 +44,7 @@ export default async function PrivacyPage() {
           <ShieldCheck size={18} /> Official SER Privacy Statement
         </span>
         <h1 style={{ fontSize: 'var(--font-size-h1)', color: 'var(--text-color)', marginBottom: '0.75rem', fontWeight: 700 }}>
-          Privacy Policy
+          Privacy Policy &amp; Child Protection
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
           Effective Date / Last Updated: <strong>{lastUpdated}</strong>
@@ -81,6 +81,7 @@ export default async function PrivacyPage() {
             <li><strong>Emergency Contact Information:</strong> Name and phone number of your designated Next of Kin.</li>
             <li><strong>Scouting &amp; Qualification Data:</strong> Scout crew details, education level, first aid certifications, disaster management trainings, and availability status.</li>
             <li><strong>Media &amp; Visual Content:</strong> Photographs, video recordings, and audio taken during SER drills, training sessions, deployments, and community events.</li>
+            <li><strong>Children &amp; Minors&apos; Data:</strong> When young scouts (under 18 years of age) participate in youth programs, personal information is collected only with the knowledge and explicit consent of their parent or legal guardian.</li>
           </ul>
         </section>
 
@@ -109,17 +110,48 @@ export default async function PrivacyPage() {
             As detailed in our <Link href="/terms" style={{ fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</Link>, SER captures images and media during public activities to highlight community response efforts.
           </p>
           <p style={{ marginTop: '0.75rem' }}>
-            Photos and videos featuring volunteers may be displayed on SER's digital channels and marketing materials. We refrain from publishing sensitive personal details alongside photos without prior permission.
+            Photos and videos featuring volunteers may be displayed on SER&apos;s digital channels and marketing materials. We refrain from publishing sensitive personal details alongside photos without prior permission. Media depicting children is strictly regulated by our Child Protection Policy set out in Section 4 below.
           </p>
           <div style={{ background: '#f8fafc', padding: '1rem 1.25rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginTop: '1rem', fontSize: '0.95rem' }}>
             <strong>Opt-Out Rights:</strong> If you prefer not to have your photograph published on social media or our website, please notify our administrative team in writing at <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a> or inform event coordinators on site.
           </div>
         </section>
 
-        {/* Section 4 */}
+        {/* Section 4 - CHILD PROTECTION POLICY */}
+        <section id="child-protection" style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <HeartHandshake size={22} /> 4. Child Protection Policy &amp; Minors&apos; Media Privacy
+          </h2>
+          <p>
+            Scouts Emergency Response is dedicated to protecting the rights, safety, and privacy of all children (individuals under 18 years of age) participating in our drills, youth trainings, and scouting operations. Under the <em>Kenya Children Act 2022</em>, the <em>Kenya Data Protection Act 2019</em>, and Scouting&apos;s <em>Safe from Harm</em> guidelines, we maintain the highest ethical standards regarding photographs and recordings of children:
+          </p>
+
+          <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginTop: '1rem' }}>
+            <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '1.05rem' }}>Ethical Standards for Children&apos;s Images &amp; Media:</h4>
+            <ul style={{ paddingLeft: '1.5rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.95rem' }}>
+              <li>
+                <strong>Obtained Solely with Prior Permission:</strong> Visual media (photographs, videos, and audio) depicting any child is collected and published exclusively after securing explicit prior consent from a parent, legal guardian, or authorized scout/school authority.
+              </li>
+              <li>
+                <strong>Ethical &amp; Dignified Portrayal:</strong> Children are portrayed respectfully, properly attired, and in constructive, educational situations—such as learning first aid, participating in safety drills, and engaging in youth leadership. We never publish images of children in distress, pain, vulnerable medical scenarios, or situations that could lead to ridicule or exploitation.
+              </li>
+              <li>
+                <strong>Child Assent &amp; Right to Refuse:</strong> In addition to parental permission, the child is informed about the photo or video in an age-appropriate manner. If a child expresses reluctance or does not want their picture taken, their refusal is honored immediately without pressure.
+              </li>
+              <li>
+                <strong>Identity &amp; Geolocation Concealment:</strong> To prevent online tracking or child exploitation, full names, home addresses, phone numbers, school locations, or GPS metadata are never published alongside photos of minors. Only first names and general troop designations may appear when appropriate.
+              </li>
+              <li>
+                <strong>Right to Immediate Image Deletion:</strong> Parents, guardians, or children may request the immediate deletion and removal of any published photo or video from SER websites and social media at any time by contacting our team at <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a>.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Section 5 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Share2 size={22} /> 4. Data Sharing &amp; Third-Party Disclosure
+            <Share2 size={22} /> 5. Data Sharing &amp; Third-Party Disclosure
           </h2>
           <p>
             SER strictly respects your privacy. <strong>We do NOT sell, rent, or trade your personal information to commercial third parties.</strong>
@@ -134,20 +166,20 @@ export default async function PrivacyPage() {
           </ul>
         </section>
 
-        {/* Section 5 */}
+        {/* Section 6 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Lock size={22} /> 5. Data Security &amp; Storage
+            <Lock size={22} /> 6. Data Security &amp; Storage
           </h2>
           <p>
             We implement administrative, technical, and physical safeguards to protect your personal data against unauthorised access, loss, or misuse. Access to volunteer databases is restricted strictly to authorised SER administrative personnel.
           </p>
         </section>
 
-        {/* Section 6 */}
+        {/* Section 7 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <UserCheck size={22} /> 6. Your Rights
+            <UserCheck size={22} /> 7. Your Rights &amp; Parental Rights
           </h2>
           <p>
             Under data protection law, you have the right to:
@@ -156,20 +188,22 @@ export default async function PrivacyPage() {
             <li><strong>Access &amp; Review:</strong> Request a copy of the personal data we hold about you.</li>
             <li><strong>Correction &amp; Update:</strong> Update your registration details at any time via our <Link href="/update-details" style={{ fontWeight: 600, textDecoration: 'underline' }}>Update Details page</Link>.</li>
             <li><strong>Deletion / Deregistration:</strong> Request the removal or deletion of your profile from our active database.</li>
+            <li><strong>Parental Rights:</strong> Parents and legal guardians possess full rights to inspect, update, or request deletion of personal information and photographs of their minor children held by SER.</li>
           </ul>
         </section>
 
-        {/* Section 7 */}
+        {/* Section 8 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Mail size={22} /> 7. Contact Us
+            <Mail size={22} /> 8. Contact Us
           </h2>
           <p>
-            If you have questions regarding this Privacy Policy or wish to exercise your privacy rights, contact us at:
+            If you have questions regarding this Privacy Policy, Child Protection standards, or wish to exercise your privacy rights, contact us at:
           </p>
           <div style={{ marginTop: '1rem', background: '#f8fafc', padding: '1rem 1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.95rem' }}>
             <p style={{ margin: '0 0 0.4rem 0' }}><strong>Scouts Emergency Response Privacy Officer</strong></p>
             <p style={{ margin: '0 0 0.4rem 0' }}>Email: <a href="mailto:info@seresponse.org">info@seresponse.org</a></p>
+            <p style={{ margin: '0 0 0.4rem 0' }}>Child Safeguarding Inquiries: <a href="mailto:safeguarding@seresponse.org">safeguarding@seresponse.org</a> / <a href="mailto:info@seresponse.org">info@seresponse.org</a></p>
             <p style={{ margin: '0 0 0.4rem 0' }}>Phone / WhatsApp: <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer">+254 742 435 314</a></p>
           </div>
         </section>

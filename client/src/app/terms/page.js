@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { ShieldCheck, Camera, UserCheck, Lock, FileText, AlertCircle, HelpCircle } from 'lucide-react';
+import { ShieldCheck, Camera, UserCheck, Lock, FileText, AlertCircle, HelpCircle, HeartHandshake } from 'lucide-react';
 import { getSiteContent } from '../admin/actions';
 
 export async function generateMetadata() {
   const siteContent = await getSiteContent();
-  const title = 'Terms of Service & Media Release | Scouts Emergency Response';
-  const description = 'Official Terms of Service, Volunteer Agreement, and Media & Photo Release Policy for Scouts Emergency Response (SER).';
+  const title = 'Terms of Service, Media Release & Child Protection | Scouts Emergency Response';
+  const description = 'Official Terms of Service, Volunteer Agreement, Media Release Policy, and Child Protection Policy for Scouts Emergency Response (SER).';
 
   return {
     title,
@@ -44,14 +44,14 @@ export default async function TermsPage() {
           <ShieldCheck size={18} /> Official SER Legal Agreement
         </span>
         <h1 style={{ fontSize: 'var(--font-size-h1)', color: 'var(--text-color)', marginBottom: '0.75rem', fontWeight: 700 }}>
-          Terms of Service &amp; Media Release
+          Terms of Service, Media Release &amp; Child Protection
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
           Effective Date / Last Updated: <strong>{lastUpdated}</strong>
         </p>
       </div>
 
-      {/* Important Callout Box for Media Release */}
+      {/* Important Callout Box for Media Release & Child Protection */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(18, 154, 68, 0.08) 0%, rgba(18, 154, 68, 0.02) 100%)',
         borderLeft: '4px solid var(--primary-color)',
@@ -64,10 +64,10 @@ export default async function TermsPage() {
           <Camera size={24} style={{ color: 'var(--primary-color)', flexShrink: 0, marginTop: '2px' }} />
           <div>
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--primary-color)', fontWeight: 600 }}>
-              Key Highlight: Photo &amp; Media Release Consent
+              Key Highlight: Photo Release &amp; Child Protection Policy
             </h3>
             <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.6' }}>
-              By registering as a volunteer or participating in Scouts Emergency Response (SER) activities, you grant SER explicit authorisation to capture and publish photographs, videos, and media content featuring you across our official social media channels, website, press publications, and training materials.
+              By registering as a volunteer or participating in Scouts Emergency Response (SER) activities, you grant SER authorisation to capture and publish photographs, videos, and media content featuring you across our official platforms. For all children and minors (under 18 years of age), media capture and publication are strictly governed by our Child Protection Policy, requiring prior parental/guardian permission and ethical, dignified depiction.
             </p>
           </div>
         </div>
@@ -135,16 +135,53 @@ export default async function TermsPage() {
                 <strong>Waiver of Inspection:</strong> You waive any right to inspect or approve the finished photo, video, or publication prior to its use.
               </li>
               <li>
+                <strong>Protection of Minors &amp; Children:</strong> Any capture, publication, or broadcast of photographs, videos, or audio recordings depicting children (individuals under 18 years of age) is strictly governed by our Child Protection Policy set out in Section 4 below, requiring prior parental/guardian consent and ethical depiction.
+              </li>
+              <li>
                 <strong>Opt-Out / Revocation Procedure:</strong> If you have specific privacy or personal safety concerns regarding media publication, you may submit a written request to <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a> detailing your request. SER will endeavour to honour written opt-out requests for future publications where reasonably practicable.
               </li>
             </ul>
           </div>
         </section>
 
-        {/* Section 4 */}
+        {/* Section 4 - CHILD PROTECTION POLICY */}
+        <section id="child-protection" style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <HeartHandshake size={22} /> 4. Child Protection Policy &amp; Ethical Photography of Minors
+          </h2>
+          <p>
+            Scouts Emergency Response (SER) holds an uncompromising commitment to the safeguarding, dignity, and welfare of children and young people. In alignment with the World Organization of the Scout Movement (WOSM) <em>Safe from Harm</em> framework, the <em>Kenya Children Act 2022</em>, and the <em>Kenya Data Protection Act 2019</em>, we mandate strict safeguards regarding the ethical use of children&apos;s pictures and personal data.
+          </p>
+          
+          <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginTop: '1rem' }}>
+            <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '1.05rem' }}>Child Safeguarding &amp; Ethical Photography Standards:</h4>
+            <ul style={{ paddingLeft: '1.5rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.95rem' }}>
+              <li>
+                <strong>Mandatory Parental &amp; Guardian Consent:</strong> No photograph, video recording, or audio interview of any child (under 18 years of age) will be captured, published, or distributed across SER digital platforms, social media, or publications without prior, verifiable permission from a parent, legal guardian, or designated school/scout authority.
+              </li>
+              <li>
+                <strong>Child Assent &amp; Right to Refuse:</strong> In addition to parental permission, every child is informed in an age-appropriate manner about the purpose of any photography or filming. A child&apos;s personal preference is always paramount. If a child expresses reluctance or does not wish to be photographed, their decision is respected immediately and without condition.
+              </li>
+              <li>
+                <strong>Ethical &amp; Dignified Representation:</strong> Images and videos featuring children must portray them respectfully, appropriately attired, and in positive, empowering settings—such as learning first aid techniques, teamwork exercises, community disaster preparedness, and scout leadership activities. SER strictly prohibits taking or publishing pictures of children in distress, illness, vulnerable injury simulations, or any context that could compromise their dignity or well-being.
+              </li>
+              <li>
+                <strong>Identity &amp; Location Safeguarding:</strong> To protect children from cyberbullying, online grooming, or unauthorized contact, SER strictly prohibits publishing identifying personal information alongside pictures of minors. Full surnames, residential addresses, contact telephone numbers, personal email addresses, and specific school schedules or exact locations are never disclosed. Where appropriate, only first names and general troop/county designations may be used.
+              </li>
+              <li>
+                <strong>Supervised &amp; Authorized Media Capture:</strong> Only authorized SER media officers and vetted adult leaders may photograph or film activities involving youth members. Media capture must occur in open, visible, and supervised group settings; individual, private, or unsupervised photography of minors is strictly prohibited.
+              </li>
+              <li>
+                <strong>Consent Revocation &amp; Rapid Image Takedown:</strong> Parents, legal guardians, or the child have the right to revoke consent or request the immediate removal and deletion of any photograph or video featuring the minor from SER platforms. Written requests submitted to <a href="mailto:info@seresponse.org" style={{ fontWeight: 600 }}>info@seresponse.org</a> or our Child Safeguarding team are treated with urgency and executed promptly.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Section 5 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Lock size={22} /> 4. Data Protection &amp; Confidentiality
+            <Lock size={22} /> 5. Data Protection &amp; Confidentiality
           </h2>
           <p>
             Your personal information (such as contact numbers, ID numbers, blood group, and emergency contact details) is handled with strict confidentiality in accordance with data privacy standards and the <em>Kenya Data Protection Act 2019</em>.
@@ -154,10 +191,10 @@ export default async function TermsPage() {
           </p>
         </section>
 
-        {/* Section 5 */}
+        {/* Section 6 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <AlertCircle size={22} /> 5. Health, Safety &amp; Limitation of Liability
+            <AlertCircle size={22} /> 6. Health, Safety &amp; Limitation of Liability
           </h2>
           <p>
             Emergency response, first aid training, field simulations, and disaster preparedness activities carry inherent physical risks.
@@ -170,17 +207,18 @@ export default async function TermsPage() {
           </ul>
         </section>
 
-        {/* Section 6 */}
+        {/* Section 7 */}
         <section style={{ background: 'var(--bg-card, #ffffff)', padding: '1.75rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <h2 style={{ fontSize: '1.35rem', color: 'var(--primary-color)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <HelpCircle size={22} /> 6. Contact &amp; Inquiries
+            <HelpCircle size={22} /> 7. Contact &amp; Inquiries
           </h2>
           <p>
-            If you have questions, feedback, or concerns regarding these Terms of Service or Media Release policies, please reach out to our administration team:
+            If you have questions, feedback, or concerns regarding these Terms of Service, Media Release, or Child Protection policies, please reach out to our administration team:
           </p>
           <div style={{ marginTop: '1rem', background: '#f8fafc', padding: '1rem 1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.95rem' }}>
             <p style={{ margin: '0 0 0.4rem 0' }}><strong>Scouts Emergency Response (SER)</strong></p>
             <p style={{ margin: '0 0 0.4rem 0' }}>Email: <a href="mailto:info@seresponse.org">info@seresponse.org</a></p>
+            <p style={{ margin: '0 0 0.4rem 0' }}>Child Safeguarding Inquiries: <a href="mailto:safeguarding@seresponse.org">safeguarding@seresponse.org</a> / <a href="mailto:info@seresponse.org">info@seresponse.org</a></p>
             <p style={{ margin: '0 0 0.4rem 0' }}>Phone / WhatsApp: <a href="https://wa.me/254742435314" target="_blank" rel="noopener noreferrer">+254 742 435 314</a></p>
             <p style={{ margin: 0 }}>Website: <a href="https://seresponse.org" target="_blank" rel="noopener noreferrer">https://seresponse.org</a></p>
           </div>
