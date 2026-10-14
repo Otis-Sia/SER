@@ -3,6 +3,87 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
+/**
+ * Returns optimized thumbnail URL for external image CDNs (e.g. Google Photos lh3)
+ * while preserving original URLs for direct uploads / S3.
+ */
+function getThumbnailUrl(url, targetWidth = 800) {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com')) {
+    return url.replace(/=w\d+.*$/, '') + `=w${targetWidth}`;
+  }
+  return url;
+}
+
+/**
+ * Returns responsive srcset for Google Photos CDN
+ */
+function getSrcSet(url) {
+  if (!url || !url.includes('googleusercontent.com')) return undefined;
+  const baseUrl = url.replace(/=w\d+.*$/, '');
+  return `${baseUrl}=w400 400w, ${baseUrl}=w800 800w, ${baseUrl}=w1200 1200w`;
+}
+
+function GalleryImageCard({ item, index, openLightbox }) {
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const rawSrc = item.imageUrl || item.image || item.image_url;
+  const thumbSrc = hasError ? rawSrc : getThumbnailUrl(rawSrc, 800);
+  const srcSet = hasError ? undefined : getSrcSet(rawSrc);
+
+  // Eager load first 4 items so users entering / scrolling to gallery see photos immediately
+  const isEager = index < 4;
+  const isHighPriority = index < 2;
+
+  return (
+    <div className={`gallery-item ${isLoaded ? 'is-loaded' : ''}`} key={item.id || index}>
+      <a
+        href={rawSrc}
+        onClick={(e) => openLightbox(index, e)}
+        title={item.title || 'SER Event Photo'}
+        rel="noreferrer"
+        style={{ position: 'relative', display: 'block', width: '100%', height: '100%' }}
+      >
+        <img
+          src={thumbSrc}
+          srcSet={srcSet}
+          sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
+          alt={item.alt || item.title || `SER Event photo ${index + 1}`}
+          width={800}
+          height={600}
+          loading={isEager ? 'eager' : 'lazy'}
+          fetchPriority={isHighPriority ? 'high' : 'auto'}
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onLoad={() => setIsLoaded(true)}
+          onError={() => {
+            if (!hasError) setHasError(true);
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.3s ease'
+          }}
+        />
+        <div className="overlay">
+          {item.title && <span className="overlay-title">{item.title}</span>}
+          {item.description && (
+            <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
+              {item.description}
+            </p>
+          )}
+          <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
+            View Image
+          </span>
+        </div>
+      </a>
+    </div>
+  );
+}
+
 export default function ProjectGalleryLightbox({ galleryItems }) {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
@@ -51,7 +132,7 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
     <div style={{
       position: 'fixed',
       top: 0, left: 0, width: '100%', height: '100%',
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: 'rgba(0,0,0,0.75)',
       zIndex: 999999,
       display: 'flex',
       alignItems: 'center',
@@ -61,10 +142,11 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
       overflowY: 'auto',
       padding: '2rem 0'
     }} onClick={closeLightbox}>
-      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', zIndex: 10001 }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', zIndex: 10001, maxWidth: '95vw', maxHeight: '75vh' }} onClick={(e) => e.stopPropagation()}>
         <button 
           onClick={closeLightbox}
           style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', zIndex: 10004, borderRadius: '50%', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+          aria-label="Close image preview"
         >
           <X size={24} />
         </button>
@@ -72,6 +154,7 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
           <button 
             onClick={prevImage}
             style={{ position: 'absolute', left: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10003, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+            aria-label="Previous image"
           >
             <ChevronLeft size={32} />
           </button>
@@ -79,29 +162,30 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
         
         <img 
           src={galleryItems[lightboxIndex].imageUrl || galleryItems[lightboxIndex].image || galleryItems[lightboxIndex].image_url} 
-          alt={galleryItems[lightboxIndex].title} 
+          alt={galleryItems[lightboxIndex].title || 'Enlarged project photo'} 
           referrerPolicy="no-referrer"
-          style={{ maxWidth: '95vw', maxHeight: '70vh', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+          style={{ maxWidth: '92vw', maxHeight: '65vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
         />
 
         {galleryItems.length > 1 && (
           <button 
             onClick={nextImage}
             style={{ position: 'absolute', right: '15px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: '12px', zIndex: 10003, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+            aria-label="Next image"
           >
             <ChevronRight size={32} />
           </button>
         )}
       </div>
 
-      <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '40px 20px 25px', background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10002 }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '30px 20px 20px', background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10002 }} onClick={(e) => e.stopPropagation()}>
         {galleryItems[lightboxIndex].title && (
           <div style={{ color: '#fff', textAlign: 'center', fontSize: '1.25rem', fontWeight: '600', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
             {galleryItems[lightboxIndex].title}
           </div>
         )}
         {galleryItems[lightboxIndex].description && (
-          <div style={{ color: 'rgba(255,255,255,0.95)', textAlign: 'center', marginTop: '8px', fontSize: '0.95rem', maxWidth: '800px', lineHeight: 1.5, textShadow: '0 1px 2px rgba(0,0,0,0.8)', overflowY: 'auto', maxHeight: '20vh' }}>
+          <div style={{ color: 'rgba(255,255,255,0.95)', textAlign: 'center', marginTop: '8px', fontSize: '0.95rem', maxWidth: '800px', lineHeight: 1.5, textShadow: '0 1px 2px rgba(0,0,0,0.8)', overflowY: 'auto', maxHeight: '18vh' }}>
             {galleryItems[lightboxIndex].description}
           </div>
         )}
@@ -112,38 +196,14 @@ export default function ProjectGalleryLightbox({ galleryItems }) {
   return (
     <>
       <div className="gallery-grid">
-        {galleryItems.map((item, index) => {
-          const imgSrc = item.imageUrl || item.image || item.image_url;
-          return (
-            <div className="gallery-item" key={item.id || index}>
-              <a
-                href={imgSrc}
-                onClick={(e) => openLightbox(index, e)}
-                title={item.title}
-                rel="noreferrer"
-                style={{ position: 'relative', display: 'block', width: '100%' }}
-              >
-                <img 
-                  src={imgSrc} 
-                  alt={item.alt || item.title || `SER Event photo ${index + 1}`} 
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="overlay">
-                  <span className="overlay-title">{item.title}</span>
-                  {item.description && (
-                    <p className="overlay-desc" style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.9 }}>
-                      {item.description}
-                    </p>
-                  )}
-                  <span className="overlay-action" style={{ marginTop: '0.5rem' }}>
-                    View Image
-                  </span>
-                </div>
-              </a>
-            </div>
-          );
-        })}
+        {galleryItems.map((item, index) => (
+          <GalleryImageCard
+            key={item.id || index}
+            item={item}
+            index={index}
+            openLightbox={openLightbox}
+          />
+        ))}
       </div>
 
       {typeof document !== 'undefined' && lightbox && createPortal(lightbox, document.body)}

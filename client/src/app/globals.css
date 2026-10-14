@@ -942,11 +942,13 @@ footer a:focus-visible {
 }
 
 .gallery-item {
-    background-color: var(--secondary-color);
+    background-color: var(--light-gray-color, #f2f2f2);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     overflow: hidden;
     position: relative;
+    aspect-ratio: 4 / 3;
+    min-height: 220px;
     transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 
@@ -958,10 +960,13 @@ footer a:focus-visible {
 .gallery-item a {
     display: block;
     width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .gallery-item img {
     width: 100%;
+    height: 100%;
     aspect-ratio: 4 / 3;
     display: block;
     object-fit: cover;
@@ -987,6 +992,7 @@ footer a:focus-visible {
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
 }
 
 .gallery-item:hover .overlay {
@@ -1027,16 +1033,20 @@ footer a:focus-visible {
 }
 
 @media (max-width: 900px) {
-    /* Show overlay always on touch devices */
+    /* Show overlay always on touch devices with compact padding */
     .gallery-item .overlay {
         opacity: 1;
         transform: translateY(0);
+        padding: 1rem 0.9rem;
     }
 }
 
 @media (max-width: 600px) {
     .gallery-grid {
         grid-template-columns: 1fr;
+    }
+    .gallery-item {
+        min-height: 240px;
     }
 }
 
