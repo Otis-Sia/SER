@@ -32,9 +32,9 @@ function GalleryImageCard({ item, index, openLightbox }) {
   const thumbSrc = hasError ? rawSrc : getThumbnailUrl(rawSrc, 800);
   const srcSet = hasError ? undefined : getSrcSet(rawSrc);
 
-  // Eager load first 4 items so users entering / scrolling to gallery see photos immediately
-  const isEager = index < 4;
-  const isHighPriority = index < 2;
+  // Eager load first 8 items so users entering / scrolling to gallery see photos immediately
+  const isEager = index < 8;
+  const isHighPriority = index < 4;
 
   return (
     <div className={`gallery-item ${isLoaded ? 'is-loaded' : ''}`} key={item.id || index}>
@@ -64,8 +64,7 @@ function GalleryImageCard({ item, index, openLightbox }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease'
+            display: 'block'
           }}
         />
         <div className="overlay">

@@ -935,6 +935,12 @@ footer a:focus-visible {
 
 /* Gallery */
 
+.gallery-section,
+#gallery {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
