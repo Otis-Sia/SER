@@ -10,7 +10,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 function getThumbnailUrl(url, targetWidth = 800) {
   if (!url) return '';
   if (url.includes('googleusercontent.com')) {
-    return url.replace(/=w\d+.*$/, '') + `=w${targetWidth}`;
+    return url.replace(/=[^/]*$/, '') + `=w${targetWidth}`;
   }
   return url;
 }
@@ -20,7 +20,7 @@ function getThumbnailUrl(url, targetWidth = 800) {
  */
 function getSrcSet(url) {
   if (!url || !url.includes('googleusercontent.com')) return undefined;
-  const baseUrl = url.replace(/=w\d+.*$/, '');
+  const baseUrl = url.replace(/=[^/]*$/, '');
   return `${baseUrl}=w400 400w, ${baseUrl}=w800 800w, ${baseUrl}=w1200 1200w`;
 }
 

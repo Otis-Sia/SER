@@ -936,7 +936,9 @@ footer a:focus-visible {
 /* Gallery */
 
 .gallery-section,
-#gallery {
+.gallery-section.reveal,
+#gallery,
+#gallery.reveal {
     opacity: 1 !important;
     transform: none !important;
 }
@@ -1039,11 +1041,26 @@ footer a:focus-visible {
 }
 
 @media (max-width: 900px) {
-    /* Show overlay always on touch devices with compact padding */
+    /* Show compact bottom overlay on touch devices so photos stay prominent */
     .gallery-item .overlay {
         opacity: 1;
         transform: translateY(0);
-        padding: 1rem 0.9rem;
+        padding: 0.6rem 0.8rem;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.25) 70%, transparent 100%);
+        max-height: 40%;
+        justify-content: flex-end;
+    }
+
+    .gallery-item .overlay-title {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gallery-item .overlay-desc,
+    .gallery-item .overlay-action {
+        display: none !important;
     }
 }
 
